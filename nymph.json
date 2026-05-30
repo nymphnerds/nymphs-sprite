@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -48,6 +48,7 @@
     "open_workflows": "scripts/nymphs_sprite_open_workflows.sh",
     "fetch_assets": "scripts/nymphs_sprite_fetch_assets.sh",
     "fetch_lora": "scripts/nymphs_sprite_fetch_lora.sh",
+    "select_lora": "scripts/nymphs_sprite_select_lora.sh",
     "fetch_controlnet": "scripts/nymphs_sprite_fetch_controlnet.sh",
     "fetch_depth_anything": "scripts/nymphs_sprite_fetch_depth_anything.sh",
     "delete_models": "scripts/nymphs_sprite_delete_models.sh",
@@ -67,6 +68,7 @@
     "generate_directions",
     "fetch_assets",
     "fetch_lora",
+    "select_lora",
     "fetch_controlnet",
     "fetch_depth_anything",
     "delete_models",
@@ -236,6 +238,7 @@
     "v0.1.4 consolidates LoRA, ControlNet, and Depth downloads into one module-owned Asset Fetch dropdown.",
     "v0.1.5 makes Complete Sprite Package fetch both LoRAs, with mks0813 selected by default until the UI exposes LoRA switching.",
     "v0.1.6 routes Asset Fetch through the existing fetch_lora capability so older Manager sessions do not grey out the submit button.",
-    "v0.1.7 rebuilds the module-owned UI from the Nymphs Image rail/stage pattern, with a generated sprite preview, contact-sheet thumbnails, compact status, and no dashboard-card layout."
+    "v0.1.7 rebuilds the module-owned UI from the Nymphs Image rail/stage pattern, with a generated sprite preview, contact-sheet thumbnails, compact status, and no dashboard-card layout.",
+    "v0.1.8 removes asset download controls from the custom generation UI, keeps asset fetch in the module detail action group, adds run-level downloaded-LoRA selection, and restores the Nymphs Image strip organizer/folder picker pattern."
   ]
 }

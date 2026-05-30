@@ -460,6 +460,103 @@
       font-size: 9.8px;
     }
 
+    .strip-browser {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .folder-select {
+      height: 28px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+    }
+
+    .folder-menu {
+      position: relative;
+      width: 34px;
+      height: 28px;
+      flex: 0 0 34px;
+      display: inline-grid;
+      place-items: center;
+      align-self: center;
+      min-width: 34px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+
+    .folder-menu summary {
+      width: 34px;
+      height: 28px;
+      box-sizing: border-box;
+      display: grid;
+      place-items: center;
+      margin: 0;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 5px;
+      background: rgba(15, 26, 28, 0.85);
+      color: var(--cyan);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+      list-style: none;
+    }
+    .folder-menu summary::-webkit-details-marker { display: none; }
+    .folder-menu summary::before { content: ""; }
+
+    .folder-menu-panel {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      z-index: 6;
+      width: 210px;
+      display: grid;
+      gap: 6px;
+      padding: 8px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: rgba(7, 16, 15, 0.98);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.36);
+    }
+
+    .folder-menu-panel button {
+      width: 100%;
+      min-height: 28px;
+      justify-content: flex-start;
+      padding: 0 9px;
+      font-size: 9.8px;
+    }
+
+    .strip-select-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 6px;
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    .strip-select-actions button {
+      min-height: 28px;
+      padding: 0 9px;
+      font-size: 9.8px;
+    }
+
+    .selection-count {
+      color: var(--dim);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
     .gallery {
       display: grid;
       grid-auto-flow: column;
@@ -481,9 +578,11 @@
       gap: 5px;
       cursor: pointer;
       min-width: 0;
+      position: relative;
     }
     .thumb::before { content: ""; display: none; }
     .thumb.selected { border-color: var(--green); }
+    .thumb.checked { border-color: var(--cyan); }
     .thumb img {
       width: 100%;
       height: 60px;
@@ -500,6 +599,29 @@
       text-overflow: ellipsis;
     }
     .thumb.selected span { color: var(--green); }
+
+    .thumb-check {
+      position: absolute;
+      top: 7px;
+      left: 7px;
+      width: 18px;
+      height: 18px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(41, 230, 218, 0.72);
+      border-radius: 4px;
+      background: rgba(2, 8, 7, 0.86);
+      z-index: 3;
+      cursor: pointer;
+    }
+
+    .thumb-check input {
+      width: 14px;
+      height: 14px;
+      accent-color: var(--green);
+      margin: 0;
+      cursor: pointer;
+    }
 
     pre {
       max-height: 130px;
@@ -569,24 +691,6 @@
       </section>
 
       <section class="section">
-        <div class="section-title"><span>Assets</span><span id="asset-chip">needed</span></div>
-        <div class="field">
-          <label for="asset-source">Download</label>
-          <select id="asset-source">
-            <option value="complete_sprite">Complete Sprite Package</option>
-            <option value="mks0813_pixel_art">LoRA: mks0813 Z-Image Turbo Pixel Art</option>
-            <option value="tarn59_pixel_art">LoRA: tarn59 Pixel Art Style</option>
-            <option value="controlnet_union">Staged ControlNet Union</option>
-            <option value="depth_anything_small">Depth Anything V2 Small</option>
-          </select>
-        </div>
-        <div class="command-row two no-top">
-          <button id="fetch-assets" type="button">Fetch</button>
-          <button id="open-lora" type="button">Open LoRA</button>
-        </div>
-      </section>
-
-      <section class="section">
         <div class="section-title"><span>Prompt</span><span>8-way</span></div>
         <div class="field">
           <label for="subject-id">Subject ID</label>
@@ -606,7 +710,7 @@
           <div class="field"><label for="height">Height</label><input id="height" type="number" min="256" max="2048" step="64" value="1024"></div>
           <div class="field"><label for="steps">Steps</label><input id="steps" type="number" min="1" max="80" value="9"></div>
           <div class="field"><label for="seed">Seed</label><input id="seed" type="number" value="123456789"></div>
-          <div class="field wide"><label for="lora-path">LoRA Path</label><input id="lora-path" maxlength="512" placeholder="Selected module LoRA"></div>
+          <div class="field wide"><label for="lora-choice">LoRA</label><select id="lora-choice"></select></div>
           <div class="field"><label for="lora-trigger">Trigger</label><input id="lora-trigger" maxlength="80" value="pxlstl"></div>
           <div class="field"><label for="lora-scale">Scale</label><input id="lora-scale" type="number" min="0" max="2" step="0.05" value="0.85"></div>
         </div>
@@ -658,10 +762,26 @@
           <div class="strip-controls">
             <button id="strip-prev" type="button" title="Previous output">&lt;</button>
             <button id="strip-next" type="button" title="Next output">&gt;</button>
-            <button id="open-outputs" type="button">Open</button>
-            <button id="open-logs" type="button">Logs</button>
           </div>
         </div>
+        <div class="strip-browser">
+          <select class="folder-select" id="output-folder" aria-label="Output folder"></select>
+          <div class="strip-select-actions">
+            <details class="folder-menu" id="folder-menu">
+              <summary aria-label="Folder actions" title="Folder actions">...</summary>
+              <div class="folder-menu-panel">
+                <button id="choose-folder" type="button">Choose Folder</button>
+                <button id="open-outputs" type="button">Open Outputs</button>
+                <button id="open-logs" type="button">Logs</button>
+              </div>
+            </details>
+            <span class="selection-count" id="selection-count">0 selected</span>
+            <button id="select-visible" type="button">Select</button>
+            <button id="select-all-visible" type="button">Select All</button>
+            <button id="clear-selection" type="button">Clear</button>
+          </div>
+        </div>
+        <input id="folder-picker" type="file" accept="image/*" webkitdirectory multiple hidden>
         <div class="gallery" id="gallery"></div>
         <pre id="output">Ready.</pre>
       </section>
@@ -675,6 +795,10 @@
       busy: false,
       outputs: [],
       selectedIndex: -1,
+      selectedOutputPaths: new Set(),
+      localObjectUrls: [],
+      manualFolderName: "",
+      selectedLoraPath: "",
       statusValues: {},
     };
 
@@ -711,8 +835,7 @@
         button.disabled = value;
       });
       if (!value) {
-        $("strip-prev").disabled = state.outputs.length < 2;
-        $("strip-next").disabled = state.outputs.length < 2;
+        updateStripControls();
       }
       $("status-pill").textContent = value ? label : statusLabel();
       $("status-pill").className = value ? "status-pill warn" : statusClass();
@@ -731,6 +854,13 @@
       const text = String(value || "");
       if (!text || text === "none") return [];
       return text.split(",").map((item) => item.trim()).filter(Boolean);
+    }
+
+    function loraChoices(value) {
+      return list(value).map((item) => {
+        const [id, name, ...pathParts] = item.split("|");
+        return { id, name: name || id, path: pathParts.join("|") };
+      }).filter((item) => item.id && item.path);
     }
 
     function yes(value) {
@@ -753,29 +883,59 @@
       return state.statusValues.health === "ok" ? "status-pill ok" : "status-pill warn";
     }
 
+    function populateLoraChoices(values) {
+      const select = $("lora-choice");
+      const choices = loraChoices(values.lora_choices);
+      const selectedId = values.selected_lora_candidate || values.weight_profile_selected || "";
+      state.selectedLoraPath = values.selected_lora_path || "";
+      select.innerHTML = "";
+      if (!choices.length) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "No sprite LoRA downloaded";
+        select.appendChild(option);
+        select.disabled = true;
+        return;
+      }
+      select.disabled = false;
+      for (const choice of choices) {
+        const option = document.createElement("option");
+        option.value = choice.id;
+        option.dataset.path = choice.path;
+        option.textContent = `${choice.id.replace(/_/g, " ")} / ${choice.name}`;
+        select.appendChild(option);
+      }
+      const selectedOption = Array.from(select.options).find((option) => option.value === selectedId)
+        || Array.from(select.options).find((option) => option.dataset.path === values.selected_lora_path)
+        || select.options[0];
+      if (selectedOption) {
+        select.value = selectedOption.value;
+        state.selectedLoraPath = selectedOption.dataset.path || state.selectedLoraPath;
+      }
+    }
+
     function renderStatus(text) {
       const values = parseKeyValues(text);
       state.statusValues = values;
       const loras = list(values.downloaded_loras);
-      const downloaded = list(values.downloaded_models);
-      const readyCount = downloaded.length || loras.length;
       const controlReady = yes(values.controlnet_ready);
       const depthReady = yes(values.depth_models_ready);
 
       $("status-pill").textContent = statusLabel();
       $("status-pill").className = statusClass();
       $("runtime-chip").textContent = values.health === "ok" ? "ready" : "check";
-      $("asset-chip").textContent = readyCount ? `${readyCount} local` : "needed";
       $("model-chip").textContent = values.weight_profile_selected || "r32";
       $("runtime-text").textContent = values.zimage_url ? `Z-Image ${values.zimage_url}` : "Z-Image";
       $("selected-model-text").textContent = values.selected_lora_path ? basename(values.selected_lora_path) : (loras.join(", ") || "none");
       $("progress-detail").textContent = `LoRA ${loras.length || 0} | Control ${controlReady ? "ready" : "staged"} | Depth ${depthReady ? "ready" : "staged"}`;
-      if (values.ui_dir) {
-        document.querySelector(".image-shell").style.backgroundImage =
-          `url("${pathToFileUrl(`${values.ui_dir}/nymphs_preview_forest.png`)}"), linear-gradient(125deg, #020807, #061411)`;
+      populateLoraChoices(values);
+      if (values.zimage_url) {
+        document.querySelector(".image-shell").style.background =
+          `url("${values.zimage_url}/ui/nymphs_preview_forest.png") center center / cover no-repeat, rgba(4, 12, 11, 0.82)`;
       }
 
-      if (!$("lora-path").value && values.selected_lora_path) $("lora-path").placeholder = values.selected_lora_path;
+      if (values.selected_lora_trigger) $("lora-trigger").value = values.selected_lora_trigger;
+      if (values.selected_lora_scale) $("lora-scale").value = values.selected_lora_scale;
       setProgress("Idle", $("progress-detail").textContent, 0);
     }
 
@@ -789,7 +949,7 @@
       if (!path || path === "None") return;
       if (!/\.(png|jpg|jpeg|webp)$/i.test(path)) return;
       if (state.outputs.some((item) => item.path === path)) return;
-      state.outputs.unshift({ path, label: label || basename(path), url: pathToFileUrl(path) });
+      state.outputs.unshift({ path, label: label || basename(path), url: pathToFileUrl(path), managed: true });
       renderGallery();
       showOutput(0);
     }
@@ -798,6 +958,15 @@
       for (const line of String(text || "").split(/\r?\n/)) {
         const match = line.match(/^(sprite_contact_sheet|output_[A-Za-z0-9_]+)=([^\r\n]+)$/);
         if (match) addOutput(match[2].trim(), match[1].replace(/^output_/, ""));
+      }
+      const urlMatches = String(text || "").match(/"url"\s*:\s*"([^"]+)"/g) || [];
+      for (const item of urlMatches) {
+        const match = item.match(/"url"\s*:\s*"([^"]+)"/);
+        if (!match) continue;
+        const rawUrl = match[1].replace(/\\\//g, "/");
+        const base = state.statusValues.zimage_url || "http://127.0.0.1:8090";
+        const url = rawUrl.startsWith("/") ? `${base}${rawUrl}` : rawUrl;
+        addOutput(url, "zimage");
       }
       const jsonPaths = String(text || "").match(/"output_path"\s*:\s*"([^"]+)"/g) || [];
       for (const item of jsonPaths) {
@@ -823,17 +992,28 @@
     function renderGallery() {
       const gallery = $("gallery");
       gallery.innerHTML = "";
-      $("strip-label").textContent = `Current batch (${state.outputs.length})`;
+      const label = state.manualFolderName || "Current batch";
+      $("strip-label").textContent = `${label} (${state.outputs.length})`;
+      syncOutputFolder(label);
+      updateSelectionCount();
       for (const [index, item] of state.outputs.entries()) {
-        const node = document.createElement("button");
-        node.type = "button";
-        node.className = `thumb ${index === state.selectedIndex ? "selected" : ""}`;
-        node.innerHTML = `<img src="${escapeHtml(item.url)}" alt=""><span>${escapeHtml(item.label)}</span>`;
+        const key = outputKey(item);
+        const node = document.createElement("div");
+        node.className = `thumb ${index === state.selectedIndex ? "selected" : ""} ${state.selectedOutputPaths.has(key) ? "checked" : ""}`;
+        node.innerHTML = `
+          <label class="thumb-check" title="Select output"><input type="checkbox" ${state.selectedOutputPaths.has(key) ? "checked" : ""}></label>
+          <img src="${escapeHtml(item.url)}" alt="">
+          <span>${escapeHtml(item.label)}</span>
+        `;
+        const checkbox = node.querySelector("input");
+        checkbox.addEventListener("change", (event) => {
+          event.stopPropagation();
+          toggleOutputSelection(item, checkbox.checked);
+        });
         node.addEventListener("click", () => showOutput(index));
         gallery.appendChild(node);
       }
-      $("strip-prev").disabled = state.outputs.length < 2 || state.busy;
-      $("strip-next").disabled = state.outputs.length < 2 || state.busy;
+      updateStripControls();
     }
 
     function showOutput(index) {
@@ -846,6 +1026,86 @@
       $("empty").hidden = true;
       $("output-label").textContent = item.label || basename(item.path);
       renderGallery();
+    }
+
+    function outputKey(item) {
+      return item?.path || item?.url || "";
+    }
+
+    function syncOutputFolder(label) {
+      const select = $("output-folder");
+      select.innerHTML = "";
+      const option = document.createElement("option");
+      option.value = "current";
+      option.textContent = `${label} (${state.outputs.length})`;
+      select.appendChild(option);
+      select.value = "current";
+      select.disabled = state.outputs.length === 0;
+    }
+
+    function updateSelectionCount() {
+      const count = state.selectedOutputPaths.size;
+      $("selection-count").textContent = `${count} selected`;
+    }
+
+    function updateStripControls() {
+      $("strip-prev").disabled = state.outputs.length < 2 || state.busy;
+      $("strip-next").disabled = state.outputs.length < 2 || state.busy;
+      $("select-visible").disabled = state.selectedIndex < 0 || state.busy;
+      $("select-all-visible").disabled = state.outputs.length === 0 || state.busy;
+      $("clear-selection").disabled = state.selectedOutputPaths.size === 0 || state.busy;
+      updateSelectionCount();
+    }
+
+    function toggleOutputSelection(item, checked) {
+      const key = outputKey(item);
+      if (!key) return;
+      if (checked) state.selectedOutputPaths.add(key);
+      else state.selectedOutputPaths.delete(key);
+      renderGallery();
+    }
+
+    function selectVisibleOutput() {
+      const item = state.outputs[state.selectedIndex];
+      if (!item) return;
+      state.selectedOutputPaths.add(outputKey(item));
+      renderGallery();
+    }
+
+    function selectAllVisibleOutputs() {
+      for (const item of state.outputs) state.selectedOutputPaths.add(outputKey(item));
+      renderGallery();
+    }
+
+    function clearOutputSelection() {
+      state.selectedOutputPaths.clear();
+      renderGallery();
+    }
+
+    function clearLocalObjectUrls() {
+      for (const url of state.localObjectUrls) URL.revokeObjectURL(url);
+      state.localObjectUrls = [];
+    }
+
+    function chooseFolderImages(files) {
+      const images = Array.from(files || []).filter((file) => file.type.startsWith("image/"));
+      clearLocalObjectUrls();
+      state.outputs = images.map((file, index) => {
+        const url = URL.createObjectURL(file);
+        state.localObjectUrls.push(url);
+        return {
+          path: file.webkitRelativePath || file.name || url,
+          label: file.name || `image-${index + 1}`,
+          url,
+          managed: false,
+        };
+      });
+      state.selectedOutputPaths.clear();
+      state.manualFolderName = images[0]?.webkitRelativePath?.split("/")[0] || "Chosen folder";
+      state.selectedIndex = -1;
+      renderGallery();
+      if (state.outputs[0]) showOutput(0);
+      $("folder-picker").value = "";
     }
 
     function stepOutput(offset) {
@@ -922,16 +1182,26 @@
     $("refresh-status").addEventListener("click", refreshStatus);
     $("open-zimage").addEventListener("click", () => moduleAction("start_zimage").catch(() => {}));
     $("check-runtime").addEventListener("click", () => moduleAction("check_runtime").catch(() => {}));
-    $("fetch-assets").addEventListener("click", () => {
-      moduleAction("fetch_lora", { asset: $("asset-source").value })
-        .then(refreshStatus)
-        .catch(() => {});
-    });
-    $("open-lora").addEventListener("click", () => moduleAction("open_lora").catch(() => {}));
     $("open-outputs").addEventListener("click", () => moduleAction("open_outputs").catch(() => {}));
     $("open-logs").addEventListener("click", () => moduleAction("logs").catch(() => {}));
     $("strip-prev").addEventListener("click", () => stepOutput(-1));
     $("strip-next").addEventListener("click", () => stepOutput(1));
+    $("choose-folder").addEventListener("click", () => {
+      $("folder-menu").open = false;
+      $("folder-picker").click();
+    });
+    $("folder-picker").addEventListener("change", (event) => chooseFolderImages(event.target.files));
+    $("select-visible").addEventListener("click", selectVisibleOutput);
+    $("select-all-visible").addEventListener("click", selectAllVisibleOutputs);
+    $("clear-selection").addEventListener("click", clearOutputSelection);
+    $("lora-choice").addEventListener("change", () => {
+      const option = $("lora-choice").selectedOptions[0];
+      state.selectedLoraPath = option?.dataset.path || "";
+      if (!$("lora-choice").value) return;
+      moduleAction("select_lora", { candidate: $("lora-choice").value }, { quiet: false })
+        .then(refreshStatus)
+        .catch(() => {});
+    });
     $("generate").addEventListener("click", () => {
       if (state.busy) return;
       const directions = Array.from(document.querySelectorAll("#directions input:checked")).map((input) => input.value);
@@ -941,6 +1211,8 @@
       }
       state.outputs = [];
       state.selectedIndex = -1;
+      state.manualFolderName = "";
+      state.selectedOutputPaths.clear();
       renderGallery();
       $("result-image").style.display = "none";
       $("empty").hidden = false;
@@ -949,7 +1221,7 @@
         "subject-id": value("subject-id"),
         "subject-prompt": value("subject-prompt"),
         "negative-prompt": value("negative-prompt"),
-        "lora-path": value("lora-path"),
+        "lora-path": state.selectedLoraPath,
         "lora-trigger": value("lora-trigger"),
         "lora-scale": value("lora-scale"),
         seed: value("seed"),

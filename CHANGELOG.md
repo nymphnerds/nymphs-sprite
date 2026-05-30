@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.8 - 2026-05-30
+
+- Removed asset download controls from the custom generation UI.
+- Kept asset fetch in the module detail action group, where package download
+  and repair choices belong.
+- Added a run-level downloaded-LoRA selector for Sprite Foundry-style batch
+  setup before source direction generation.
+- Restored the Nymphs Image strip organizer shape with a folder picker,
+  current preview selection, select-all, and clear-selection controls.
+
 ## 0.1.7 - 2026-05-30
 
 - Rebuilt the module-owned UI around the Nymphs Image rail/stage pattern.

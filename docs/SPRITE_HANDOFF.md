@@ -130,7 +130,7 @@ ui/manager.html
 - `ui/manager.html` now follows the Nymphs Image custom UI pattern:
 
 ```text
-left rail  -> runtime, assets, prompt, Z-Image controls, sprite controls
+left rail  -> runtime, prompt, Z-Image controls, LoRA choice, sprite controls
 right pane -> image preview stage, progress, generated batch strip, compact log
 ```
 
@@ -144,6 +144,14 @@ grid-template-columns: clamp(260px, 28vw, 300px) minmax(300px, 1fr);
 - The old generic dashboard/card layout is gone. Module UI actions use the
   Manager WebView2 bridge; the page does not run shell directly and does not
   add its own bottom chrome.
+- Asset fetching is not in the custom generation UI. It belongs to the module
+  detail action group.
+- LoRA selection is in the custom generation UI because it is part of the
+  Sprite Foundry-style run contract: choose the style/LoRA, then generate raw
+  source directions, then post-process the batch.
+- The preview strip should match Nymphs Image behavior: browse the current
+  generated batch, choose a local image folder, click one image into the main
+  preview, and select/clear visible thumbnails for review.
 
 - Selected LoRA config is stored at:
 

@@ -21,6 +21,7 @@ lora_count=0
 lora_cache_bytes=0
 lora_cache_size=0B
 lora_files=none
+lora_choices=none
 downloaded_loras=none
 models_ready=false
 assets_ready=false
@@ -122,6 +123,7 @@ if preset_file.exists():
 downloaded: list[str] = []
 missing: list[str] = []
 files: list[str] = []
+choices: list[str] = []
 seen_paths: set[Path] = set()
 total_bytes = 0
 
@@ -140,6 +142,7 @@ for candidate_id, item in candidates.items():
         downloaded.append(candidate_id)
         path = matches[0]
         files.append(f"{candidate_id}:{path.name}")
+        choices.append(f"{candidate_id}|{path.name}|{path}")
         if path not in seen_paths:
             seen_paths.add(path)
             try:
@@ -157,6 +160,7 @@ if lora_dir.exists():
         profile_id = f"custom_{clean(path.stem)}"
         downloaded.append(profile_id)
         files.append(f"{profile_id}:{path.name}")
+        choices.append(f"{profile_id}|{path.name}|{path}")
         try:
             total_bytes += path.stat().st_size
         except OSError:
@@ -170,6 +174,7 @@ emit("lora_count", str(len(seen_paths)))
 emit("lora_cache_bytes", str(total_bytes))
 emit("lora_cache_size", format_bytes(total_bytes))
 emit("lora_files", ",".join(files) if files else "none")
+emit("lora_choices", ",".join(choices) if choices else "none")
 emit("downloaded_loras", ",".join(downloaded) if downloaded else "none")
 emit("weight_profile_selected", selected)
 emit("weight_profiles_available", ",".join(available) if available else "none")
@@ -185,6 +190,7 @@ while IFS='=' read -r key value; do
     lora_cache_bytes) lora_cache_bytes="${value}" ;;
     lora_cache_size) lora_cache_size="${value}" ;;
     lora_files) lora_files="${value}" ;;
+    lora_choices) lora_choices="${value}" ;;
     downloaded_loras) downloaded_loras="${value}" ;;
     weight_profile_selected) weight_profile_selected="${value}" ;;
     weight_profiles_available) weight_profiles_available="${value}" ;;
@@ -266,6 +272,7 @@ lora_count=${lora_count}
 lora_cache_bytes=${lora_cache_bytes}
 lora_cache_size=${lora_cache_size}
 lora_files=${lora_files}
+lora_choices=${lora_choices}
 selected_lora_candidate=${selected_lora_candidate}
 selected_lora_path=${selected_lora_path}
 selected_lora_trigger=${selected_lora_trigger}
