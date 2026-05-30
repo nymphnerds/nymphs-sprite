@@ -1,0 +1,16 @@
+{
+  "provider": "zimage",
+  "mode": "txt2img",
+  "model_id": "Tongyi-MAI/Z-Image-Turbo",
+  "controlnet_repo_id": "alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union",
+  "control_mode": "__CONTROL_MODE__",
+  "control_image": "__CONTROL_IMAGE_PATH_OR_DATA_URL__",
+  "controlnet_conditioning_scale": 0.55,
+  "control_guidance_start": 0.0,
+  "control_guidance_end": 0.85,
+  "lora_path": "__Z_IMAGE_TURBO_LORA_PATH__",
+  "lora_scale": 0.85,
+  "prompt": "__LORA_ACTIVATION__, __SUBJECT_PROMPT__, __DIRECTION_PROMPT__, pixel art sprite, game character sprite, clean readable silhouette, isolated figure",
+  "negative_prompt": "__NEGATIVE_PROMPT__, extra limbs, duplicate character, cropped body, text, watermark, busy background",
+  "implementation_note": "Current Nymphs Image /generate does not consume these controlnet fields yet. Add a Z-Image ControlNet backend path before using this profile for generation."
+}

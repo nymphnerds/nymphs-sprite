@@ -1,0 +1,11 @@
+{
+  "provider": "depth_anything",
+  "model_id": "depth-anything/Depth-Anything-V2-Small-hf",
+  "input_image": "__SOURCE_IMAGE__",
+  "output_kind": "depth_raw",
+  "postprocess": {
+    "square_crop": true,
+    "pixelate_size": 48,
+    "register_artifacts": ["depth_raw", "depth"]
+  }
+}

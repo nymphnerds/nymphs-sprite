@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nymphs Sprite</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0d1110;
+      --panel: #151b19;
+      --panel-2: #101615;
+      --line: #26332f;
+      --text: #ecf6f0;
+      --muted: #9fb4ac;
+      --soft: #d3e4dd;
+      --accent: #76e0b6;
+      --accent-2: #7db7ff;
+      --warn: #ffc46b;
+      --bad: #ff8d8d;
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+
+    body {
+      padding: 24px;
+    }
+
+    main {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: end;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 720;
+    }
+
+    h2 {
+      font-size: 17px;
+      font-weight: 680;
+    }
+
+    h3 {
+      font-size: 13px;
+      color: var(--soft);
+      font-weight: 680;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      max-width: 760px;
+      line-height: 1.45;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel-2);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .status-pill.ok {
+      color: var(--accent);
+      border-color: rgba(118, 224, 182, 0.45);
+    }
+
+    .status-pill.warn {
+      color: var(--warn);
+      border-color: rgba(255, 196, 107, 0.45);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.85fr) minmax(420px, 1.15fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 16px 42px var(--shadow);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-body {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button,
+    select,
+    input,
+    textarea {
+      font: inherit;
+      letter-spacing: 0;
+    }
+
+    button {
+      min-height: 36px;
+      border: 1px solid #365046;
+      border-radius: 6px;
+      padding: 0 12px;
+      color: var(--text);
+      background: #19231f;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      color: #f7fff9;
+    }
+
+    button.primary {
+      background: #1f5f4b;
+      border-color: #3aa987;
+      color: #f7fff9;
+      font-weight: 700;
+    }
+
+    button.secondary {
+      border-color: #37536b;
+      background: #172130;
+    }
+
+    button:disabled {
+      cursor: default;
+      opacity: 0.58;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid #34443f;
+      border-radius: 6px;
+      background: #0d1412;
+      color: var(--text);
+      padding: 8px 10px;
+    }
+
+    textarea {
+      min-height: 82px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    .checks {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .check {
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid #34443f;
+      border-radius: 6px;
+      background: #0d1412;
+      color: var(--soft);
+    }
+
+    .check input {
+      width: 16px;
+      min-height: 16px;
+      accent-color: var(--accent);
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 7px 12px;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+
+    .kv strong {
+      color: var(--soft);
+      font-weight: 650;
+    }
+
+    pre {
+      min-height: 260px;
+      max-height: 440px;
+      margin: 0;
+      overflow: auto;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid #26332f;
+      background: #090d0c;
+      color: #d7e7df;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .hint {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .error {
+      color: var(--bad);
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 16px;
+      }
+
+      header,
+      .grid,
+      .form-grid,
+      .checks {
+        grid-template-columns: 1fr;
+      }
+
+      .status-pill {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Nymphs Sprite</h1>
+        <p class="subtitle">Z-Image Turbo first, sprite LoRA second, ControlNet and Depth Anything staged for guided turnarounds.</p>
+      </div>
+      <div id="statusPill" class="status-pill">Waiting for Manager</div>
+    </header>
+
+    <div class="grid">
+      <section>
+        <div class="section-head">
+          <h2>Flow</h2>
+          <button id="refreshStatus" class="secondary" type="button">Refresh</button>
+        </div>
+        <div class="section-body">
+          <div class="actions">
+            <button id="openZImage" class="primary" type="button">Open Z-Image</button>
+            <button id="fetchLora" type="button">Fetch LoRA</button>
+            <button id="fetchControlnet" type="button">Fetch ControlNet</button>
+            <button id="fetchDepth" type="button">Fetch Depth</button>
+            <button id="checkRuntime" type="button">Check Runtime</button>
+          </div>
+
+          <label>
+            LoRA source
+            <select id="loraSource">
+              <option value="mks0813_pixel_art">mks0813 / Z-Image Turbo Pixel Art</option>
+              <option value="tarn59_pixel_art">tarn59 / Pixel Art Style</option>
+            </select>
+          </label>
+
+          <div class="kv" id="statusGrid">
+            <strong>State</strong><span>Unknown</span>
+            <strong>Z-Image</strong><span>http://127.0.0.1:8090</span>
+            <strong>LoRA root</strong><span>$HOME/LoRA/loras</span>
+          </div>
+
+          <p class="hint">This UI calls module actions through NymphsCore Manager. The copied Nymphs Image UI is kept beside it as `nymph_image_reference.html` for parity while this module owns the sprite workflow.</p>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>Generate 8-Way</h2>
+          <button id="generate" class="primary" type="button">Generate</button>
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <label>
+              Subject ID
+              <input id="subjectId" maxlength="80" value="hero_test" autocomplete="off">
+            </label>
+            <label>
+              Seed
+              <input id="seed" type="number" min="0" value="123456789">
+            </label>
+            <label class="full">
+              Subject prompt
+              <textarea id="subjectPrompt" maxlength="256">armored forest knight with a short cloak</textarea>
+            </label>
+            <label class="full">
+              Negative prompt
+              <textarea id="negativePrompt" maxlength="256">blurry, low detail, extra limbs, cropped body</textarea>
+            </label>
+            <label>
+              LoRA path
+              <input id="loraPath" maxlength="256" placeholder="Leave empty to use latest /api/loras result">
+            </label>
+            <label>
+              LoRA trigger
+              <input id="loraTrigger" maxlength="80" value="pxlstl">
+            </label>
+            <label>
+              LoRA scale
+              <input id="loraScale" type="number" min="0" max="2" step="0.05" value="0.85">
+            </label>
+            <label>
+              Steps
+              <input id="steps" type="number" min="1" max="80" value="9">
+            </label>
+            <label>
+              Width
+              <input id="width" type="number" min="256" max="2048" step="64" value="1024">
+            </label>
+            <label>
+              Height
+              <input id="height" type="number" min="256" max="2048" step="64" value="1024">
+            </label>
+          </div>
+
+          <div>
+            <h3>Directions</h3>
+            <div class="checks" id="directions">
+              <label class="check"><input type="checkbox" value="front" checked>Front</label>
+              <label class="check"><input type="checkbox" value="front_left" checked>Front left</label>
+              <label class="check"><input type="checkbox" value="left" checked>Left</label>
+              <label class="check"><input type="checkbox" value="back_left" checked>Back left</label>
+              <label class="check"><input type="checkbox" value="back" checked>Back</label>
+              <label class="check"><input type="checkbox" value="back_right" checked>Back right</label>
+              <label class="check"><input type="checkbox" value="right" checked>Right</label>
+              <label class="check"><input type="checkbox" value="front_right" checked>Front right</label>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <h2>Output</h2>
+        <button id="clearOutput" type="button">Clear</button>
+      </div>
+      <div class="section-body">
+        <pre id="output">Ready.</pre>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const pending = new Map();
+    const output = document.getElementById("output");
+    const statusPill = document.getElementById("statusPill");
+    const statusGrid = document.getElementById("statusGrid");
+    let busy = false;
+
+    function append(text) {
+      output.textContent = output.textContent === "Ready." ? text : `${output.textContent}\n${text}`;
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function setBusy(value) {
+      busy = value;
+      document.querySelectorAll("button").forEach((button) => {
+        button.disabled = value && button.id !== "clearOutput";
+      });
+      statusPill.textContent = value ? "Running" : "Ready";
+      statusPill.className = value ? "status-pill warn" : "status-pill ok";
+    }
+
+    function parseKeyValues(text) {
+      const values = {};
+      for (const line of text.split(/\r?\n/)) {
+        const index = line.indexOf("=");
+        if (index > 0) {
+          values[line.slice(0, index)] = line.slice(index + 1);
+        }
+      }
+      return values;
+    }
+
+    function renderStatus(text) {
+      const values = parseKeyValues(text);
+      const rows = [
+        ["State", values.state || "unknown"],
+        ["Health", values.health || "unknown"],
+        ["Z-Image", values.zimage_url || "http://127.0.0.1:8090"],
+        ["LoRA root", values.lora_dir || values.lora_root || ""],
+        ["Selected LoRA", values.selected_lora_path || ""],
+        ["ControlNet", values.controlnet_dir || ""],
+        ["Depth", values.depth_models_dir || ""],
+        ["UI", values.manager_ui || ""]
+      ];
+      statusGrid.innerHTML = rows.map(([key, value]) => `<strong>${escapeHtml(key)}</strong><span>${escapeHtml(value)}</span>`).join("");
+      const ok = values.health === "ok";
+      statusPill.textContent = ok ? "Installed" : (values.state || "Needs status");
+      statusPill.className = ok ? "status-pill ok" : "status-pill warn";
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+
+    function runAction(action, args = {}) {
+      if (!window.chrome || !window.chrome.webview) {
+        append("ERROR: NymphsCore Manager bridge is unavailable.");
+        statusPill.textContent = "Bridge unavailable";
+        statusPill.className = "status-pill warn";
+        return Promise.reject(new Error("Manager bridge unavailable"));
+      }
+
+      const requestId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      append(`$ ${action}`);
+      setBusy(true);
+      return new Promise((resolve, reject) => {
+        pending.set(requestId, { resolve, reject });
+        window.chrome.webview.postMessage({ type: "module_action", requestId, action, args });
+      });
+    }
+
+    function onMessage(event) {
+      const message = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+      if (!message || !message.type) {
+        return;
+      }
+      if (message.type === "module_action_progress") {
+        append(message.line || "");
+        return;
+      }
+      if (message.type !== "module_action_result") {
+        return;
+      }
+
+      const item = pending.get(message.requestId);
+      if (!item) {
+        return;
+      }
+      pending.delete(message.requestId);
+      setBusy(false);
+      if (message.ok) {
+        if (message.output) {
+          append(message.output.trim());
+        }
+        item.resolve(message.output || "");
+      } else {
+        const error = message.error || "Action failed.";
+        append(`ERROR: ${error}`);
+        statusPill.textContent = "Action failed";
+        statusPill.className = "status-pill warn";
+        item.reject(new Error(error));
+      }
+    }
+
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.addEventListener("message", onMessage);
+    }
+
+    function value(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function compactArgs(args) {
+      return Object.fromEntries(Object.entries(args).filter(([, val]) => String(val).trim() !== ""));
+    }
+
+    async function refreshStatus() {
+      try {
+        const text = await runAction("status");
+        renderStatus(text);
+      } catch {
+        // Output already shows the error.
+      }
+    }
+
+    document.getElementById("refreshStatus").addEventListener("click", refreshStatus);
+    document.getElementById("openZImage").addEventListener("click", () => runAction("start_zimage").catch(() => {}));
+    document.getElementById("checkRuntime").addEventListener("click", () => runAction("check_runtime").catch(() => {}));
+    document.getElementById("fetchControlnet").addEventListener("click", () => runAction("fetch_controlnet").catch(() => {}));
+    document.getElementById("fetchDepth").addEventListener("click", () => runAction("fetch_depth_anything").catch(() => {}));
+    document.getElementById("fetchLora").addEventListener("click", () => {
+      runAction("fetch_lora", { candidate: document.getElementById("loraSource").value }).catch(() => {});
+    });
+    document.getElementById("clearOutput").addEventListener("click", () => {
+      output.textContent = "Ready.";
+    });
+    document.getElementById("generate").addEventListener("click", () => {
+      if (busy) {
+        return;
+      }
+      const directions = Array.from(document.querySelectorAll("#directions input:checked")).map((input) => input.value);
+      if (directions.length === 0) {
+        append("ERROR: choose at least one direction.");
+        return;
+      }
+      runAction("generate_directions", compactArgs({
+        "subject-id": value("subjectId"),
+        "subject-prompt": value("subjectPrompt"),
+        "negative-prompt": value("negativePrompt"),
+        "lora-path": value("loraPath"),
+        "lora-trigger": value("loraTrigger"),
+        "lora-scale": value("loraScale"),
+        seed: value("seed"),
+        steps: value("steps"),
+        width: value("width"),
+        height: value("height"),
+        directions: directions.join(",")
+      })).catch(() => {});
+    });
+
+    refreshStatus();
+  </script>
+</body>
+</html>

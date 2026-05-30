@@ -1,0 +1,243 @@
+{
+  "manifest_version": 1,
+  "id": "nymphs-sprite",
+  "name": "Nymphs Sprite",
+  "short_name": "NS",
+  "version": "0.1.0",
+  "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
+  "category": "image",
+  "kind": "sprite",
+  "packaging": "repo",
+  "repo": {
+    "url": "https://github.com/nymphnerds/nymphs-sprite.git",
+    "branch": "main"
+  },
+  "source": {
+    "type": "repo",
+    "repo": "https://github.com/nymphnerds/nymphs-sprite.git",
+    "ref": "main"
+  },
+  "install": {
+    "root": "$HOME/Nymphs-Sprite",
+    "entrypoint": "scripts/install_nymphs_sprite.sh",
+    "version_marker": "$HOME/Nymphs-Sprite/.nymph-module-version",
+    "installed_markers": [
+      "$HOME/Nymphs-Sprite/.nymph-module-version"
+    ]
+  },
+  "artifacts": {
+    "outputs_root": "$HOME/NymphsData/outputs/nymphs-sprite",
+    "config_root": "$HOME/NymphsData/config/nymphs-sprite",
+    "logs_root": "$HOME/NymphsData/logs/nymphs-sprite",
+    "models_root": "$HOME/NymphsData/models/nymphs-sprite",
+    "controlnet_root": "$HOME/NymphsData/models/nymphs-sprite/controlnet",
+    "depth_models_root": "$HOME/NymphsData/models/nymphs-sprite/depth",
+    "profiles_root": "$HOME/Nymphs-Sprite/profiles",
+    "lora_root": "$HOME/LoRA/loras"
+  },
+  "entrypoints": {
+    "install": "scripts/install_nymphs_sprite.sh",
+    "update": "scripts/nymphs_sprite_update.sh",
+    "status": "scripts/nymphs_sprite_status.sh",
+    "open_ui": "scripts/nymphs_sprite_open_ui.sh",
+    "open_zimage": "scripts/nymphs_sprite_open_zimage.sh",
+    "start_zimage": "scripts/nymphs_sprite_start_zimage.sh",
+    "open": "scripts/nymphs_sprite_open.sh",
+    "open_lora": "scripts/nymphs_sprite_open_lora.sh",
+    "open_outputs": "scripts/nymphs_sprite_open_outputs.sh",
+    "open_workflows": "scripts/nymphs_sprite_open_workflows.sh",
+    "fetch_lora": "scripts/nymphs_sprite_fetch_lora.sh",
+    "fetch_controlnet": "scripts/nymphs_sprite_fetch_controlnet.sh",
+    "fetch_depth_anything": "scripts/nymphs_sprite_fetch_depth_anything.sh",
+    "check_runtime": "scripts/nymphs_sprite_check_runtime.sh",
+    "generate_directions": "scripts/nymphs_sprite_generate_directions.sh",
+    "logs": "scripts/nymphs_sprite_logs.sh",
+    "uninstall": "scripts/nymphs_sprite_uninstall.sh"
+  },
+  "capabilities": [
+    "install",
+    "status",
+    "open_ui",
+    "open_zimage",
+    "start_zimage",
+    "open_lora",
+    "open_outputs",
+    "generate_directions",
+    "fetch_lora",
+    "fetch_controlnet",
+    "fetch_depth_anything",
+    "check_runtime",
+    "open",
+    "logs",
+    "uninstall"
+  ],
+  "ui": {
+    "sort_order": 25,
+    "standard_lifecycle_rail": true,
+    "manager_ui": {
+      "type": "local_html",
+      "title": "Nymphs Sprite",
+      "entrypoint": "ui/manager.html"
+    },
+    "manager_action_groups": [
+      {
+        "id": "lora_fetch",
+        "title": "LoRA Fetch",
+        "layout": "compact",
+        "entrypoint": "fetch_lora",
+        "result": "show_logs",
+        "visibility": "installed",
+        "description": "Download a Z-Image Turbo-compatible sprite or pixel-art LoRA. The selected LoRA is saved as the module preset and used automatically by Generate 8-Way unless a custom LoRA path is supplied.",
+        "links": [
+          {
+            "label": "mks0813 pixel art LoRA",
+            "url": "https://huggingface.co/mks0813/z-image-turbo-pixel-art-lora"
+          },
+          {
+            "label": "tarn59 pixel art LoRA",
+            "url": "https://huggingface.co/tarn59/pixel_art_style_lora_z_image_turbo"
+          },
+          {
+            "label": "Z-Image Turbo",
+            "url": "https://huggingface.co/Tongyi-MAI/Z-Image-Turbo"
+          }
+        ],
+        "fields": [
+          {
+            "name": "candidate",
+            "type": "select",
+            "label": "Download",
+            "arg": "--candidate",
+            "default": "mks0813_pixel_art",
+            "options": [
+              {
+                "label": "Z-Image Turbo Pixel Art LoRA",
+                "value": "mks0813_pixel_art",
+                "description": "Recommended first sprite LoRA; trigger pxlstl"
+              },
+              {
+                "label": "Pixel Art Style LoRA for Z-Image Turbo",
+                "value": "tarn59_pixel_art",
+                "description": "Alternative pixel-art style LoRA; trigger Pixel art style."
+              }
+            ]
+          },
+          {
+            "name": "hf_token",
+            "type": "secret",
+            "label": "Hugging Face token",
+            "secret_id": "huggingface.token",
+            "env": "NYMPHS3D_HF_TOKEN",
+            "optional": true
+          }
+        ],
+        "submit": {
+          "label": "Fetch LoRA"
+        }
+      }
+    ],
+    "manager_actions": [
+      {
+        "id": "open_ui",
+        "label": "Open UI",
+        "entrypoint": "open_ui",
+        "result": "open_module_ui"
+      },
+      {
+        "id": "open_zimage",
+        "label": "Open Z-Image",
+        "entrypoint": "open_zimage",
+        "result": "open_in_manager"
+      },
+      {
+        "id": "open_lora",
+        "label": "Open LoRA",
+        "entrypoint": "open_lora",
+        "result": "open_directory"
+      },
+      {
+        "id": "open_outputs",
+        "label": "Open Outputs",
+        "entrypoint": "open_outputs",
+        "result": "open_directory"
+      },
+      {
+        "id": "open_workflows",
+        "label": "Workflows",
+        "entrypoint": "open_workflows",
+        "result": "open_directory"
+      },
+      {
+        "id": "fetch_controlnet",
+        "label": "Fetch ControlNet",
+        "entrypoint": "fetch_controlnet",
+        "result": "show_output"
+      },
+      {
+        "id": "fetch_depth_anything",
+        "label": "Fetch Depth",
+        "entrypoint": "fetch_depth_anything",
+        "result": "show_output"
+      },
+      {
+        "id": "check_runtime",
+        "label": "Check Runtime",
+        "entrypoint": "check_runtime",
+        "result": "show_output"
+      },
+      {
+        "id": "generate_directions",
+        "label": "Generate 8-Way",
+        "entrypoint": "generate_directions",
+        "result": "show_output"
+      },
+      {
+        "id": "logs",
+        "label": "Logs",
+        "entrypoint": "logs",
+        "result": "open_notepad"
+      },
+      {
+        "id": "open",
+        "label": "Open Docs",
+        "entrypoint": "open",
+        "result": "open_directory"
+      }
+    ]
+  },
+  "overview": {
+    "body": "Initial Nymphs Sprite scaffold. Targets Z-Image Turbo through Nymphs Image with a Z-Image-compatible sprite LoRA, Z-Image ControlNet Union, and Depth Anything, while keeping Sprite Foundry's ComfyUI workflow contract as reference material for parity."
+  },
+  "uninstall": {
+    "supports_purge": true,
+    "supports_data_delete": true,
+    "requires_confirmation": true,
+    "dry_run_arg": "--dry-run",
+    "confirm_arg": "--yes",
+    "purge_arg": "--purge",
+    "data_only_arg": "--data-only",
+    "preserve_by_default": [
+      "outputs",
+      "config",
+      "logs"
+    ],
+    "removes_by_default": [
+      "module files",
+      "workflow templates"
+    ]
+  },
+  "dependencies": {
+    "zimage": "Required generation backend for Tongyi-MAI/Z-Image-Turbo and Z-Image Turbo LoRA loading.",
+    "zimage_controlnet_union": "alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union for depth/canny morphology control.",
+    "depth_anything": "depth-anything/Depth-Anything-V2-Small-hf for depth references and derived depth maps.",
+    "nymphscore": "Target orchestration layer for replacing the captured ComfyUI workflow behavior.",
+    "comfyui": "Optional reference runtime only while parity work is in progress."
+  },
+  "update_policy": {
+    "channel": "experimental"
+  },
+  "notes": [
+    "Initial scaffold captures Sprite Foundry ComfyUI workflow templates, Z-Image Turbo request profiles, pixel-art LoRA candidates, Z-Image ControlNet Union, Depth Anything, a sprite-specific Manager UI, and the NymphsCore module contract.",
+    "The direction runner calls Nymphs Image /generate with the chosen Z-Image Turbo LoRA. ControlNet and Depth Anything fetch/status surfaces are first-class; Z-Image ControlNet generation needs a backend path because the installed diffusers runtime exposes ZImagePipeline but not ZImageControlNetPipeline."
+  ]
+}

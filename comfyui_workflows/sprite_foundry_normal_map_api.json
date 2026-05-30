@@ -1,0 +1,24 @@
+{
+  "1": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "__SOURCE_IMAGE__"
+    }
+  },
+  "2": {
+    "class_type": "MiDaS-NormalMapPreprocessor",
+    "inputs": {
+      "image": ["1", 0],
+      "a": 6.283185307179586,
+      "bg_threshold": 0.1,
+      "resolution": 768
+    }
+  },
+  "3": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": ["2", 0],
+      "filename_prefix": "__SUBJECT_ID___DIRECTION___normal"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "default": "mks0813_pixel_art",
+  "candidates": {
+    "mks0813_pixel_art": {
+      "label": "Z-Image-Turbo Pixel Art LoRA",
+      "repo_id": "mks0813/z-image-turbo-pixel-art-lora",
+      "filename": "z-image-turbo-pixel-art-lora.safetensors",
+      "base_model": "Tongyi-MAI/Z-Image-Turbo",
+      "trigger": "pxlstl",
+      "prompt_suffix": ", pxlstl",
+      "recommended_lora_scale": 0.85,
+      "license_note": "Follows the license of Tongyi-MAI/Z-Image-Turbo.",
+      "source_url": "https://huggingface.co/mks0813/z-image-turbo-pixel-art-lora"
+    },
+    "tarn59_pixel_art": {
+      "label": "Pixel Art Style LoRA for Z-Image Turbo",
+      "repo_id": "tarn59/pixel_art_style_lora_z_image_turbo",
+      "filename": null,
+      "base_model": "Tongyi-MAI/Z-Image-Turbo",
+      "trigger": "Pixel art style.",
+      "prompt_suffix": ", Pixel art style.",
+      "recommended_lora_scale": 0.85,
+      "license_note": "Apache-2.0 model card license.",
+      "source_url": "https://huggingface.co/tarn59/pixel_art_style_lora_z_image_turbo"
+    }
+  }
+}

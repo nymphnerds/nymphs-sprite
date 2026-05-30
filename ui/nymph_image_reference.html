@@ -1,0 +1,3313 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nymphs Image</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07100f;
+      --surface: #0b1514;
+      --surface-2: #101b1d;
+      --panel: rgba(8, 17, 18, 0.94);
+      --panel-2: rgba(5, 12, 12, 0.98);
+      --line: #1b3536;
+      --line-strong: #284446;
+      --text: #f0faf7;
+      --muted: #9bb9b4;
+      --dim: #789d98;
+      --cyan: #29e6da;
+      --green: #97df48;
+      --warn: #ffc94a;
+      --bad: #ff735f;
+      --button: #18221f;
+      --button-2: #101817;
+      --font-head: Bahnschrift, "Arial Narrow", "Segoe UI", sans-serif;
+      --font-mono: "Cascadia Mono", "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --font-body: Inter, "Segoe UI", system-ui, sans-serif;
+      font-family: var(--font-body);
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html, body { height: 100%; }
+    * { scrollbar-width: thin; scrollbar-color: rgba(41, 230, 218, 0.78) transparent; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { border-radius: 999px; background: rgba(41, 230, 218, 0.72); }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(41, 230, 218, 0.95); }
+    ::-webkit-scrollbar-corner { background: transparent; }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      color: var(--text);
+      background:
+        linear-gradient(125deg, #020807 0%, #03100e 44%, #061411 78%, #081816 100%);
+      font-family: var(--font-body);
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      letter-spacing: 0;
+    }
+
+    button {
+      min-height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 4px 7px;
+      border: 1px solid var(--line-strong);
+      border-radius: 5px;
+      background: rgba(15, 26, 28, 0.85);
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 9.8px;
+      font-weight: 850;
+      line-height: 1.1;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    button::before { content: "//"; color: var(--green); }
+
+    button:hover:not(:disabled) {
+      border-color: #315659;
+      background: #122022;
+      color: var(--green);
+    }
+
+    button:disabled {
+      color: #5e7a75;
+      border-color: #1f3637;
+      background: rgba(11, 20, 21, 0.72);
+      cursor: default;
+      opacity: 0.72;
+    }
+    button:disabled::before { color: #355a56; }
+
+    button.primary {
+      border-color: var(--green);
+      background: linear-gradient(90deg, var(--green), rgba(41, 230, 218, 0.92));
+      color: #06110f;
+      font-weight: 950;
+    }
+    button.primary::before { color: #06110f; }
+
+    button.danger {
+      color: #ffb15f;
+      border-color: rgba(255, 139, 39, 0.52);
+      background: rgba(37, 20, 12, 0.82);
+    }
+    button.danger::before { color: #ff8b27; }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: var(--surface-2);
+      color: var(--text);
+      outline: none;
+      font-size: 12px;
+    }
+
+    input,
+    select {
+      height: 28px;
+      padding: 0 7px;
+    }
+
+    textarea {
+      min-height: 104px;
+      resize: vertical;
+      padding: 8px;
+      line-height: 1.34;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--cyan);
+      box-shadow: none;
+    }
+
+    label {
+      display: block;
+      margin: 0 0 3px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 9.6px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0.035em;
+    }
+
+    .app {
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: clamp(260px, 28vw, 300px) minmax(300px, 1fr);
+      min-width: 0;
+      background: rgba(2, 8, 7, 0.72);
+    }
+
+    .sidebar {
+      min-width: 0;
+      height: 100vh;
+      height: 100dvh;
+      overflow-y: auto;
+      border-right: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(8, 17, 18, 0.94), rgba(5, 12, 12, 0.98));
+      padding: 15px 14px 14px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .section {
+      border: 0;
+      border-top: 1px solid rgba(33, 71, 74, 0.72);
+      border-radius: 0;
+      background: transparent;
+      padding: 11px 0;
+      box-shadow: none;
+      min-width: 0;
+    }
+    .section:first-child { padding-top: 0; border-top: 0; }
+
+    #runtime-section { order: 10; }
+    #source-section { order: 15; }
+    #gemini-controls { order: 16; }
+    #prompt-section { order: 20; }
+    #zimage-controls { order: 30; }
+    #parts-section { order: 40; }
+
+    #source-section.promoted {
+      order: 15;
+      border-top-color: rgba(41, 230, 218, 0.72);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 0 0 7px;
+      color: var(--green);
+      font-family: var(--font-mono);
+      font-size: 10.4px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .section-title span:first-child::before { content: "// "; color: var(--cyan); }
+    .section-title span:last-child { color: var(--cyan); }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    .segmented.three-way {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .segment {
+      min-height: 28px;
+    }
+
+    .segment.active {
+      background: rgba(20, 45, 35, 0.78);
+      border-color: var(--cyan);
+      color: var(--green);
+    }
+
+    .workflow-tabs { margin-top: 7px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .model-choice-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 66px;
+      gap: 7px;
+      align-items: end;
+    }
+    .model-choice-row select { font-size: 11.5px; }
+    .model-choice-row button {
+      width: 66px;
+      min-width: 66px;
+      padding-inline: 6px;
+    }
+
+    .field {
+      display: grid;
+      gap: 0;
+      min-width: 0;
+    }
+
+    .wide { grid-column: 1 / -1; }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      min-height: 28px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0.035em;
+    }
+
+    .toggle-row input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--green);
+    }
+
+    .hint {
+      color: var(--dim);
+      font-size: 11.5px;
+      line-height: 1.35;
+    }
+
+    .hint.good { color: var(--green); }
+
+    .drop {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      height: auto;
+      width: 100%;
+      padding: 10px;
+      border: 1px dashed rgba(41,230,218,0.36);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 28%, rgba(41, 230, 218, 0.08), transparent 34%),
+        rgba(11, 21, 20, 0.66);
+      cursor: pointer;
+    }
+
+    .drop.drag { border-color: var(--green); }
+
+    .drop img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center center;
+      display: none;
+      background: transparent;
+    }
+
+    .drop-hint {
+      display: grid;
+      gap: 5px;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .parts-source-card {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      min-width: 0;
+      padding: 7px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(8, 16, 15, 0.62);
+    }
+
+    .parts-source-thumb {
+      width: 64px;
+      height: 64px;
+      border: 1px dashed rgba(41,230,218,0.36);
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: var(--dim);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      background: rgba(4, 8, 8, 0.78);
+    }
+
+    .parts-source-thumb.drag {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .parts-source-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+    }
+
+    .parts-source-meta {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .parts-source-meta input[readonly] {
+      height: 28px;
+      border-radius: 5px;
+      border-color: rgba(33, 71, 74, 0.72);
+      background: rgba(7, 16, 16, 0.78);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 850;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+
+    .parts-source-actions {
+      grid-column: 1 / -1;
+      margin-top: 0;
+    }
+
+    .parts-source-actions button {
+      height: 26px;
+      min-height: 26px;
+      padding-inline: 8px;
+    }
+
+    .command-row {
+      display: grid;
+      gap: 6px;
+      margin-top: 7px;
+      align-items: stretch;
+    }
+
+    .command-row button {
+      width: 100%;
+      min-width: 0;
+      height: 28px;
+      min-height: 28px;
+      padding: 2px 6px;
+      font-size: 9.5px;
+      text-align: center;
+    }
+
+    .two { grid-template-columns: 1fr 1fr; }
+    .three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .no-top { margin-top: 0; }
+    .part-clear-row { margin-top: 7px; }
+
+    #part-guidance {
+      min-height: 88px;
+    }
+
+    button.subtle {
+      color: var(--muted);
+      background: rgba(11, 20, 21, 0.72);
+    }
+
+    .prompt-tools {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .saved-prompt-tools { margin-top: 10px; }
+
+    details {
+      border: 0;
+      border-top: 1px solid rgba(33, 71, 74, 0.72);
+      border-radius: 0;
+      background: transparent;
+      padding: 11px 0 0;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--cyan);
+      font-weight: 900;
+      font-family: var(--font-mono);
+      font-size: 10.4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      list-style: none;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::before { content: "// "; color: var(--green); }
+
+    .parts-list-head {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr) 66px;
+      gap: 7px;
+      align-items: end;
+      margin-top: 8px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.035em;
+    }
+
+    .parts-list-head[hidden] {
+      display: none;
+    }
+
+    .parts-list-head span:last-child {
+      text-align: right;
+    }
+
+    .parts-list {
+      display: grid;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .parts-extract-row {
+      margin-top: 8px;
+    }
+
+    .parts-extract-row button {
+      height: 32px;
+      min-height: 32px;
+      font-size: 10px;
+    }
+
+    .part-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr) 66px;
+      gap: 7px;
+      align-items: center;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      padding: 7px;
+      background: rgba(8, 15, 15, 0.62);
+    }
+
+    .part-item input { width: 16px; height: 16px; accent-color: var(--green); justify-self: start; }
+    .part-item input:last-child { justify-self: end; }
+    .part-name { color: var(--text); font-weight: 800; overflow-wrap: anywhere; }
+    .part-meta { color: var(--dim); font-size: 11px; overflow-wrap: anywhere; }
+
+    .stage {
+      min-width: 0;
+      min-height: 0;
+      height: 100%;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      background: rgba(7, 16, 15, 0.88);
+    }
+
+    .topbar {
+      min-width: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 0 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(11, 23, 24, 0.92);
+      overflow: hidden;
+    }
+
+    .title {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--font-head);
+      font-size: 22px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .runtime {
+      color: var(--muted);
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+
+    .viewer {
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 16px 24px 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .image-shell {
+      width: 100%;
+      height: 100%;
+      max-height: none;
+      min-height: 0;
+      border: 1px solid rgba(40, 68, 70, 0.9);
+      border-radius: 8px;
+      background:
+        url("/ui/nymphs_preview_forest.png") center center / cover no-repeat,
+        rgba(4, 12, 11, 0.82);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .image-shell img {
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
+      object-fit: contain;
+      object-position: center center;
+      display: none;
+      position: relative;
+      z-index: 2;
+    }
+
+    .empty {
+      display: grid;
+      gap: 8px;
+      place-items: center;
+      color: var(--dim);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 900;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .empty::before {
+      content: "Generated image appears here.";
+      color: var(--cyan);
+      font-size: 11px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .progress {
+      padding: 9px 24px 10px;
+      display: grid;
+      gap: 6px;
+      align-content: end;
+      background: rgba(11, 23, 24, 0.92);
+    }
+
+    .status-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      overflow: hidden;
+    }
+
+    .status-line span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .model-line {
+      min-width: 0;
+      overflow: hidden;
+      color: var(--dim);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .model-line span:first-child {
+      color: var(--cyan);
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .progress-line {
+      display: grid;
+      grid-template-columns: 160px minmax(0, 1fr) 86px;
+      gap: 10px;
+      color: var(--muted);
+      align-items: center;
+    }
+
+    .progress-stage {
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .bar {
+      height: 6px;
+      border-radius: 999px;
+      background: #223532;
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--cyan), var(--green), var(--warn));
+      transition: width 0.22s ease;
+    }
+
+    .strip-head {
+      display: none;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      margin-top: 6px;
+      margin-bottom: 6px;
+    }
+
+    .strip-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      color: var(--muted);
+      font-family: Consolas, monospace;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .strip-title span:last-child {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: var(--cyan);
+    }
+
+    .strip-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .strip-controls button {
+      min-height: 28px;
+      padding: 0 9px;
+      font-size: 9.8px;
+    }
+
+    .strip-controls button.active {
+      border-color: var(--line-strong);
+      color: var(--green);
+    }
+
+    .strip-browser {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .folder-select {
+      height: 28px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+    }
+
+    .folder-menu {
+      position: relative;
+      width: 34px;
+      height: 28px;
+      flex: 0 0 34px;
+      display: inline-grid;
+      place-items: center;
+      align-self: center;
+      min-width: 34px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+
+    .folder-menu summary {
+      width: 34px;
+      height: 28px;
+      box-sizing: border-box;
+      display: grid;
+      place-items: center;
+      margin: 0;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 5px;
+      background: rgba(15, 26, 28, 0.85);
+      color: var(--cyan);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+      list-style: none;
+    }
+    .folder-menu summary::-webkit-details-marker { display: none; }
+    .folder-menu summary::before { content: ""; }
+
+    .folder-menu-panel {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      z-index: 6;
+      width: 210px;
+      display: grid;
+      gap: 6px;
+      padding: 8px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: rgba(7, 16, 15, 0.98);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.36);
+    }
+
+    .folder-menu-panel button {
+      width: 100%;
+      min-height: 28px;
+      justify-content: flex-start;
+      padding: 0 9px;
+      font-size: 9.8px;
+    }
+
+    .strip-select-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 6px;
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    .strip-select-actions button {
+      min-height: 28px;
+      padding: 0 9px;
+      font-size: 9.8px;
+    }
+
+    .selection-count {
+      color: var(--dim);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .gallery {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 124px;
+      gap: 8px;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      min-height: 0;
+    }
+
+    .gallery:empty { display: none; }
+
+    .thumb {
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 8px;
+      background: #08100f;
+      padding: 5px;
+      display: grid;
+      grid-template-rows: 60px auto;
+      gap: 5px;
+      cursor: pointer;
+      min-width: 0;
+      position: relative;
+    }
+
+    .thumb.selected { border-color: var(--green); }
+    .thumb.checked { border-color: var(--cyan); }
+    .thumb img { width: 100%; height: 60px; object-fit: contain; object-position: center center; border-radius: 5px; background: #020403; }
+    .thumb.broken img { opacity: 0.32; }
+    .thumb span { color: var(--muted); font-size: 11px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .thumb.selected span { color: var(--green); }
+
+    .thumb-check {
+      position: absolute;
+      top: 7px;
+      left: 7px;
+      width: 18px;
+      height: 18px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(41, 230, 218, 0.72);
+      border-radius: 4px;
+      background: rgba(2, 8, 7, 0.86);
+      z-index: 3;
+      cursor: pointer;
+    }
+
+    .thumb-check input {
+      width: 14px;
+      height: 14px;
+      accent-color: var(--green);
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      max-width: min(720px, calc(100vw - 36px));
+      padding: 10px 12px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: rgba(8, 17, 18, 0.96);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.16s ease;
+      color: var(--text);
+      z-index: 5;
+    }
+
+    .toast.show { opacity: 1; }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.58);
+    }
+
+    .modal.open { display: grid; }
+
+    .modal-panel {
+      width: min(760px, calc(100vw - 36px));
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: #0b1211;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.42);
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .modal-title {
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .modal textarea {
+      min-height: 320px;
+      max-height: 62vh;
+    }
+
+    @media (max-width: 600px) {
+      body { overflow: auto; }
+      .app { height: auto; min-height: 100vh; grid-template-columns: 1fr; }
+      .sidebar { height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      .stage { height: 82vh; min-height: min(620px, 100vh); }
+      .image-shell { height: 100%; max-height: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="sidebar">
+      <section class="section" id="runtime-section">
+        <div class="section-title"><span>Runtime</span><span id="mode-chip">Z-Image</span></div>
+        <div class="segmented three-way" role="tablist">
+          <button class="segment active" id="mode-zimage" type="button">Z-Image</button>
+          <button class="segment" id="mode-gemini" type="button">nano</button>
+          <button class="segment" id="mode-parts" type="button">Parts</button>
+        </div>
+        <div class="segmented workflow-tabs" id="z-workflow-tabs" role="tablist" aria-label="Z-Image workflow">
+          <button class="segment active" id="mode-text-image" type="button">Prompt</button>
+          <button class="segment" id="mode-image-to-image" type="button">Image to Image</button>
+          <input id="z-use-guide" type="checkbox" hidden>
+        </div>
+        <div class="command-row three">
+          <button id="open-outputs" type="button">Open</button>
+          <button class="subtle" id="clear-outputs" type="button">Clear</button>
+          <button class="danger" id="stop-backend" type="button">Stop</button>
+        </div>
+      </section>
+
+      <section class="section" id="source-section" hidden>
+        <div class="section-title"><span>Image Source</span><span id="source-name">none</span></div>
+        <div class="drop" id="drop">
+          <input id="source-file" type="file" accept="image/*" hidden>
+          <img id="source-preview" alt="Source preview">
+          <div class="drop-hint" id="drop-hint">
+            <strong>Drop image</strong>
+            <span>or click to choose</span>
+          </div>
+        </div>
+        <div class="command-row two">
+          <button id="use-selected-source" type="button" disabled>Current</button>
+          <button id="open-source-images" type="button">Open</button>
+        </div>
+        <div class="command-row two no-top">
+          <button id="clear-source" type="button" disabled>Clear</button>
+          <button id="refresh-gallery" type="button">Refresh</button>
+        </div>
+        <div class="grid" id="z-strength-row" hidden>
+          <div class="field wide"><label for="strength">Image Strength</label><input id="strength" type="number" min="0.05" max="1" step="0.05" value="0.55"></div>
+        </div>
+      </section>
+
+      <section class="section" id="zimage-controls">
+        <div class="section-title"><span>Z-Image</span><span id="zimage-ready">checking</span></div>
+        <div class="grid">
+          <div class="model-choice-row wide">
+            <div class="field">
+              <label for="image-provider">Provider</label>
+              <select id="image-provider">
+                <option value="zimage">Z-Image Turbo</option>
+                <option value="qwen_edit">Qwen Image Edit 2511</option>
+              </select>
+            </div>
+          </div>
+          <div class="model-choice-row wide">
+            <div class="field">
+              <label for="z-model-choice">Model Choice</label>
+              <select id="z-model-choice">
+                <option value="auto_r32">Z-Image Nunchaku r32</option>
+                <option value="auto_r128">Z-Image Nunchaku r128</option>
+                <option value="int4_r256">Z-Image Nunchaku r256</option>
+              </select>
+            </div>
+            <button id="load-z-model" type="button">Load</button>
+          </div>
+          <div class="field wide">
+            <label for="z-profile">Profile</label>
+            <select id="z-profile"></select>
+          </div>
+          <div class="command-row three wide no-top">
+            <button id="save-profile" type="button">Save</button>
+            <button class="subtle" id="delete-profile" type="button">Delete</button>
+            <button class="subtle" id="open-config" type="button">Open</button>
+          </div>
+          <div class="field"><label for="width">Width</label><input id="width" type="number" min="64" max="2048" step="8" value="1024"></div>
+          <div class="field"><label for="height">Height</label><input id="height" type="number" min="64" max="2048" step="8" value="1024"></div>
+          <div class="field"><label for="steps">Steps</label><input id="steps" type="number" min="1" max="80" value="9"></div>
+          <div class="field"><label for="guidance">Guidance</label><input id="guidance" type="number" step="0.1" value="0"></div>
+          <div class="field"><label for="seed">Seed</label><input id="seed" type="number" value="0"></div>
+          <div class="field"><label for="variants">Variants</label><input id="variants" type="number" min="1" max="8" value="1"></div>
+          <div class="field"><label for="seed-step">Seed Step</label><input id="seed-step" type="number" min="1" max="1000000" value="1"></div>
+          <div class="toggle-row wide"><span>Use LoRA</span><input id="z-use-lora" type="checkbox"></div>
+          <div class="field wide z-lora-row" hidden><label for="z-lora-run">LoRA Run</label><select id="z-lora-run"></select></div>
+          <div class="field wide z-lora-row" hidden><label for="z-lora-checkpoint">LoRA Checkpoint</label><select id="z-lora-checkpoint"></select></div>
+          <div class="command-row three wide z-lora-row no-top" hidden>
+            <button id="z-lora-open" type="button">Open LoRA</button>
+            <button id="z-lora-latest" type="button">Use Latest</button>
+            <button class="subtle" id="z-lora-clear" type="button">Clear</button>
+          </div>
+          <div class="field wide z-lora-row" hidden><label for="z-lora-path">LoRA Path</label><input id="z-lora-path" type="text" placeholder="/home/nymph/LoRA/loras/.../checkpoint.safetensors"></div>
+          <div class="field z-lora-row" hidden><label for="z-lora-strength">LoRA Strength</label><input id="z-lora-strength" type="number" min="0" max="2" step="0.05" value="1"></div>
+          <div class="toggle-row z-lora-row" hidden><span>Use Activation</span><input id="z-lora-auto-trigger" type="checkbox"></div>
+          <div class="field wide z-lora-row" hidden><label for="z-lora-trigger">Activation</label><input id="z-lora-trigger" type="text" placeholder="optional trigger text"></div>
+        </div>
+      </section>
+
+      <section class="section" id="gemini-controls" hidden>
+        <div class="section-title"><span>Gemini Flash</span><span>OpenRouter</span></div>
+        <div class="grid">
+          <div class="toggle-row wide"><span>Guide Image</span><input id="gemini-use-guide" type="checkbox"></div>
+          <div class="field wide gemini-guide-row" hidden><label for="gemini-guide-label">Guide Image</label><input id="gemini-guide-label" type="text" readonly value="none"></div>
+          <div class="command-row three wide gemini-guide-row no-top" hidden>
+            <button id="gemini-guide-use-selected" type="button">Current</button>
+            <button id="gemini-guide-open-images" type="button">Open</button>
+            <button class="subtle" id="gemini-guide-clear" type="button">Clear</button>
+          </div>
+          <div class="field wide">
+            <label for="api-key">API Key</label>
+            <input id="api-key" type="password" autocomplete="off" placeholder="Optional if saved in Manager">
+            <div class="hint" id="openrouter-status">Checking saved OpenRouter key.</div>
+          </div>
+          <div class="command-row two wide no-top">
+            <button id="save-api-key" type="button">Apply Key</button>
+            <button class="subtle" id="remove-api-key" type="button">Remove Key</button>
+          </div>
+          <div class="field wide">
+            <label for="gemini-model">Model</label>
+            <select id="gemini-model">
+              <option value="google/gemini-2.5-flash-image">Gemini 2.5 Flash Image</option>
+              <option value="google/gemini-3.1-flash-image-preview">Gemini 3.1 Flash Image</option>
+              <option value="google/gemini-3-pro-image-preview">Gemini 3 Pro Image</option>
+            </select>
+          </div>
+          <div class="field"><label for="aspect">Aspect</label><select id="aspect"><option>1:1</option><option>2:3</option><option>3:2</option><option>3:4</option><option>4:3</option><option>4:5</option><option>5:4</option><option>9:16</option><option>16:9</option><option>21:9</option></select></div>
+          <div class="field"><label for="image-size">Size</label><select id="image-size"><option value="">Auto</option><option>1K</option><option>2K</option><option>4K</option></select></div>
+          <div class="field"><label for="gemini-variants">Variants</label><input id="gemini-variants" type="number" min="1" max="8" value="1"></div>
+        </div>
+      </section>
+
+      <section class="section" id="prompt-section">
+        <div class="section-title"><span>Prompt</span><span id="prompt-kind">asset</span></div>
+        <div class="prompt-tools">
+          <div class="field">
+            <label for="subject">Subject</label>
+            <select id="subject"></select>
+          </div>
+          <div class="field">
+            <label for="style">Style</label>
+            <select id="style"></select>
+          </div>
+          <div class="field">
+            <label for="view">View</label>
+            <select id="view"></select>
+          </div>
+        </div>
+        <textarea id="prompt" spellcheck="false"></textarea>
+        <div class="command-row two">
+          <button id="edit-prompt" type="button">Editor</button>
+          <button id="apply-prompt" type="button">Apply</button>
+        </div>
+        <div class="command-row">
+          <button id="clear-prompt" type="button">Clear</button>
+        </div>
+        <div class="prompt-tools saved-prompt-tools">
+          <div class="field">
+            <label for="saved-prompt">Saved Prompt</label>
+            <select id="saved-prompt"></select>
+          </div>
+          <div class="field">
+            <label for="save-current-prompt">Prompt Tools</label>
+            <div class="command-row two no-top">
+              <button id="save-current-prompt" type="button">Save</button>
+              <button class="subtle" id="delete-saved-prompt" type="button">Delete</button>
+            </div>
+          </div>
+          <div class="command-row no-top">
+            <button class="subtle" id="open-saved-presets" type="button">Open</button>
+          </div>
+        </div>
+        <details class="prompt-advanced">
+          <summary>Advanced Negative</summary>
+          <div class="prompt-tools">
+            <div class="field">
+              <label for="negative-preset">Negative</label>
+              <select id="negative-preset"></select>
+            </div>
+          </div>
+          <textarea id="negative-prompt" spellcheck="false"></textarea>
+        </details>
+        <div class="command-row">
+          <button class="primary" id="generate" type="button">Generate</button>
+        </div>
+      </section>
+
+      <section class="section" id="parts-section" hidden>
+        <details id="parts-details" open>
+          <summary>Image Part Extraction</summary>
+          <div class="grid" style="margin-top:10px">
+            <div class="field wide">
+              <label for="parts-source-label">Source Image</label>
+              <div class="parts-source-card">
+                <div class="parts-source-thumb" id="parts-source-drop">
+                  <input id="parts-source-file" type="file" accept="image/*" hidden>
+                  <img id="parts-source-preview" alt="Parts source preview">
+                  <span id="parts-source-empty">none</span>
+                </div>
+                <div class="parts-source-meta">
+                  <input id="parts-source-label" type="text" readonly value="none">
+                </div>
+                <div class="command-row three no-top parts-source-actions">
+                  <button id="parts-use-selected-source" type="button">Current</button>
+                  <button id="parts-open-images" type="button">Open</button>
+                  <button class="subtle" id="parts-clear-source" type="button">Clear</button>
+                </div>
+              </div>
+            </div>
+            <div class="field wide">
+              <label for="planner-provider">Planner Provider</label>
+              <select id="planner-provider">
+                <option value="gemini">Gemini</option>
+                <option value="brain">Brain Vision</option>
+              </select>
+            </div>
+            <div class="field wide" id="planner-model-field">
+              <label for="planner-model">Planner Model</label>
+              <select id="planner-model">
+                <option value="google/gemini-2.5-flash">Gemini 2.5 Flash</option>
+                <option value="google/gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
+              </select>
+            </div>
+            <div class="field wide" id="planner-brain-field" hidden>
+              <label for="planner-brain-model">Brain Model</label>
+              <input id="planner-brain-model" type="text" readonly value="Auto vision model">
+            </div>
+            <div class="field wide">
+              <label for="extractor-provider">Extractor</label>
+              <select id="extractor-provider">
+                <option value="gemini">Gemini Flash</option>
+                <option value="qwen_edit">Qwen Image Edit local</option>
+              </select>
+            </div>
+            <div class="field"><label for="max-parts">Max</label><input id="max-parts" type="number" min="1" max="16" value="8"></div>
+            <div class="toggle-row"><span>Style Lock</span><input id="style-lock" type="checkbox" checked></div>
+            <div class="toggle-row"><span>Face</span><input id="base-face" type="checkbox"></div>
+            <div class="toggle-row"><span>Eyes In Base</span><input id="base-eyes" type="checkbox"></div>
+            <div class="toggle-row wide"><span>Add Eyeball Part</span><input id="eye-part" type="checkbox"></div>
+            <div class="field wide"><label for="part-guidance-select">Extraction Prompt</label><select id="part-guidance-select"></select></div>
+            <div class="field wide"><textarea id="part-guidance" spellcheck="false"></textarea></div>
+            <div class="command-row two wide no-top">
+              <button id="edit-part-guidance" type="button">Editor</button>
+              <button class="subtle" id="clear-part-guidance" type="button">Clear Prompt</button>
+            </div>
+          </div>
+          <div class="command-row">
+            <button id="plan-parts" type="button">Plan Parts</button>
+          </div>
+          <div class="parts-list-head" id="parts-list-head" hidden>
+            <span>Extract</span>
+            <span></span>
+            <span>Symmetry</span>
+          </div>
+          <div class="parts-list" id="parts-list"></div>
+          <div class="command-row part-clear-row" id="clear-parts-row" hidden>
+            <button id="clear-parts" type="button">Clear Parts</button>
+          </div>
+          <div class="command-row parts-extract-row" id="parts-extract-row" hidden>
+            <button class="primary" id="extract-parts" type="button" disabled>Extract (0)</button>
+          </div>
+        </details>
+      </section>
+    </aside>
+
+    <section class="stage">
+      <section class="viewer">
+        <div class="image-shell">
+          <img id="result-image" alt="Generated image">
+          <div class="empty" id="empty" aria-label="Generated image appears here."></div>
+        </div>
+      </section>
+      <section class="progress">
+        <div class="status-line">
+          <span id="runtime-text">No model loaded</span>
+          <span id="output-label">No output</span>
+        </div>
+        <div class="model-line"><span>Selected</span> <span id="selected-model-text">checking</span></div>
+        <div class="progress-line">
+          <span class="progress-stage" id="progress-stage">Idle</span>
+          <span id="progress-detail">Waiting for prompt.</span>
+          <span id="progress-percent">0%</span>
+        </div>
+        <div class="bar"><span id="progress-bar"></span></div>
+        <div class="strip-head">
+          <div class="strip-title"><span>Browse</span><span id="strip-label">Outputs</span></div>
+          <div class="strip-controls">
+            <button id="strip-prev" type="button" title="Previous output">&lt;</button>
+            <button id="strip-next" type="button" title="Next output">&gt;</button>
+          </div>
+        </div>
+        <div class="strip-browser">
+          <select class="folder-select" id="output-folder" aria-label="Output folder"></select>
+          <div class="strip-select-actions">
+            <details class="folder-menu" id="folder-menu">
+              <summary aria-label="Folder actions" title="Folder actions">...</summary>
+              <div class="folder-menu-panel">
+                <button id="choose-folder" type="button">Choose Folder</button>
+                <button id="move-selected" type="button">Move Selected</button>
+                <button class="danger" id="delete-folder" type="button">Delete Folder</button>
+              </div>
+            </details>
+            <span class="selection-count" id="selection-count">0 selected</span>
+            <button id="select-visible" type="button">Select</button>
+            <button id="select-all-visible" type="button">Select All</button>
+            <button id="clear-selection" type="button">Clear</button>
+            <button class="danger" id="delete-selected" type="button">Delete</button>
+          </div>
+        </div>
+        <input id="folder-picker" type="file" accept="image/*" webkitdirectory multiple hidden>
+        <div class="gallery" id="gallery"></div>
+      </section>
+    </section>
+  </main>
+  <div class="modal" id="text-modal" aria-hidden="true">
+    <div class="modal-panel">
+      <div class="modal-title" id="text-modal-title">Editor</div>
+      <textarea id="text-modal-value" spellcheck="false"></textarea>
+      <div class="command-row two">
+        <button class="primary" id="text-modal-apply" type="button">Apply</button>
+        <button class="subtle" id="text-modal-close" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const state = {
+      mode: "zimage",
+      sourceDataUrl: "",
+      sourceName: "",
+      partsSourceDataUrl: "",
+      partsSourceName: "",
+      selectedOutput: null,
+      outputs: [],
+      localOutputs: [],
+      localObjectUrls: [],
+      visibleOutputs: [],
+      selectedOutputPaths: new Set(),
+      outputView: "recent",
+      viewerSource: "outputs",
+      manualFolderName: "",
+      activeBatchId: "",
+      parts: [],
+      busy: false,
+      openrouterConfigured: false,
+      progressTimer: null,
+      lastTaskOutputPath: "",
+      userPresets: { subject: [], style: [], view: [], negative: [], part_guidance: [], saved: [], settings: [] },
+      loraRuns: [],
+      loraCheckpoints: {},
+      modalApply: null,
+      serverInfo: null,
+      modelChoiceDirty: false,
+    };
+
+    const subjects = { none: ["None", ""] };
+    const styles = { none: ["No Style", ""] };
+    const views = { none: ["None", ""] };
+    const negatives = { none: ["None", ""] };
+    const partGuidancePresets = { none: ["None", ""] };
+
+    const profiles = {
+      r32_fast: { label: "Fast 512", modelChoice: "auto_r32", width: 512, height: 512, steps: 8, guidance: 0, variants: 1, seedStep: 1 },
+      r32_draft: { label: "Draft 768", modelChoice: "auto_r32", width: 768, height: 768, steps: 8, guidance: 0, variants: 1, seedStep: 1 },
+      r32_default: { label: "Default 1024", modelChoice: "auto_r32", width: 1024, height: 1024, steps: 9, guidance: 0, variants: 1, seedStep: 1 },
+      r32_large: { label: "Large 1536", modelChoice: "auto_r32", width: 1536, height: 1536, steps: 9, guidance: 0, variants: 1, seedStep: 1 },
+      r32_max: { label: "Max 2048", modelChoice: "auto_r32", width: 2048, height: 2048, steps: 9, guidance: 0, variants: 1, seedStep: 1 },
+      r128_fast: { label: "Fast 512", modelChoice: "auto_r128", width: 512, height: 512, steps: 8, guidance: 0, variants: 1, seedStep: 1 },
+      r128_draft: { label: "Draft 768", modelChoice: "auto_r128", width: 768, height: 768, steps: 8, guidance: 0, variants: 1, seedStep: 1 },
+      r128_default: { label: "Default 1024", modelChoice: "auto_r128", width: 1024, height: 1024, steps: 9, guidance: 0, variants: 1, seedStep: 1 },
+      r128_large: { label: "Large 1536", modelChoice: "auto_r128", width: 1536, height: 1536, steps: 9, guidance: 0, variants: 1, seedStep: 1 },
+      r128_max: { label: "Max 2048", modelChoice: "auto_r128", width: 2048, height: 2048, steps: 9, guidance: 0, variants: 1, seedStep: 1 },
+      r256_fast: { label: "Fast 512", modelChoice: "int4_r256", width: 512, height: 512, steps: 8, guidance: 0, variants: 1, seedStep: 1 },
+      r256_draft: { label: "Draft 768", modelChoice: "int4_r256", width: 768, height: 768, steps: 8, guidance: 0, variants: 1, seedStep: 1 },
+      r256_default: { label: "Default 1024", modelChoice: "int4_r256", width: 1024, height: 1024, steps: 9, guidance: 0, variants: 1, seedStep: 1 },
+      r256_large: { label: "Large 1536", modelChoice: "int4_r256", width: 1536, height: 1536, steps: 9, guidance: 0, variants: 1, seedStep: 1 },
+      r256_max: { label: "Max 2048", modelChoice: "int4_r256", width: 2048, height: 2048, steps: 9, guidance: 0, variants: 1, seedStep: 1 },
+    };
+
+    const controlHelp = {
+      "mode-zimage": "Use the local Z-Image backend for prompt and image-to-image generation.",
+      "mode-gemini": "Use Gemini image generation through OpenRouter.",
+      "mode-parts": "Plan and extract reusable image parts from the big preview or a chosen source image.",
+      "mode-text-image": "Generate from the visible prompt only.",
+      "mode-image-to-image": "Send one picked image with the Z-Image prompt.",
+      "open-outputs": "Open the generated image output folder.",
+      "clear-outputs": "Clear only the current big preview selection. This does not delete image files.",
+      "stop-backend": "Stop the local image backend runtime.",
+      "use-selected-source": "Use the image currently shown in the big preview as the image-to-image source.",
+      "open-source-images": "Choose a local image file as the image-to-image source.",
+      "clear-source": "Clear the current image-to-image source.",
+      "refresh-gallery": "Refresh the output image strip.",
+      strength: "How strongly Z-Image should transform the guide image.",
+      "z-model-choice": "Choose which local Z-Image Nunchaku weight to load.",
+      "load-z-model": "Load the selected Z-Image Nunchaku weight. Changing the dropdown alone does not load it.",
+      "z-profile": "Load a reusable Z-Image profile. Built-in profiles can switch Nunchaku rank, image size, steps, and variants.",
+      "save-profile": "Save the current Z-Image settings as a reusable profile.",
+      "delete-profile": "Delete the selected user profile.",
+      "open-config": "Open the editable image profile presets folder.",
+      width: "Generated image width in pixels.",
+      height: "Generated image height in pixels.",
+      steps: "How many image-generation refinement steps to run. More steps are slower.",
+      guidance: "How strongly Z-Image follows the prompt. Z-Image Turbo usually works best near the default.",
+      seed: "Z-Image seed. Use 0 for random, or a positive whole number to repeat a result.",
+      variants: "How many single-image variants Generate should make.",
+      "seed-step": "For Z-Image variants, add this amount to the starting seed for each next image.",
+      "z-use-lora": "Load a Z-Image LoRA during generation.",
+      "z-lora-run": "Choose a Z-Image LoRA folder or file from the LoRA library.",
+      "z-lora-checkpoint": "Choose which checkpoint file inside the selected LoRA run to use.",
+      "z-lora-open": "Open the LoRA folder.",
+      "z-lora-latest": "Use the latest available LoRA checkpoint from the selected run.",
+      "z-lora-clear": "Clear the selected LoRA.",
+      "z-lora-path": "Path to a Z-Image LoRA safetensors file.",
+      "z-lora-strength": "How strongly the selected LoRA should influence generation.",
+      "z-lora-auto-trigger": "Automatically insert this LoRA activation text into the prompt.",
+      "z-lora-trigger": "Activation text for this LoRA. By default this uses the selected LoRA name.",
+      "gemini-use-guide": "Send one picked image along with the prompt so Gemini can edit from or stay closer to an existing design.",
+      "gemini-guide-label": "Image file to send with the Gemini prompt.",
+      "gemini-guide-use-selected": "Use the image currently shown in the big preview as the Gemini guide image.",
+      "gemini-guide-open-images": "Choose a local image file as the Gemini guide image.",
+      "gemini-guide-clear": "Clear the Gemini guide image.",
+      "api-key": "OpenRouter API key for Gemini image generation. Leave blank to use the saved Manager/environment key.",
+      "save-api-key": "Save the pasted OpenRouter API key to the module config so Gemini and parts extraction can reuse it.",
+      "remove-api-key": "Remove the module-saved OpenRouter API key. Environment or Manager-provided keys may still be available.",
+      "gemini-model": "Gemini image model to call through OpenRouter.",
+      aspect: "Gemini output aspect ratio.",
+      "image-size": "Output size for Gemini 3.1 Flash Image or Gemini 3 Pro Image. Gemini 2.5 Flash Image uses its fixed size for the selected aspect ratio.",
+      "gemini-variants": "How many Gemini image variants Generate should make.",
+      subject: "Managed subject prompt block shown in the visible prompt.",
+      style: "Managed style prompt block shown in the visible prompt.",
+      view: "Managed view/cutout prompt block shown in the visible prompt.",
+      prompt: "What the selected image backend should create. Keep it direct and editable; use Editor for longer text.",
+      "edit-prompt": "Open the prompt in a larger editor.",
+      "apply-prompt": "Apply the selected subject, style, view, and negative preset blocks to the visible prompt.",
+      "clear-prompt": "Clear the visible prompt text.",
+      "saved-prompt": "Saved full prompt to load into the visible prompt.",
+      "save-current-prompt": "Save the current visible prompt.",
+      "delete-saved-prompt": "Delete the selected saved prompt.",
+      "open-saved-presets": "Open the editable prompt preset folder.",
+      "negative-preset": "Managed negative prompt block.",
+      "negative-prompt": "Optional negative prompt used when guidance is enabled.",
+      generate: "Run generation using the active backend and current settings.",
+      "parts-source-label": "Source image used for Image Part Extraction.",
+      "parts-source-drop": "Drop or choose the source image for Image Part Extraction.",
+      "parts-use-selected-source": "Use the image currently shown in the big preview as the parts extraction source.",
+      "parts-open-images": "Choose a local image file as the parts extraction source.",
+      "parts-clear-source": "Clear the parts extraction source image.",
+      "planner-provider": "Choose Gemini through OpenRouter or Brain Vision from the local Brain module for part planning.",
+      "planner-model": "Gemini vision model used to identify extractable character parts before image edits run.",
+      "planner-brain-model": "Brain Vision auto-finds and starts the local Brain vision model, then restores Brain afterward.",
+      "extractor-provider": "Choose Gemini or local Qwen Image Edit for extracting the planned parts.",
+      "max-parts": "Maximum parts to include in one extraction plan. This controls cost before image edits run.",
+      "style-lock": "Apply the active Style field strongly during guided part extraction.",
+      "base-face": "Keep facial features on the anatomy base extraction instead of leaving the head feature-neutral.",
+      "base-eyes": "When Face is on, keep finished eyes on the anatomy base instead of leaving the eye area blank.",
+      "eye-part": "Add one separate reusable eyeball-only extraction target.",
+      "part-guidance-select": "Reusable extraction guidance preset.",
+      "part-guidance": "Extra guidance applied to every character-part extraction request.",
+      "edit-part-guidance": "Open extraction guidance in a larger editor.",
+      "clear-part-guidance": "Clear only the extraction guidance prompt text.",
+      "plan-parts": "Analyze the parts source image and build an editable extraction checklist.",
+      "clear-parts": "Clear the current planned parts checklist.",
+      "extract-parts": "Extract every planned part with its Extract checkbox enabled.",
+      "output-folder": "Choose which output folder or recent group to browse in the strip.",
+      "choose-folder": "Choose a local folder of images to browse.",
+      "move-selected": "Move checked strip images into a new named folder.",
+      "delete-folder": "Delete the current user-created output folder.",
+      "select-visible": "Select the image currently shown in the big preview.",
+      "select-all-visible": "Select all images currently visible in the strip.",
+      "clear-selection": "Clear checked strip selections.",
+      "delete-selected": "Delete checked strip images from disk.",
+    };
+
+    function applyControlHelp() {
+      for (const [id, text] of Object.entries(controlHelp)) {
+        const node = $(id);
+        if (!node) continue;
+        node.title = text;
+        for (const label of document.querySelectorAll(`label[for="${CSS.escape(id)}"]`)) {
+          label.title = text;
+        }
+        const toggle = node.closest(".toggle-row");
+        if (toggle) {
+          toggle.title = text;
+          const caption = toggle.querySelector("span");
+          if (caption) caption.title = text;
+        }
+      }
+    }
+
+    function zModelSelection() {
+      const value = $("z-model-choice").value || "auto_r32";
+      const [precision, rawRank] = value.split("_r");
+      return {
+        model_id: "Tongyi-MAI/Z-Image-Turbo",
+        nunchaku_precision: precision || "auto",
+        nunchaku_rank: parseInt(rawRank || "32", 10),
+        label: $("z-model-choice").selectedOptions[0]?.textContent || "Z-Image",
+      };
+    }
+
+    function profileModelChoice(values) {
+      return values?.modelChoice || "auto_r32";
+    }
+
+    function profileBelongsToSelectedModel(values) {
+      return profileModelChoice(values) === ($("z-model-choice").value || "auto_r32");
+    }
+
+    function modelChoiceFromInfo(info) {
+      const extra = info?.extra || {};
+      const rank = parseInt(extra.configured_nunchaku_rank || extra.nunchaku_rank || "32", 10);
+      if (rank === 256) return "int4_r256";
+      if (rank === 128) return "auto_r128";
+      return "auto_r32";
+    }
+
+    function numberValue(id, fallback) {
+      const value = parseFloat($(id).value);
+      return Number.isFinite(value) ? value : fallback;
+    }
+
+    function intValue(id, fallback) {
+      const value = parseInt($(id).value, 10);
+      return Number.isFinite(value) ? value : fallback;
+    }
+
+    function option(label, value) {
+      const node = document.createElement("option");
+      node.value = value;
+      node.textContent = label;
+      return node;
+    }
+
+    function profileValues() {
+      return {
+        width: intValue("width", 1024),
+        height: intValue("height", 1024),
+        steps: intValue("steps", 9),
+        guidance: numberValue("guidance", 0),
+        seed: intValue("seed", 0),
+        variants: intValue("variants", 1),
+        seedStep: intValue("seed-step", 1),
+        modelChoice: $("z-model-choice").value,
+        useGuide: $("z-use-guide").checked,
+        strength: numberValue("strength", 0.55),
+        useLora: $("z-use-lora").checked,
+        loraPath: $("z-lora-path").value.trim(),
+        loraStrength: numberValue("z-lora-strength", 1),
+        loraAutoTrigger: $("z-lora-auto-trigger").checked,
+        loraTrigger: $("z-lora-trigger").value.trim(),
+        geminiModel: $("gemini-model").value,
+        aspect: $("aspect").value,
+        imageSize: $("image-size").value,
+        geminiVariants: intValue("gemini-variants", 1),
+      };
+    }
+
+    function applyProfileValues(values) {
+      if (!values || typeof values !== "object") return;
+      const assignments = [
+        ["width", values.width],
+        ["height", values.height],
+        ["steps", values.steps],
+        ["guidance", values.guidance],
+        ["seed", values.seed],
+        ["variants", values.variants],
+        ["seed-step", values.seedStep],
+        ["strength", values.strength],
+        ["z-lora-path", values.loraPath],
+        ["z-lora-strength", values.loraStrength],
+        ["z-lora-trigger", values.loraTrigger],
+        ["gemini-model", values.geminiModel],
+        ["aspect", values.aspect],
+        ["image-size", values.imageSize],
+        ["gemini-variants", values.geminiVariants],
+      ];
+      for (const [id, value] of assignments) {
+        if (value !== undefined && $(id)) $(id).value = value;
+      }
+      if (values.useGuide !== undefined) $("z-use-guide").checked = !!values.useGuide;
+      if (values.useLora !== undefined) $("z-use-lora").checked = !!values.useLora;
+      if (values.loraAutoTrigger !== undefined) $("z-lora-auto-trigger").checked = !!values.loraAutoTrigger;
+      syncGuideRows();
+      syncLoraRows();
+      updateGenerateLabel();
+    }
+
+    function setImageWorkflow(useGuide) {
+      $("z-use-guide").checked = !!useGuide;
+      syncGuideRows();
+    }
+
+    function syncImageWorkflowButtons() {
+      const useGuide = $("z-use-guide").checked;
+      $("mode-text-image").classList.toggle("active", !useGuide);
+      $("mode-image-to-image").classList.toggle("active", useGuide);
+    }
+
+    function presetPrompt(kind, key) {
+      if (!key) return "";
+      if (!key.startsWith("user:")) {
+        const sources = { subject: subjects, style: styles, view: views, negative: negatives, part_guidance: partGuidancePresets };
+        const source = sources[kind] || subjects;
+        return source[key]?.[1] || "";
+      }
+      const id = key.slice(5);
+      const preset = (state.userPresets[kind] || []).find((item) => item.id === id);
+      return preset?.prompt || "";
+    }
+
+    function presetLabel(kind, key) {
+      if (!key) return "";
+      if (!key.startsWith("user:")) {
+        const sources = { subject: subjects, style: styles, view: views, negative: negatives, part_guidance: partGuidancePresets };
+        const source = sources[kind] || subjects;
+        return source[key]?.[0] || "";
+      }
+      const preset = (state.userPresets[kind] || []).find((item) => item.id === key.slice(5));
+      return preset?.name || "";
+    }
+
+    function loraActivationFromPath(path) {
+      const name = String(path || "").split(/[\\/]/).pop() || "";
+      return name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").trim();
+    }
+
+    function toast(message) {
+      $("toast").textContent = message;
+      $("toast").classList.add("show");
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => $("toast").classList.remove("show"), 3500);
+    }
+
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function moduleAction(action) {
+      window.location.href = `nymphs-module-action://${action}`;
+    }
+
+    function openImagesFolder() {
+      moduleAction("open_outputs");
+    }
+
+    function setBusy(value) {
+      state.busy = value;
+      $("generate").disabled = value;
+      updatePartButton();
+      updateCurrentSourceButtons();
+    }
+
+    function setProgress(stage, detail, percent) {
+      const value = Number.isFinite(percent) ? Math.max(0, Math.min(100, percent)) : 0;
+      $("progress-stage").textContent = stage || "Idle";
+      $("progress-detail").textContent = detail || "";
+      $("progress-percent").textContent = `${Math.round(value)}%`;
+      $("progress-bar").style.width = `${value}%`;
+    }
+
+    async function pollTask() {
+      try {
+        const response = await fetch("/active_task", { cache: "no-store" });
+        if (!response.ok) return;
+        const task = await response.json();
+        const percent = Number(task.progress_percent);
+        setProgress(task.stage || task.status || "Working", task.detail || "Processing.", Number.isFinite(percent) ? percent : 8);
+        const outputPath = task.last_output_path || "";
+        if (outputPath && outputPath !== state.lastTaskOutputPath) {
+          state.lastTaskOutputPath = outputPath;
+          await refreshOutputs(false);
+        }
+      } catch {}
+    }
+
+    function startProgress() {
+      clearInterval(state.progressTimer);
+      pollTask();
+      state.progressTimer = setInterval(pollTask, 700);
+    }
+
+    function stopProgress(done, detail) {
+      clearInterval(state.progressTimer);
+      state.progressTimer = null;
+      if (done) setProgress("Done", detail || "Complete.", 100);
+    }
+
+    function finalPrompt() {
+      syncManagedPromptBlocks();
+      return unwrapManagedPromptMarkers($("prompt").value);
+    }
+
+    function buildPresetPromptText() {
+      const subject = presetPrompt("subject", $("subject").value);
+      const style = presetPrompt("style", $("style").value);
+      const view = presetPrompt("view", $("view").value);
+      return [subject, style, view].filter(Boolean).join("\n\n");
+    }
+
+    function managedPromptBlock(kind, prompt) {
+      const labels = { subject: "Auto Subject", style: "Auto Style", view: "Auto View", lora: "Auto LoRA" };
+      const label = labels[kind];
+      const value = (prompt || "").trim();
+      if (!label || !value) return "";
+      return `[${label}]\n${value}\n[/${label}]`;
+    }
+
+    function removeManagedPromptBlock(text, kind) {
+      const labels = { subject: "Auto Subject", style: "Auto Style", view: "Auto View", lora: "Auto LoRA" };
+      const label = labels[kind];
+      if (!label) return (text || "").trim();
+      const pattern = new RegExp(`\\n?\\[${label}\\]\\n[\\s\\S]*?\\n\\[\\/${label}\\]\\n?`, "g");
+      return (text || "").replace(pattern, "\n").replace(/\n{3,}/g, "\n\n").trim();
+    }
+
+    function managedPromptBlockContent(text, kind) {
+      const labels = { subject: "Auto Subject", style: "Auto Style", view: "Auto View", lora: "Auto LoRA" };
+      const label = labels[kind];
+      if (!label) return "";
+      const pattern = new RegExp(`\\[${label}\\]\\n([\\s\\S]*?)\\n\\[\\/${label}\\]`);
+      const match = pattern.exec(text || "");
+      return (match?.[1] || "").trim();
+    }
+
+    function removeAllManagedPromptBlocks(text) {
+      return ["subject", "style", "view", "lora"].reduce((value, kind) => removeManagedPromptBlock(value, kind), text || "");
+    }
+
+    function unwrapManagedPromptMarkers(text) {
+      return (text || "")
+        .replace(/\n?\[Auto (?:Subject|Style|View|LoRA)\]\n?/g, "\n")
+        .replace(/\n?\[\/Auto (?:Subject|Style|View|LoRA)\]\n?/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+    }
+
+    function syncManagedPromptBlocks() {
+      const subject = presetPrompt("subject", $("subject").value);
+      const style = presetPrompt("style", $("style").value);
+      const view = presetPrompt("view", $("view").value);
+      const activation = ($("z-lora-trigger")?.value || "").trim();
+      const useLora = state.mode === "zimage" && $("z-use-lora").checked && $("z-lora-auto-trigger").checked && activation;
+      const body = removeAllManagedPromptBlocks($("prompt").value);
+      const blocks = [
+        managedPromptBlock("subject", subject),
+        managedPromptBlock("style", style),
+        managedPromptBlock("view", view),
+        managedPromptBlock("lora", useLora ? activation : ""),
+        body,
+      ].filter(Boolean);
+      $("prompt").value = [...new Set(blocks)].join("\n\n");
+    }
+
+    const applyPromptPresets = syncManagedPromptBlocks;
+
+    function populatePromptSelect(selectId, kind, items, fallbackValue = "") {
+      const select = $(selectId);
+      const previous = select.value;
+      select.innerHTML = "";
+      for (const [key, value] of Object.entries(items)) {
+        select.appendChild(option(value[0], key));
+      }
+      for (const preset of state.userPresets[kind] || []) {
+        select.appendChild(option(preset.name || preset.id, `user:${preset.id}`));
+      }
+      const values = [...select.options].map((node) => node.value);
+      if (previous && previous !== "none" && values.includes(previous)) select.value = previous;
+      else if (fallbackValue && values.includes(fallbackValue)) select.value = fallbackValue;
+      else if (values.includes(previous)) select.value = previous;
+    }
+
+    function populateProfileSelect() {
+      const select = $("z-profile");
+      const previous = select.value;
+      const isLoaded = selectedModelIsLoaded();
+      select.innerHTML = "";
+      if (!isLoaded) {
+        select.appendChild(option("Load model first", ""));
+        select.disabled = true;
+        $("save-profile").disabled = true;
+        $("delete-profile").disabled = true;
+        return;
+      }
+      select.disabled = false;
+      $("save-profile").disabled = false;
+      $("delete-profile").disabled = false;
+      for (const [key, value] of Object.entries(profiles).filter(([, value]) => profileBelongsToSelectedModel(value))) {
+        select.appendChild(option(value.label || key, key));
+      }
+      for (const preset of (state.userPresets.settings || []).filter((preset) => profileBelongsToSelectedModel(preset.values || {}))) {
+        select.appendChild(option(preset.name || preset.id, `user:${preset.id}`));
+      }
+      const values = [...select.options].map((node) => node.value);
+      if (previous && values.includes(previous)) select.value = previous;
+      else select.selectedIndex = 0;
+      if (select.value) {
+        const profile = select.value.startsWith("user:")
+          ? (state.userPresets.settings || []).find((item) => item.id === select.value.slice(5))?.values
+          : profiles[select.value];
+        applyProfileValues(profile);
+      }
+    }
+
+    function populateSavedPromptSelect() {
+      const select = $("saved-prompt");
+      const previous = select.value;
+      select.innerHTML = "";
+      select.appendChild(option("Current Draft", ""));
+      for (const preset of state.userPresets.saved || []) {
+        select.appendChild(option(preset.name || preset.id, preset.id));
+      }
+      if ([...select.options].some((node) => node.value === previous)) select.value = previous;
+    }
+
+    function applyNegativePreset() {
+      const prompt = presetPrompt("negative", $("negative-preset").value);
+      $("negative-prompt").value = prompt;
+    }
+
+    function applyPartGuidancePreset(overwrite = true) {
+      const prompt = presetPrompt("part_guidance", $("part-guidance-select").value);
+      if (overwrite || !$("part-guidance").value.trim()) $("part-guidance").value = prompt;
+    }
+
+    async function loadPresets() {
+      try {
+        const response = await fetch("/api/presets", { cache: "no-store" });
+        if (!response.ok) throw new Error();
+        const body = await response.json();
+        state.userPresets = {
+          subject: body.subject || [],
+          style: body.style || [],
+          view: body.view || [],
+          negative: body.negative || [],
+          part_guidance: body.part_guidance || [],
+          saved: body.saved || [],
+          settings: body.settings || [],
+        };
+      } catch {
+        state.userPresets = { subject: [], style: [], view: [], negative: [], part_guidance: [], saved: [], settings: [] };
+      }
+      populatePromptSelect("subject", "subject", subjects, "none");
+      populatePromptSelect("style", "style", styles, "none");
+      populatePromptSelect("view", "view", views, "none");
+      populatePromptSelect("negative-preset", "negative", negatives, "none");
+      populatePromptSelect("part-guidance-select", "part_guidance", partGuidancePresets, "user:default");
+      applyPartGuidancePreset(false);
+      populateProfileSelect();
+      populateSavedPromptSelect();
+      syncManagedPromptBlocks();
+    }
+
+    async function saveSettingsPreset() {
+      const name = window.prompt("Profile name");
+      if (!name) return;
+      const response = await fetch("/api/presets/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, values: profileValues() }),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        toast(body.detail || "Could not save profile.");
+        return;
+      }
+      await loadPresets();
+      const body = await response.json().catch(() => ({}));
+      if (body.preset?.id) $("z-profile").value = `user:${body.preset.id}`;
+      toast("Profile saved.");
+    }
+
+    async function deleteSettingsPreset() {
+      const value = $("z-profile").value;
+      if (!value.startsWith("user:")) {
+        toast("Built-in profiles stay available.");
+        return;
+      }
+      await fetch(`/api/presets/settings/${encodeURIComponent(value.slice(5))}`, { method: "DELETE" });
+      await loadPresets();
+      toast("Profile deleted.");
+    }
+
+    async function waitForRuntimeAfterRestart() {
+      for (let attempt = 0; attempt < 45; attempt++) {
+        await sleep(1000);
+        try {
+          const response = await fetch("/health", { cache: "no-store" });
+          if (response.ok) {
+            await refreshInfo();
+            setProgress("Idle", "Z-Image restarted for selected model.", 0);
+            return true;
+          }
+        } catch {
+          setProgress("Restarting", "Waiting for Z-Image to come back.", 5);
+        }
+      }
+      setProgress("Restarting", "Restart is taking longer than expected.", 5);
+      return false;
+    }
+
+    async function requestSelectedZModelLoad(selection) {
+      const response = await fetch("/api/model/load", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(selection),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.detail || `Model switch failed with HTTP ${response.status}.`);
+      }
+      return response.json().catch(() => ({}));
+    }
+
+    function configuredSelection(info) {
+      const extra = info?.extra || {};
+      return {
+        model_id: info?.configured_model_id || "Tongyi-MAI/Z-Image-Turbo",
+        nunchaku_rank: parseInt(extra.configured_nunchaku_rank || extra.nunchaku_rank || "32", 10),
+        nunchaku_precision: String(extra.configured_nunchaku_precision || "auto").toLowerCase(),
+      };
+    }
+
+    function selectedMatchesConfigured(info = state.serverInfo) {
+      if (!info) return false;
+      const selected = zModelSelection();
+      const configured = configuredSelection(info);
+      return selected.model_id === configured.model_id
+        && selected.nunchaku_rank === configured.nunchaku_rank
+        && selected.nunchaku_precision === configured.nunchaku_precision;
+    }
+
+    function selectedModelIsLoaded(info = state.serverInfo) {
+      return Boolean(info?.loaded_model_id) && selectedMatchesConfigured(info);
+    }
+
+    async function applySelectedZModel(options = {}) {
+      if (state.mode !== "zimage") return;
+      const manageBusy = options.manageBusy !== false;
+      const throwOnError = options.throwOnError === true;
+      const keepProgress = options.keepProgress === true;
+      const pollProgress = options.pollProgress !== false;
+      const selection = zModelSelection();
+      const startedProgress = pollProgress && !state.progressTimer;
+      if (manageBusy) setBusy(true);
+      if (startedProgress) startProgress();
+      setProgress("Loading", `Loading ${selection.label}.`, 5);
+      try {
+        let body = await requestSelectedZModelLoad(selection);
+        if (body.loaded) {
+          state.modelChoiceDirty = false;
+          await refreshInfo();
+          populateProfileSelect();
+          if (startedProgress && !keepProgress) stopProgress(true, `${selection.label} loaded.`);
+          else setProgress("Idle", `${selection.label} loaded.`, 0);
+          toast(`${selection.label} loaded.`);
+          return true;
+        }
+        toast(`Restarting Z-Image for ${selection.label}.`);
+        const restarted = await waitForRuntimeAfterRestart();
+        if (!restarted) throw new Error("Z-Image restart is taking longer than expected.");
+        setProgress("Loading", `Loading ${selection.label}.`, 8);
+        body = await requestSelectedZModelLoad(selection);
+        if (!body.loaded) throw new Error("Z-Image restarted, but the selected model did not load.");
+        state.modelChoiceDirty = false;
+        await refreshInfo();
+        populateProfileSelect();
+        if (startedProgress && !keepProgress) stopProgress(true, `${selection.label} loaded.`);
+        else setProgress("Idle", `${selection.label} loaded.`, 0);
+        toast(`${selection.label} loaded.`);
+        return true;
+      } catch (err) {
+        populateProfileSelect();
+        if (startedProgress && !keepProgress) stopProgress(false);
+        setProgress("Idle", "Model switch failed.", 0);
+        toast(err.message || "Model switch failed.");
+        if (throwOnError) throw err;
+        return false;
+      } finally {
+        if (manageBusy) setBusy(false);
+      }
+    }
+
+    async function ensureSelectedZModelReady() {
+      await refreshInfo();
+      if (selectedModelIsLoaded()) return true;
+      return applySelectedZModel({ manageBusy: false, throwOnError: true, keepProgress: true });
+    }
+
+    async function stopRuntime() {
+      setBusy(true);
+      setProgress("Stopping", "Stopping Z-Image.", 5);
+      try {
+        const response = await fetch("/api/runtime/stop", { method: "POST" });
+        if (!response.ok) {
+          const body = await response.json().catch(() => ({}));
+          throw new Error(body.detail || `Stop failed with HTTP ${response.status}.`);
+        }
+        toast("Stopping Z-Image.");
+        await sleep(1200);
+        $("runtime-text").textContent = "Runtime stopped";
+        $("zimage-ready").textContent = "offline";
+        setProgress("Idle", "Runtime stopped.", 0);
+      } catch (err) {
+        setProgress("Idle", "Stop failed.", 0);
+        toast(err.message || "Stop failed.");
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function saveManagedPromptPreset(kind, selectId) {
+      syncManagedPromptBlocks();
+      const select = $(selectId);
+      const currentName = presetLabel(kind, select.value);
+      const name = window.prompt(`${kind === "style" ? "Style" : "Subject"} preset name`, currentName || "");
+      if (!name) return;
+      const prompt = managedPromptBlockContent($("prompt").value, kind) || presetPrompt(kind, select.value);
+      if (!prompt) {
+        toast(`Choose or write a ${kind} prompt first.`);
+        return;
+      }
+      const response = await fetch(`/api/presets/${kind}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, prompt }),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        toast(body.detail || `Could not save ${kind} preset.`);
+        return;
+      }
+      const body = await response.json().catch(() => ({}));
+      await loadPresets();
+      if (body.preset?.id) select.value = `user:${body.preset.id}`;
+      syncManagedPromptBlocks();
+      toast(`${kind === "style" ? "Style" : "Subject"} saved.`);
+    }
+
+    async function deleteManagedPromptPreset(kind, selectId, fallbackValue) {
+      const select = $(selectId);
+      const value = select.value;
+      if (!value.startsWith("user:")) {
+        toast(`Choose a ${kind} preset first.`);
+        return;
+      }
+      await fetch(`/api/presets/${kind}/${encodeURIComponent(value.slice(5))}`, { method: "DELETE" });
+      await loadPresets();
+      select.value = fallbackValue;
+      syncManagedPromptBlocks();
+      toast(`${kind === "style" ? "Style" : "Subject"} deleted.`);
+    }
+
+    async function saveCurrentPrompt() {
+      syncManagedPromptBlocks();
+      const prompt = unwrapManagedPromptMarkers($("prompt").value);
+      if (!prompt) {
+        toast("Enter a prompt first.");
+        return;
+      }
+      const name = window.prompt("Saved prompt name");
+      if (!name) return;
+      const response = await fetch("/api/presets/saved", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, prompt }),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        toast(body.detail || "Could not save prompt.");
+        return;
+      }
+      const body = await response.json().catch(() => ({}));
+      await loadPresets();
+      if (body.preset?.id) $("saved-prompt").value = body.preset.id;
+      toast("Prompt saved.");
+    }
+
+    async function deleteSavedPrompt() {
+      const value = $("saved-prompt").value;
+      if (!value) {
+        toast("Choose a saved prompt first.");
+        return;
+      }
+      await fetch(`/api/presets/saved/${encodeURIComponent(value)}`, { method: "DELETE" });
+      await loadPresets();
+      $("saved-prompt").value = "";
+      toast("Saved prompt deleted.");
+    }
+
+    function loadSavedPrompt() {
+      const id = $("saved-prompt").value;
+      if (!id) return;
+      const preset = (state.userPresets.saved || []).find((item) => item.id === id);
+      if (preset?.prompt) {
+        $("subject").value = "none";
+        $("style").value = "none";
+        $("view").value = "none";
+        $("prompt").value = preset.prompt;
+      }
+    }
+
+    function setMode(mode) {
+      state.mode = mode;
+      $("mode-zimage").classList.toggle("active", mode === "zimage");
+      $("mode-gemini").classList.toggle("active", mode === "gemini");
+      $("mode-parts").classList.toggle("active", mode === "parts");
+      $("zimage-controls").hidden = mode !== "zimage";
+      $("gemini-controls").hidden = mode !== "gemini";
+      $("prompt-section").hidden = mode === "parts";
+      $("parts-section").hidden = mode !== "parts";
+      $("z-workflow-tabs").hidden = mode !== "zimage";
+      $("mode-chip").textContent = mode === "zimage" ? "Z-Image" : mode === "gemini" ? "Gemini" : "Parts";
+      $("prompt-kind").textContent = mode === "zimage" ? "local" : mode === "gemini" ? "cloud" : "planner";
+      updateGenerateLabel();
+      updatePartButton();
+      syncGuideRows();
+      syncSourceVisibility();
+    }
+
+    function syncGuideRows() {
+      for (const node of document.querySelectorAll(".gemini-guide-row")) node.hidden = !$("gemini-use-guide").checked;
+      $("z-strength-row").hidden = !$("z-use-guide").checked;
+      syncImageWorkflowButtons();
+      syncSourceVisibility();
+      updateSourceLabels();
+    }
+
+    function syncSourceVisibility() {
+      const active =
+        (state.mode === "zimage" && $("z-use-guide").checked) ||
+        (state.mode === "gemini" && $("gemini-use-guide").checked);
+      $("source-section").hidden = !active;
+      $("source-section").classList.toggle("promoted", active);
+    }
+
+    function syncLoraRows() {
+      const enabled = $("z-use-lora").checked;
+      for (const node of document.querySelectorAll(".z-lora-row")) node.hidden = !enabled;
+      if (enabled && !state.loraRuns.length) loadLoras();
+    }
+
+    function updateSourceLabels() {
+      const label = state.sourceName || "none";
+      $("gemini-guide-label").value = label;
+      $("parts-source-label").value = state.partsSourceName || "none";
+    }
+
+    function updateCurrentSourceButtons() {
+      const disabled = state.busy || !state.selectedOutput;
+      $("use-selected-source").disabled = disabled;
+      $("gemini-guide-use-selected").disabled = disabled;
+      $("parts-use-selected-source").disabled = disabled;
+    }
+
+    function updateGenerateLabel() {
+      if (state.mode === "gemini") {
+        const count = intValue("gemini-variants", 1);
+        $("generate").textContent = count > 1 ? "Variants" : "Generate";
+      } else {
+        const count = intValue("variants", 1);
+        $("generate").textContent = count > 1 ? "Variants" : "Generate";
+      }
+    }
+
+    function syncFaceControls() {
+      const enabled = $("base-face").checked;
+      $("base-eyes").disabled = !enabled;
+      if (!enabled) $("base-eyes").checked = false;
+    }
+
+    function syncPlannerProviderUi() {
+      const provider = $("planner-provider").value || "gemini";
+      const useGemini = provider === "gemini";
+      $("planner-model-field").hidden = !useGemini;
+      $("planner-brain-field").hidden = useGemini;
+    }
+
+    function openTextModal(title, value, onApply, readOnly = false) {
+      state.modalApply = onApply;
+      $("text-modal-title").textContent = title;
+      $("text-modal-value").value = value || "";
+      $("text-modal-value").readOnly = readOnly;
+      $("text-modal-apply").hidden = readOnly;
+      $("text-modal").classList.add("open");
+      $("text-modal").setAttribute("aria-hidden", "false");
+      $("text-modal-value").focus();
+    }
+
+    function closeTextModal() {
+      $("text-modal").classList.remove("open");
+      $("text-modal").setAttribute("aria-hidden", "true");
+      state.modalApply = null;
+    }
+
+    function applyTextModal() {
+      if (state.modalApply) state.modalApply($("text-modal-value").value);
+      closeTextModal();
+    }
+
+    function setLoraPath(path, updateTrigger = true) {
+      $("z-lora-path").value = path || "";
+      if (updateTrigger && path && !$("z-lora-trigger").value.trim()) {
+        $("z-lora-trigger").value = loraActivationFromPath(path);
+      }
+    }
+
+    function populateLoraCheckpoints(runId) {
+      const select = $("z-lora-checkpoint");
+      select.innerHTML = "";
+      const checkpoints = state.loraCheckpoints[runId] || [];
+      if (!checkpoints.length) {
+        select.appendChild(option("No checkpoints found", ""));
+        return;
+      }
+      for (const checkpoint of checkpoints) {
+        select.appendChild(option(checkpoint.name || checkpoint.id, checkpoint.id));
+      }
+      select.value = checkpoints[0].id;
+      setLoraPath(checkpoints[0].id);
+    }
+
+    function populateLoras() {
+      const select = $("z-lora-run");
+      const previous = select.value;
+      select.innerHTML = "";
+      if (!state.loraRuns.length) {
+        select.appendChild(option("No LoRA runs found", ""));
+        $("z-lora-checkpoint").innerHTML = "";
+        $("z-lora-checkpoint").appendChild(option("No checkpoints found", ""));
+        return;
+      }
+      for (const run of state.loraRuns) {
+        select.appendChild(option(run.name || run.id, run.id));
+      }
+      select.value = state.loraRuns.some((run) => run.id === previous) ? previous : state.loraRuns[0].id;
+      populateLoraCheckpoints(select.value);
+    }
+
+    async function loadLoras() {
+      try {
+        const response = await fetch("/api/loras", { cache: "no-store" });
+        if (!response.ok) throw new Error();
+        const body = await response.json();
+        state.loraRuns = body.runs || [];
+        state.loraCheckpoints = body.checkpoints || {};
+      } catch {
+        state.loraRuns = [];
+        state.loraCheckpoints = {};
+      }
+      populateLoras();
+    }
+
+    function useLatestLora() {
+      if (!state.loraRuns.length) {
+        loadLoras();
+        toast("Scanning LoRA folder.");
+        return;
+      }
+      $("z-lora-run").value = state.loraRuns[0].id;
+      populateLoraCheckpoints(state.loraRuns[0].id);
+      syncManagedPromptBlocks();
+      toast("Latest LoRA selected.");
+    }
+
+    function clearLora() {
+      $("z-lora-run").value = "";
+      $("z-lora-checkpoint").value = "";
+      $("z-lora-path").value = "";
+      $("z-lora-trigger").value = "";
+      $("z-lora-auto-trigger").checked = false;
+      syncManagedPromptBlocks();
+    }
+
+    function clearCurrentPreview() {
+      state.selectedOutput = null;
+      $("result-image").removeAttribute("src");
+      $("result-image").style.display = "none";
+      $("empty").style.display = "grid";
+      $("output-label").textContent = "No output";
+      updateCurrentSourceButtons();
+      for (const node of document.querySelectorAll(".thumb")) {
+        node.classList.remove("selected");
+      }
+      updateStripButtons();
+      toast("Preview cleared.");
+    }
+
+    function readFileDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(reader.error || new Error("Could not read file."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function setSourceFile(file) {
+      if (!file || !file.type.startsWith("image/")) return;
+      state.sourceDataUrl = await readFileDataUrl(file);
+      state.sourceName = file.name;
+      $("source-preview").src = state.sourceDataUrl;
+      $("source-preview").style.display = "block";
+      $("drop-hint").style.display = "none";
+      $("source-name").textContent = file.name.slice(0, 22);
+      $("clear-source").disabled = false;
+      updateSourceLabels();
+    }
+
+    function clearSource() {
+      state.sourceDataUrl = "";
+      state.sourceName = "";
+      $("source-preview").removeAttribute("src");
+      $("source-preview").style.display = "none";
+      $("drop-hint").style.display = "grid";
+      $("source-name").textContent = "none";
+      $("source-file").value = "";
+      $("clear-source").disabled = true;
+      updateSourceLabels();
+    }
+
+    async function setPartsSourceFile(file) {
+      if (!file || !file.type.startsWith("image/")) return;
+      state.partsSourceDataUrl = await readFileDataUrl(file);
+      state.partsSourceName = file.name;
+      $("parts-source-preview").src = state.partsSourceDataUrl;
+      $("parts-source-preview").style.display = "block";
+      $("parts-source-empty").style.display = "none";
+      $("parts-source-label").value = file.name;
+      state.parts = [];
+      renderParts();
+    }
+
+    function clearPartsSource() {
+      state.partsSourceDataUrl = "";
+      state.partsSourceName = "";
+      $("parts-source-preview").removeAttribute("src");
+      $("parts-source-preview").style.display = "none";
+      $("parts-source-empty").style.display = "block";
+      $("parts-source-label").value = "none";
+      $("parts-source-file").value = "";
+      state.parts = [];
+      renderParts();
+    }
+
+    async function outputAsFile(output) {
+      if (output.file instanceof File) return output.file;
+      const response = await fetch(output.url, { cache: "no-store" });
+      if (!response.ok) throw new Error("Could not read current preview image.");
+      const blob = await response.blob();
+      return new File([blob], output.name || "output.png", { type: blob.type || "image/png" });
+    }
+
+    async function useSelectedAsSource() {
+      try {
+        if (!state.selectedOutput) {
+          toast("Select an image in the big preview first.");
+          return;
+        }
+        const file = await outputAsFile(state.selectedOutput);
+        await setSourceFile(file);
+        toast("Current image set as source.");
+      } catch (err) {
+        toast(err.message || "Could not use current image as source.");
+      }
+    }
+
+    async function useSelectedAsPartsSource() {
+      try {
+        if (!state.selectedOutput) {
+          toast("Select an image in the big preview first.");
+          return;
+        }
+        const file = await outputAsFile(state.selectedOutput);
+        await setPartsSourceFile(file);
+        toast("Current image set as parts source.");
+      } catch (err) {
+        toast(err.message || "Could not use current image as parts source.");
+      }
+    }
+
+    function previewUrl(output) {
+      if (!output?.url) return "";
+      if (String(output.url).startsWith("blob:")) return output.url;
+      const stamp = output.created ? String(Math.round(Number(output.created) * 1000)) : "";
+      if (!stamp) return output.url;
+      return `${output.url}${output.url.includes("?") ? "&" : "?"}v=${encodeURIComponent(stamp)}`;
+    }
+
+    function showResult(output) {
+      if (!output) return;
+      state.selectedOutput = output;
+      $("result-image").src = previewUrl(output);
+      $("result-image").style.display = "block";
+      $("empty").style.display = "none";
+      $("output-label").textContent = output.name || "Image ready";
+      updateCurrentSourceButtons();
+      for (const node of document.querySelectorAll(".thumb")) {
+        node.classList.toggle("selected", node.dataset.path === output.path);
+      }
+      updateStripButtons();
+    }
+
+    function outputMetadata(output) {
+      return output?.metadata || {};
+    }
+
+    function outputBatchId(output) {
+      return output?.batch_id || outputMetadata(output).batch_id || "";
+    }
+
+    function outputBatchType(output) {
+      return output?.batch_type || outputMetadata(output).batch_type || "";
+    }
+
+    function outputBatchLabel(output) {
+      return output?.batch_label || outputMetadata(output).batch_label || "Current Batch";
+    }
+
+    function outputItemLabel(output) {
+      return output?.item_label || outputMetadata(output).item_label || output?.name || "Image";
+    }
+
+    function outputItemIndex(output) {
+      const value = output?.item_index ?? outputMetadata(output).item_index;
+      const parsed = parseInt(value, 10);
+      return Number.isFinite(parsed) ? parsed : 9999;
+    }
+
+    function outputKey(output) {
+      return output?.relative_path || output?.path || output?.url || "";
+    }
+
+    function outputFolder(output) {
+      return output?.folder || "";
+    }
+
+    function folderLabel(folder) {
+      return folder ? folder : "Outputs";
+    }
+
+    function outputCreatedMs(output) {
+      const value = Number(output?.created || 0);
+      if (!Number.isFinite(value) || value <= 0) return 0;
+      return value > 100000000000 ? value : value * 1000;
+    }
+
+    function outputDateKey(output) {
+      const created = outputCreatedMs(output);
+      if (!created) return "Unknown Date";
+      const date = new Date(created);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function sortedViewerOutputs() {
+      const outputs = [...state.outputs, ...state.localOutputs];
+      outputs.sort((a, b) => outputCreatedMs(b) - outputCreatedMs(a));
+      return outputs;
+    }
+
+    function makeBatchId(prefix) {
+      return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(16).slice(2, 8)}`;
+    }
+
+    function syncOutputViewOptions(outputs) {
+      const select = $("output-folder");
+      const dates = [...new Set(outputs.map(outputDateKey))].sort().reverse();
+      const folders = [...new Set(outputs.map(outputFolder).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+      const validViews = new Set([
+        "recent",
+        ...dates.map((date) => `date:${date}`),
+        ...folders.map((folder) => `folder:${folder}`),
+      ]);
+      if (!validViews.has(state.outputView)) {
+        state.outputView = "recent";
+      }
+      select.innerHTML = "";
+      const recentOption = document.createElement("option");
+      recentOption.value = "recent";
+      recentOption.textContent = `Recent (${outputs.length})`;
+      select.appendChild(recentOption);
+      for (const date of dates) {
+        const count = outputs.filter((output) => outputDateKey(output) === date).length;
+        const option = document.createElement("option");
+        option.value = `date:${date}`;
+        option.textContent = `${date} (${count})`;
+        select.appendChild(option);
+      }
+      for (const folder of folders) {
+        const count = outputs.filter((output) => outputFolder(output) === folder).length;
+        const option = document.createElement("option");
+        option.value = `folder:${folder}`;
+        option.textContent = `Folder: ${folderLabel(folder)} (${count})`;
+        select.appendChild(option);
+      }
+      select.value = state.outputView;
+      select.disabled = outputs.length === 0;
+    }
+
+    function stripOutputs() {
+      const outputs = sortedViewerOutputs();
+      syncOutputViewOptions(outputs);
+      if (state.outputView === "recent") return outputs;
+      if (state.outputView.startsWith("date:")) {
+        const date = state.outputView.slice(5);
+        return outputs.filter((output) => outputDateKey(output) === date);
+      }
+      if (state.outputView.startsWith("folder:")) {
+        const folder = state.outputView.slice(7);
+        return outputs.filter((output) => outputFolder(output) === folder);
+      }
+      return outputs;
+    }
+
+    function currentOutputViewLabel() {
+      if (state.viewerSource === "manual" && state.outputView === "recent") {
+        return state.manualFolderName || "Chosen Folder";
+      }
+      if (state.outputView === "recent") return "Recent";
+      if (state.outputView.startsWith("date:")) return state.outputView.slice(5);
+      if (state.outputView.startsWith("folder:")) return folderLabel(state.outputView.slice(7));
+      return "Outputs";
+    }
+
+    function selectFromVisible(offset) {
+      if (!state.visibleOutputs.length) return;
+      const current = state.visibleOutputs.findIndex((output) => output.path === state.selectedOutput?.path);
+      const next = current < 0 ? 0 : (current + offset + state.visibleOutputs.length) % state.visibleOutputs.length;
+      showResult(state.visibleOutputs[next]);
+    }
+
+    function updateStripButtons() {
+      $("strip-prev").disabled = state.visibleOutputs.length < 2;
+      $("strip-next").disabled = state.visibleOutputs.length < 2;
+      updateSelectionUi();
+    }
+
+    function visibleSelectedOutputs() {
+      return state.visibleOutputs.filter((output) => state.selectedOutputPaths.has(outputKey(output)));
+    }
+
+    function currentManagedFolder() {
+      if (state.viewerSource === "manual" || !state.outputView.startsWith("folder:")) return "";
+      const folder = state.outputView.slice(7);
+      if (!folder) return "";
+      const hasManagedOutput = state.visibleOutputs.some((output) => output.managed !== false && outputFolder(output) === folder);
+      return hasManagedOutput ? folder : "";
+    }
+
+    function closeFolderMenu() {
+      const menu = $("folder-menu");
+      if (menu) menu.open = false;
+    }
+
+    function updateSelectionUi() {
+      const selected = visibleSelectedOutputs();
+      const managedSelected = selected.filter((output) => output.managed !== false);
+      $("selection-count").textContent = `${selected.length} selected`;
+      $("select-visible").disabled = !state.selectedOutput;
+      $("select-all-visible").disabled = state.visibleOutputs.length === 0;
+      $("clear-selection").disabled = selected.length === 0;
+      $("move-selected").disabled = managedSelected.length === 0;
+      $("delete-selected").disabled = managedSelected.length === 0;
+      $("delete-folder").disabled = !currentManagedFolder();
+      for (const node of document.querySelectorAll(".thumb")) {
+        const checked = state.selectedOutputPaths.has(node.dataset.key);
+        node.classList.toggle("checked", checked);
+        const checkbox = node.querySelector("input[type='checkbox']");
+        if (checkbox) checkbox.checked = checked;
+      }
+    }
+
+    function toggleOutputSelection(output, checked) {
+      const key = outputKey(output);
+      if (!key) return;
+      if (checked) {
+        state.selectedOutputPaths.add(key);
+      } else {
+        state.selectedOutputPaths.delete(key);
+      }
+      updateSelectionUi();
+    }
+
+    function selectVisibleOutputs() {
+      if (!state.selectedOutput) return;
+      const key = outputKey(state.selectedOutput);
+      if (key) state.selectedOutputPaths.add(key);
+      updateSelectionUi();
+    }
+
+    function selectAllVisibleOutputs() {
+      for (const output of state.visibleOutputs) {
+        const key = outputKey(output);
+        if (key) state.selectedOutputPaths.add(key);
+      }
+      updateSelectionUi();
+    }
+
+    function clearVisibleSelection() {
+      for (const output of state.visibleOutputs) {
+        state.selectedOutputPaths.delete(outputKey(output));
+      }
+      updateSelectionUi();
+    }
+
+    async function moveSelectedOutputs() {
+      const selected = visibleSelectedOutputs();
+      const managed = selected.filter((output) => output.managed !== false);
+      if (!managed.length) return;
+      const folder = window.prompt("Move selected images to folder", "");
+      if (folder === null) return;
+      closeFolderMenu();
+      const response = await fetch("/api/outputs/move", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folder, paths: managed.map((output) => output.relative_path || output.path) }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        toast(body.detail || "Could not move selected outputs.");
+        return;
+      }
+      for (const output of managed) state.selectedOutputPaths.delete(outputKey(output));
+      state.viewerSource = "outputs";
+      state.outputs = body.outputs || [];
+      state.outputView = body.folder ? `folder:${body.folder}` : "recent";
+      renderGallery();
+      if (state.visibleOutputs[0]) showResult(state.visibleOutputs[0]);
+      toast(`Moved ${body.moved || 0} images to ${body.folder || "folder"}.`);
+    }
+
+    async function deleteCurrentFolder() {
+      const folder = currentManagedFolder();
+      if (!folder) {
+        toast("Choose a managed group folder first.");
+        closeFolderMenu();
+        return;
+      }
+      const count = state.visibleOutputs.filter((output) => output.managed !== false && outputFolder(output) === folder).length;
+      const noun = count === 1 ? "image" : "images";
+      if (!window.confirm(`Delete folder "${folder}" and ${count} ${noun} inside it?`)) return;
+      closeFolderMenu();
+      const response = await fetch("/api/outputs/folder/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folder }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        toast(body.detail || "Could not delete folder.");
+        return;
+      }
+      for (const output of state.visibleOutputs) state.selectedOutputPaths.delete(outputKey(output));
+      state.outputs = body.outputs || [];
+      state.outputView = "recent";
+      renderGallery();
+      if (state.visibleOutputs[0]) showResult(state.visibleOutputs[0]);
+      else clearCurrentPreview();
+      toast(`Deleted folder ${body.folder || folder}.`);
+    }
+
+    async function deleteSelectedOutputs() {
+      const selected = visibleSelectedOutputs();
+      const managed = selected.filter((output) => output.managed !== false);
+      if (!managed.length) return;
+      const noun = managed.length === 1 ? "image" : "images";
+      if (!window.confirm(`Delete ${managed.length} selected ${noun} and matching metadata from Nymphs outputs?`)) return;
+      const response = await fetch("/api/outputs/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paths: managed.map((output) => output.relative_path || output.path) }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        toast(body.detail || "Could not delete selected outputs.");
+        return;
+      }
+      for (const output of managed) state.selectedOutputPaths.delete(outputKey(output));
+      state.outputs = body.outputs || [];
+      if (state.viewerSource === "manual") {
+        state.viewerSource = "outputs";
+      }
+      const removedKeys = new Set(managed.map(outputKey));
+      if (state.selectedOutput && removedKeys.has(outputKey(state.selectedOutput))) {
+        state.selectedOutput = null;
+        $("result-image").removeAttribute("src");
+        $("result-image").style.display = "none";
+        $("empty").style.display = "grid";
+        $("output-label").textContent = "No output";
+        updateCurrentSourceButtons();
+      }
+      renderGallery();
+      toast(`Deleted ${body.removed || 0} ${noun}.`);
+    }
+
+    function clearManualFolderOutputs() {
+      for (const url of state.localObjectUrls) URL.revokeObjectURL(url);
+      state.localObjectUrls = [];
+      state.localOutputs = [];
+      state.manualFolderName = "";
+    }
+
+    function localFolderName(files) {
+      const first = files.find((file) => file.webkitRelativePath);
+      if (!first) return "Chosen Folder";
+      return first.webkitRelativePath.split("/")[0] || "Chosen Folder";
+    }
+
+    function handleFolderPicked(event) {
+      const files = Array.from(event.target.files || []).filter((file) => file.type.startsWith("image/"));
+      clearManualFolderOutputs();
+      state.selectedOutputPaths.clear();
+      if (!files.length) {
+        event.target.value = "";
+        toast("No images found in that folder.");
+        renderGallery();
+        return;
+      }
+      state.manualFolderName = localFolderName(files);
+      state.localOutputs = files.map((file, index) => {
+        const url = URL.createObjectURL(file);
+        state.localObjectUrls.push(url);
+        const relativePath = file.webkitRelativePath || file.name;
+        return {
+          name: file.name,
+          path: `manual:${index}:${relativePath}`,
+          relative_path: `manual:${index}:${relativePath}`,
+          url,
+          folder: state.manualFolderName,
+          item_label: file.name,
+          created: (file.lastModified || Date.now()) / 1000,
+          managed: false,
+          file,
+        };
+      });
+      state.viewerSource = "outputs";
+      state.outputView = `folder:${state.manualFolderName}`;
+      event.target.value = "";
+      renderGallery();
+      if (state.visibleOutputs[0]) showResult(state.visibleOutputs[0]);
+      toast(`Loaded ${state.localOutputs.length} images from ${state.manualFolderName}.`);
+    }
+
+    function scrollGalleryWithWheel(event) {
+      const gallery = $("gallery");
+      if (!gallery || gallery.scrollWidth <= gallery.clientWidth) return;
+      const dominantY = Math.abs(event.deltaY) >= Math.abs(event.deltaX);
+      const delta = dominantY ? event.deltaY : event.deltaX;
+      if (!delta) return;
+      const multiplier = event.deltaMode === 1 ? 32 : event.deltaMode === 2 ? gallery.clientWidth : 1;
+      event.preventDefault();
+      gallery.scrollLeft += delta * multiplier;
+    }
+
+    function renderGallery() {
+      const gallery = $("gallery");
+      gallery.innerHTML = "";
+      state.visibleOutputs = stripOutputs();
+      const label = currentOutputViewLabel();
+      $("strip-label").textContent = state.visibleOutputs.length ? `${label} (${state.visibleOutputs.length})` : `${label} (0)`;
+      for (const output of state.visibleOutputs) {
+        const node = document.createElement("div");
+        node.className = "thumb";
+        node.dataset.path = output.path;
+        node.dataset.key = outputKey(output);
+        const check = document.createElement("label");
+        check.className = "thumb-check";
+        check.title = "Select output";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = state.selectedOutputPaths.has(outputKey(output));
+        checkbox.addEventListener("click", (event) => event.stopPropagation());
+        checkbox.addEventListener("change", () => toggleOutputSelection(output, checkbox.checked));
+        check.appendChild(checkbox);
+        const img = document.createElement("img");
+        img.src = previewUrl(output);
+        img.alt = output.name;
+        img.addEventListener("error", () => {
+          node.classList.add("broken");
+          if (state.selectedOutput && outputKey(state.selectedOutput) === outputKey(output)) {
+            $("output-label").textContent = "Preview image could not load";
+          }
+        });
+        const label = document.createElement("span");
+        label.textContent = outputItemLabel(output);
+        node.appendChild(check);
+        node.appendChild(img);
+        node.appendChild(label);
+        node.addEventListener("click", () => showResult(output));
+        gallery.appendChild(node);
+      }
+      updateStripButtons();
+      if (state.selectedOutput) {
+        for (const node of document.querySelectorAll(".thumb")) {
+          node.classList.toggle("selected", node.dataset.path === state.selectedOutput.path);
+        }
+      }
+      updateSelectionUi();
+    }
+
+    async function refreshOutputs(selectFirst = false) {
+      try {
+        const response = await fetch("/api/outputs?limit=80", { cache: "no-store" });
+        const body = await response.json();
+        state.outputs = body.outputs || [];
+        const outputKeys = new Set([...state.outputs, ...state.localOutputs].map(outputKey));
+        for (const key of [...state.selectedOutputPaths]) {
+          if (!outputKeys.has(key)) state.selectedOutputPaths.delete(key);
+        }
+        renderGallery();
+        if (selectFirst && state.outputs[0]) showResult(state.outputs[0]);
+      } catch {
+        toast("Could not refresh outputs.");
+      }
+    }
+
+    function activeSeed(index) {
+      const seed = parseInt($("seed").value || "0", 10);
+      if (!seed) return null;
+      const seedStep = Math.max(1, parseInt($("seed-step").value || "1", 10));
+      return seed + (index * seedStep);
+    }
+
+    async function generateZImage() {
+      const prompt = finalPrompt();
+      if (!prompt) {
+        toast("Enter a prompt first.");
+        return;
+      }
+      const useGuide = $("z-use-guide").checked;
+      const provider = $("image-provider").value || "zimage";
+      if (useGuide && !state.sourceDataUrl) {
+        toast("Choose a source image for Image to Image.");
+        return;
+      }
+      if (provider === "qwen_edit" && !useGuide) {
+        toast("Qwen Image Edit needs a source image. Enable Image to Image first.");
+        return;
+      }
+      setBusy(true);
+      startProgress();
+      if (provider === "zimage") {
+        try {
+          await ensureSelectedZModelReady();
+        } catch (err) {
+          stopProgress(false);
+          setBusy(false);
+          toast(err.message || "Load the selected Z-Image model first.");
+          return;
+        }
+      }
+      const count = Math.max(1, Math.min(parseInt($("variants").value || "1", 10), 8));
+      const outputs = [];
+      const batchId = makeBatchId(provider);
+      try {
+        for (let index = 0; index < count; index++) {
+          const payload = {
+            mode: useGuide ? "img2img" : "txt2img",
+            provider,
+            prompt,
+            width: parseInt($("width").value || "1024", 10),
+            height: parseInt($("height").value || "1024", 10),
+            steps: parseInt($("steps").value || "9", 10),
+            guidance_scale: parseFloat($("guidance").value || "0"),
+            seed: activeSeed(index),
+            strength: parseFloat($("strength").value || "0.55"),
+            image: useGuide ? state.sourceDataUrl : null,
+            batch_id: batchId,
+            batch_label: provider === "zimage" ? "Z-Image Variants" : "Qwen Edit Variants",
+            batch_type: provider,
+            item_label: `${provider === "zimage" ? "Z" : "Qwen"} ${index + 1}`,
+            item_index: index + 1,
+            item_total: count,
+          };
+          if (provider === "zimage") {
+            payload.model_id = zModelSelection().model_id;
+            payload.nunchaku_rank = zModelSelection().nunchaku_rank;
+            payload.nunchaku_precision = zModelSelection().nunchaku_precision;
+          }
+          const guidanceValue = parseFloat($("guidance").value || "0");
+          const negativePrompt = $("negative-prompt").value.trim();
+          if (guidanceValue > 1 && negativePrompt) payload.negative_prompt = negativePrompt;
+          if (provider === "zimage" && $("z-use-lora").checked) {
+            payload.lora_path = $("z-lora-path").value.trim();
+            payload.lora_scale = parseFloat($("z-lora-strength").value || "1");
+            if (!payload.lora_path) throw new Error("Paste a Z-Image LoRA path first.");
+          }
+          const response = await fetch("/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (!response.ok) {
+            const body = await response.json().catch(() => ({}));
+            throw new Error(body.detail || `Image generation failed with HTTP ${response.status}.`);
+          }
+          outputs.push(await response.json());
+        }
+        await refreshOutputs(false);
+        state.activeBatchId = batchId;
+        state.viewerSource = "outputs";
+        state.outputView = "recent";
+        renderGallery();
+        const batchOutputs = state.visibleOutputs;
+        if (batchOutputs[0]) showResult(batchOutputs[0]);
+        stopProgress(true, count > 1 ? "Variants ready." : "Image ready.");
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function generateGemini() {
+      const prompt = finalPrompt();
+      if (!prompt) {
+        toast("Enter a prompt first.");
+        return;
+      }
+      if ($("gemini-use-guide").checked && !state.sourceDataUrl) {
+        toast("Choose a guide image first.");
+        return;
+      }
+      setBusy(true);
+      startProgress();
+      try {
+        const variantCount = Math.max(1, Math.min(parseInt($("gemini-variants").value || "1", 10), 8));
+        const batchId = makeBatchId("gemini");
+        const response = await fetch("/api/gemini/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            api_key: $("api-key").value.trim(),
+            model_id: $("gemini-model").value,
+            prompt,
+            variant_count: variantCount,
+            aspect_ratio: $("aspect").value,
+            image_size: $("image-size").value,
+            guide_image: $("gemini-use-guide").checked ? state.sourceDataUrl : "",
+            batch_id: batchId,
+            batch_label: "Gemini Variants",
+            batch_type: "gemini",
+          }),
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body.detail || `Gemini failed with HTTP ${response.status}.`);
+        await refreshOutputs(false);
+        if (body.outputs?.[0]) {
+          state.outputs = [...body.outputs, ...state.outputs.filter((item) => !body.outputs.some((out) => out.path === item.path))];
+          state.activeBatchId = body.batch_id || batchId;
+          state.viewerSource = "outputs";
+          state.outputView = "recent";
+          renderGallery();
+          showResult(state.visibleOutputs[0] || body.outputs[0]);
+        }
+        stopProgress(true, variantCount > 1 ? "Gemini variants ready." : "Gemini image ready.");
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function generate() {
+      try {
+        if (state.mode === "parts") {
+          toast("Use Plan Parts in the Parts workflow.");
+          return;
+        }
+        if (state.mode === "gemini") await generateGemini();
+        else await generateZImage();
+      } catch (err) {
+        stopProgress(false);
+        toast(err.message || "Generation failed.");
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    function selectedParts() {
+      return state.parts.filter((part) => part.selected);
+    }
+
+    function updatePartButton() {
+      const count = selectedParts().length;
+      $("extract-parts").textContent = `Extract (${count})`;
+      $("plan-parts").disabled = state.busy;
+      $("extract-parts").disabled = state.busy || !count;
+      $("parts-extract-row").hidden = !state.parts.length;
+      $("clear-parts-row").hidden = !state.parts.length;
+    }
+
+    function renderParts() {
+      const list = $("parts-list");
+      list.innerHTML = "";
+      $("parts-list-head").hidden = !state.parts.length;
+      for (const part of state.parts) {
+        const row = document.createElement("div");
+        row.className = "part-item";
+        const selected = document.createElement("input");
+        selected.type = "checkbox";
+        selected.title = "Include this part when Extract runs.";
+        selected.checked = part.selected !== false;
+        selected.addEventListener("change", () => {
+          part.selected = selected.checked;
+          updatePartButton();
+        });
+        const label = document.createElement("div");
+        label.innerHTML = `<div class="part-name"></div><div class="part-meta"></div>`;
+        label.querySelector(".part-name").textContent = part.display_name || part.id || "Part";
+        label.querySelector(".part-meta").textContent = part.category || "part";
+        const symmetry = document.createElement("input");
+        symmetry.type = "checkbox";
+        symmetry.title = "Force this extracted part to stay perfectly left-right symmetrical.";
+        symmetry.checked = !!part.symmetry;
+        symmetry.addEventListener("change", () => { part.symmetry = symmetry.checked; });
+        row.appendChild(selected);
+        row.appendChild(label);
+        row.appendChild(symmetry);
+        list.appendChild(row);
+      }
+      updatePartButton();
+    }
+
+    function clearPartPlan() {
+      state.parts = [];
+      renderParts();
+      toast("Part plan cleared.");
+    }
+
+    async function planParts() {
+      if (!state.partsSourceDataUrl) {
+        toast("Choose a source image first.");
+        return;
+      }
+      setBusy(true);
+      startProgress();
+      try {
+        const plannerProvider = $("planner-provider").value || "gemini";
+        const payload = {
+          api_key: $("api-key").value.trim(),
+          source_image: state.partsSourceDataUrl,
+          planner_provider: plannerProvider,
+          max_parts: parseInt($("max-parts").value || "8", 10),
+          guidance: $("part-guidance").value,
+          base_face: $("base-face").checked,
+          base_eyes: $("base-eyes").checked,
+          eye_part: $("eye-part").checked,
+        };
+        if (plannerProvider === "gemini") payload.planner_model = $("planner-model").value;
+        const response = await fetch("/api/parts/plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body.detail || `Part planning failed with HTTP ${response.status}.`);
+        state.parts = body.parts || [];
+        renderParts();
+        stopProgress(true, `Planned ${state.parts.length} parts.`);
+      } catch (err) {
+        stopProgress(false);
+        toast(err.message || "Part planning failed.");
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function extractParts() {
+      const parts = selectedParts();
+      if (!parts.length) return;
+      if (!state.partsSourceDataUrl) {
+        toast("Choose a source image first.");
+        return;
+      }
+      setBusy(true);
+      startProgress();
+      try {
+        const batchId = makeBatchId("parts");
+        state.lastTaskOutputPath = "";
+        state.activeBatchId = batchId;
+        state.viewerSource = "outputs";
+        state.outputView = "recent";
+        const response = await fetch("/api/parts/extract", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            api_key: $("api-key").value.trim(),
+            model_id: $("gemini-model").value,
+            aspect_ratio: "1:1",
+            image_size: $("image-size").value,
+            source_image: state.partsSourceDataUrl,
+            guide_image: state.partsSourceDataUrl,
+            extractor_provider: $("extractor-provider").value,
+            parts,
+            guidance: $("part-guidance").value,
+            style_lock: $("style-lock").checked,
+            style_text: presetPrompt("style", $("style").value),
+            base_face: $("base-face").checked,
+            base_eyes: $("base-eyes").checked,
+            batch_id: batchId,
+            batch_label: "Image Parts",
+            batch_type: "parts",
+          }),
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body.detail || `Part extraction failed with HTTP ${response.status}.`);
+        await refreshOutputs(false);
+        if (body.outputs?.[0]) {
+          state.outputs = [...body.outputs, ...state.outputs.filter((item) => !body.outputs.some((out) => out.path === item.path))];
+          state.activeBatchId = body.batch_id || batchId;
+          state.viewerSource = "outputs";
+          state.outputView = "recent";
+          renderGallery();
+          showResult(state.visibleOutputs[0] || body.outputs[0]);
+        }
+        stopProgress(true, "Parts extracted.");
+      } catch (err) {
+        stopProgress(false);
+        toast(err.message || "Part extraction failed.");
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function refreshInfo() {
+      try {
+        const response = await fetch("/server_info", { cache: "no-store" });
+        const info = await response.json();
+        state.serverInfo = info;
+        const extra = info.extra || {};
+        const runtime = extra.runtime || extra.configured_runtime || "";
+        const rank = extra.nunchaku_rank ? `r${extra.nunchaku_rank}` : "";
+        const precision = extra.nunchaku_precision || "";
+        const configuredChoice = modelChoiceFromInfo(info);
+        if (!state.modelChoiceDirty && info.loaded_model_id && [...$("z-model-choice").options].some((node) => node.value === configuredChoice)) {
+          $("z-model-choice").value = configuredChoice;
+        }
+        const selected = zModelSelection();
+        $("selected-model-text").textContent = selected.label;
+        $("runtime-text").textContent = info.loaded_model_id
+          ? `Loaded ${[(info.loaded_model_id || "").split("/").pop(), runtime, precision, rank].filter(Boolean).join(" / ")}`
+          : "No model loaded";
+        $("zimage-ready").textContent = (info.supported_modes || []).join("+") || "ready";
+        populateProfileSelect();
+      } catch {
+        state.serverInfo = null;
+        $("runtime-text").textContent = "Runtime unreachable";
+        $("selected-model-text").textContent = "unreachable";
+        $("zimage-ready").textContent = "offline";
+        populateProfileSelect();
+      }
+      try {
+        const response = await fetch("/api/openrouter/status", { cache: "no-store" });
+        const info = await response.json();
+        state.openrouterConfigured = Boolean(info.configured);
+        $("openrouter-status").textContent = state.openrouterConfigured
+          ? "Saved OpenRouter key available."
+          : "Paste a key here and Apply Key, or use the shared Brain/OpenRouter key.";
+        $("openrouter-status").classList.toggle("good", state.openrouterConfigured);
+      } catch {
+        state.openrouterConfigured = false;
+        $("openrouter-status").textContent = "OpenRouter key status unavailable.";
+        $("openrouter-status").classList.remove("good");
+      }
+    }
+
+    async function saveOpenrouterKey() {
+      const apiKey = $("api-key").value.trim();
+      if (!apiKey) {
+        toast("Paste an OpenRouter key first.");
+        return;
+      }
+      try {
+        const response = await fetch("/api/openrouter/key", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ api_key: apiKey }),
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body.detail || `Save key failed with HTTP ${response.status}.`);
+        $("api-key").value = "";
+        $("openrouter-status").textContent = "Saved OpenRouter key available.";
+        $("openrouter-status").classList.add("good");
+        state.openrouterConfigured = true;
+        toast("OpenRouter key saved.");
+      } catch (err) {
+        toast(err.message || "Could not save OpenRouter key.");
+      }
+    }
+
+    async function removeOpenrouterKey() {
+      try {
+        const response = await fetch("/api/openrouter/key", { method: "DELETE" });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body.detail || `Remove key failed with HTTP ${response.status}.`);
+        $("api-key").value = "";
+        state.openrouterConfigured = Boolean(body.configured);
+        $("openrouter-status").textContent = state.openrouterConfigured
+          ? "Environment or Manager key still available."
+          : "No saved OpenRouter key.";
+        $("openrouter-status").classList.toggle("good", state.openrouterConfigured);
+        toast("OpenRouter key removed.");
+      } catch (err) {
+        toast(err.message || "Could not remove OpenRouter key.");
+      }
+    }
+
+    function bindDrop() {
+      const drop = $("drop");
+      drop.addEventListener("click", () => $("source-file").click());
+      $("source-file").addEventListener("change", (event) => setSourceFile(event.target.files?.[0]));
+      for (const name of ["dragenter", "dragover"]) {
+        drop.addEventListener(name, (event) => {
+          event.preventDefault();
+          drop.classList.add("drag");
+        });
+      }
+      for (const name of ["dragleave", "drop"]) {
+        drop.addEventListener(name, (event) => {
+          event.preventDefault();
+          drop.classList.remove("drag");
+        });
+      }
+      drop.addEventListener("drop", (event) => {
+        const file = event.dataTransfer?.files?.[0];
+        if (file) setSourceFile(file);
+      });
+    }
+
+    function init() {
+      populatePromptSelect("subject", "subject", subjects);
+      populatePromptSelect("style", "style", styles);
+      populateProfileSelect();
+      populateSavedPromptSelect();
+      applyPromptPresets();
+      bindDrop();
+      $("mode-zimage").onclick = () => setMode("zimage");
+      $("mode-gemini").onclick = () => setMode("gemini");
+      $("mode-parts").onclick = () => setMode("parts");
+      $("z-profile").onchange = () => {
+        const value = $("z-profile").value;
+        const profile = value.startsWith("user:")
+          ? (state.userPresets.settings || []).find((item) => item.id === value.slice(5))?.values
+          : profiles[value];
+        applyProfileValues(profile);
+      };
+      $("z-model-choice").onchange = () => {
+        state.modelChoiceDirty = true;
+        populateProfileSelect();
+        const selection = zModelSelection();
+        $("selected-model-text").textContent = `${selection.label} - click Load`;
+      };
+      $("load-z-model").onclick = applySelectedZModel;
+      $("save-profile").onclick = saveSettingsPreset;
+      $("delete-profile").onclick = deleteSettingsPreset;
+      $("open-config").onclick = () => moduleAction("open_image_settings_presets");
+      $("mode-text-image").onclick = () => setImageWorkflow(false);
+      $("mode-image-to-image").onclick = () => setImageWorkflow(true);
+      $("z-use-guide").onchange = syncGuideRows;
+      $("z-use-lora").onchange = () => { syncLoraRows(); syncManagedPromptBlocks(); };
+      $("z-lora-run").onchange = () => populateLoraCheckpoints($("z-lora-run").value);
+      $("z-lora-checkpoint").onchange = () => { setLoraPath($("z-lora-checkpoint").value); syncManagedPromptBlocks(); };
+      $("z-lora-auto-trigger").onchange = syncManagedPromptBlocks;
+      $("z-lora-trigger").oninput = syncManagedPromptBlocks;
+      $("z-lora-open").onclick = () => moduleAction("open_lora");
+      $("z-lora-latest").onclick = useLatestLora;
+      $("z-lora-clear").onclick = clearLora;
+      $("variants").oninput = updateGenerateLabel;
+      $("gemini-variants").oninput = updateGenerateLabel;
+      $("save-api-key").onclick = saveOpenrouterKey;
+      $("remove-api-key").onclick = removeOpenrouterKey;
+      $("gemini-use-guide").onchange = syncGuideRows;
+      $("gemini-guide-use-selected").onclick = useSelectedAsSource;
+      $("gemini-guide-open-images").onclick = openImagesFolder;
+      $("gemini-guide-label").onclick = openImagesFolder;
+      $("gemini-guide-clear").onclick = clearSource;
+      $("subject").onchange = applyPromptPresets;
+      $("style").onchange = applyPromptPresets;
+      $("view").onchange = applyPromptPresets;
+      $("negative-preset").onchange = applyNegativePreset;
+      $("part-guidance-select").onchange = () => applyPartGuidancePreset(true);
+      $("saved-prompt").onchange = loadSavedPrompt;
+      $("save-current-prompt").onclick = saveCurrentPrompt;
+      $("delete-saved-prompt").onclick = deleteSavedPrompt;
+      $("open-saved-presets").onclick = () => moduleAction("open_image_presets");
+      $("apply-prompt").onclick = applyPromptPresets;
+      $("edit-prompt").onclick = () => openTextModal("Prompt Editor", $("prompt").value, (value) => { $("prompt").value = value; });
+      $("clear-prompt").onclick = () => { $("prompt").value = ""; };
+      $("generate").onclick = generate;
+      $("clear-source").onclick = clearSource;
+      $("use-selected-source").onclick = useSelectedAsSource;
+      $("open-source-images").onclick = openImagesFolder;
+      $("refresh-gallery").onclick = () => refreshOutputs();
+      $("open-outputs").onclick = openImagesFolder;
+      $("clear-outputs").onclick = clearCurrentPreview;
+      $("stop-backend").onclick = stopRuntime;
+      $("strip-prev").onclick = () => selectFromVisible(-1);
+      $("strip-next").onclick = () => selectFromVisible(1);
+      $("output-folder").onchange = () => { state.outputView = $("output-folder").value; renderGallery(); };
+      $("choose-folder").onclick = () => { closeFolderMenu(); $("folder-picker").click(); };
+      $("folder-picker").addEventListener("change", handleFolderPicked);
+      $("select-visible").onclick = selectVisibleOutputs;
+      $("select-all-visible").onclick = selectAllVisibleOutputs;
+      $("clear-selection").onclick = clearVisibleSelection;
+      $("move-selected").onclick = moveSelectedOutputs;
+      $("delete-folder").onclick = deleteCurrentFolder;
+      $("delete-selected").onclick = deleteSelectedOutputs;
+      $("gallery").addEventListener("wheel", scrollGalleryWithWheel, { passive: false });
+      $("result-image").addEventListener("error", () => {
+        $("output-label").textContent = "Preview image could not load";
+        $("result-image").style.display = "none";
+        $("empty").style.display = "grid";
+      });
+      $("plan-parts").onclick = planParts;
+      $("extract-parts").onclick = extractParts;
+      $("parts-use-selected-source").onclick = useSelectedAsPartsSource;
+      $("parts-open-images").onclick = () => $("parts-source-file").click();
+      $("parts-clear-source").onclick = clearPartsSource;
+      $("parts-source-drop").onclick = () => $("parts-source-file").click();
+      $("parts-source-file").addEventListener("change", (event) => setPartsSourceFile(event.target.files?.[0]));
+      $("parts-source-drop").addEventListener("dragover", (event) => {
+        event.preventDefault();
+        $("parts-source-drop").classList.add("drag");
+      });
+      $("parts-source-drop").addEventListener("dragleave", () => $("parts-source-drop").classList.remove("drag"));
+      $("parts-source-drop").addEventListener("drop", (event) => {
+        event.preventDefault();
+        $("parts-source-drop").classList.remove("drag");
+        setPartsSourceFile(event.dataTransfer.files?.[0]);
+      });
+      $("base-face").onchange = syncFaceControls;
+      $("planner-provider").onchange = syncPlannerProviderUi;
+      $("edit-part-guidance").onclick = () => openTextModal("Extraction Prompt", $("part-guidance").value, (value) => { $("part-guidance").value = value; });
+      $("clear-part-guidance").onclick = () => { $("part-guidance").value = ""; };
+      $("clear-parts").onclick = clearPartPlan;
+      $("text-modal-apply").onclick = applyTextModal;
+      $("text-modal-close").onclick = closeTextModal;
+      $("text-modal").addEventListener("click", (event) => { if (event.target === $("text-modal")) closeTextModal(); });
+      document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeTextModal(); });
+      applyControlHelp();
+      setMode("zimage");
+      updateCurrentSourceButtons();
+      syncGuideRows();
+      syncLoraRows();
+      syncFaceControls();
+      syncPlannerProviderUi();
+      loadPresets();
+      refreshInfo();
+      refreshOutputs(true);
+      setInterval(refreshInfo, 10000);
+      setProgress("Idle", "Waiting for prompt.", 0);
+    }
+
+    init();
+  </script>
+</body>
+</html>

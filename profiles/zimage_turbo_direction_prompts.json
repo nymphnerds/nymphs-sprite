@@ -1,0 +1,10 @@
+{
+  "front": "facing the viewer, front view, looking at camera",
+  "front_left": "facing front-left, 3/4 view from the left, looking slightly left",
+  "left": "facing left, left side profile view",
+  "back_left": "facing back-left, 3/4 rear view from the left",
+  "back": "facing away from viewer, rear view, back of character",
+  "back_right": "facing back-right, 3/4 rear view from the right",
+  "right": "facing right, right side profile view",
+  "front_right": "facing front-right, 3/4 view from the right, looking slightly right"
+}
