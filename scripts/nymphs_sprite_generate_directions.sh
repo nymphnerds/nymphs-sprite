@@ -25,5 +25,6 @@ fi
 
 exec "${python_bin}" "${SCRIPT_DIR}/nymphs_sprite_generate_directions.py" \
   --zimage-url "${NYMPHS_SPRITE_ZIMAGE_URL}" \
+  --outputs-root "${NYMPHS_SPRITE_OUTPUTS_ROOT}" \
   "${extra_args[@]}" \
   "$@"

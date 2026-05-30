@@ -157,6 +157,20 @@ From the Manager UI, use **Open Z-Image** first. That starts the existing
 Nymphs Image backend, then **Generate** calls `POST /generate` through the
 module runner with the selected sprite LoRA settings.
 
+Each generation batch also writes a Sprite Foundry-style artifact bundle under:
+
+```text
+$HOME/NymphsData/outputs/nymphs-sprite/<subject-id>/<batch-id>
+```
+
+The bundle contains:
+
+```text
+directions/          copied per-direction image files when Z-Image returns local paths
+sprite_batch.json    prompts, seeds, LoRA settings, source Z-Image responses, and paths
+contact_sheet.png    quick visual sheet when Pillow is available
+```
+
 ## ControlNet And Depth
 
 The current local Z-Image runtime has:
