@@ -20,6 +20,9 @@ echo "install_root=${NYMPHS_SPRITE_INSTALL_DIR}"
 
 install -m 644 "${REPO_DIR}/nymph.json" "${staging_dir}/nymph.json"
 install -m 644 "${REPO_DIR}/README.md" "${staging_dir}/README.md"
+if [[ -f "${REPO_DIR}/CHANGELOG.md" ]]; then
+  install -m 644 "${REPO_DIR}/CHANGELOG.md" "${staging_dir}/CHANGELOG.md"
+fi
 if [[ -f "${REPO_DIR}/THIRD_PARTY_NOTICES.md" ]]; then
   install -m 644 "${REPO_DIR}/THIRD_PARTY_NOTICES.md" "${staging_dir}/THIRD_PARTY_NOTICES.md"
 fi

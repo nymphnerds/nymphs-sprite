@@ -23,7 +23,7 @@ Nymphs Sprite UI
 ```text
 nymphnerds/nymphs-sprite
   NymphsCore module surface, Manager page, sprite LoRA fetch, sprite runner.
-  Current reference commit in this workspace: dcd35ce.
+  Current workspace target: v0.1.3, pending/pushed after LoRA fetch/status fix.
 
 nymphnerds/sprite-foundry
   Fork of mcp-tool-shop-org/sprite-foundry. Full upstream orchestration
@@ -129,6 +129,42 @@ ui/manager.html
 
 ```text
 $HOME/NymphsData/config/nymphs-sprite/selected_lora.env
+```
+
+- LoRA fetch now follows the module guide:
+
+```text
+MODEL FETCH STARTED
+MODEL FETCH STATUS ... this_repo_cache=... active_download_files=...
+MODEL FETCH COMPLETE
+```
+
+- The default `mks0813/z-image-turbo-pixel-art-lora` file is currently:
+
+```text
+epoch-1.safetensors
+```
+
+  The Hugging Face model card still shows the older
+  `z-image-turbo-pixel-art-lora.safetensors` example, but the live repo file
+  list does not contain that filename.
+
+- Status reports local sprite assets so the Manager can show what is already
+  downloaded:
+
+```text
+downloaded_loras=...
+lora_files=...
+downloaded_models=...
+weight_profiles_downloaded=...
+controlnet_ready=...
+depth_models_ready=...
+```
+
+- Sprite LoRA cache deletion is module-owned:
+
+```bash
+scripts/nymphs_sprite_delete_models.sh --profile <lora_profile> --yes
 ```
 
 - Generated batches write under:
@@ -328,7 +364,8 @@ Replace these assumptions:
 1. Install/update `nymphs-sprite` from the dev registry in the test WSL.
    - Confirm module appears only in dev mode.
    - Confirm detail page layout matches other modules.
-   - Confirm LoRA fetch works.
+   - Confirm LoRA/ControlNet/Depth fetches use the compact progress display.
+   - Confirm downloaded LoRAs show in status/model cache after refresh.
 
 2. Pick and fetch the first Z-Image Turbo pixel-art LoRA.
    - Store it under the sprite LoRA path.

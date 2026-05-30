@@ -116,7 +116,7 @@ Current default candidate:
 
 ```text
 repo:     mks0813/z-image-turbo-pixel-art-lora
-file:     z-image-turbo-pixel-art-lora.safetensors
+file:     epoch-1.safetensors
 trigger:  pxlstl
 base:     Tongyi-MAI/Z-Image-Turbo
 ```
@@ -148,7 +148,7 @@ Nymphs Sprite uses that path directly. The direction runner is:
 scripts/nymphs_sprite_generate_directions.sh \
   --subject-id hero_test \
   --subject-prompt "armored forest knight with a short cloak" \
-  --lora-path "$HOME/LoRA/loras/nymphs-sprite/mks0813--z-image-turbo-pixel-art-lora/z-image-turbo-pixel-art-lora.safetensors" \
+  --lora-path "$HOME/LoRA/loras/nymphs-sprite/mks0813--z-image-turbo-pixel-art-lora/epoch-1.safetensors" \
   --lora-trigger pxlstl
 ```
 
@@ -213,6 +213,10 @@ scripts/nymphs_sprite_fetch_controlnet.sh
 scripts/nymphs_sprite_fetch_depth_anything.sh
 scripts/nymphs_sprite_check_runtime.sh
 ```
+
+Status reports downloaded sprite LoRAs, ControlNet, and Depth Anything assets
+back to the Manager. Sprite LoRA weights are deletable through the module-owned
+`delete_models` entrypoint, one selected profile at a time.
 
 The integration target is documented in
 `profiles/zimage_turbo_controlnet_request.json`.

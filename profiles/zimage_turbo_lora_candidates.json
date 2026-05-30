@@ -4,7 +4,7 @@
     "mks0813_pixel_art": {
       "label": "Z-Image-Turbo Pixel Art LoRA",
       "repo_id": "mks0813/z-image-turbo-pixel-art-lora",
-      "filename": "z-image-turbo-pixel-art-lora.safetensors",
+      "filename": "epoch-1.safetensors",
       "base_model": "Tongyi-MAI/Z-Image-Turbo",
       "trigger": "pxlstl",
       "prompt_suffix": ", pxlstl",
@@ -15,7 +15,7 @@
     "tarn59_pixel_art": {
       "label": "Pixel Art Style LoRA for Z-Image Turbo",
       "repo_id": "tarn59/pixel_art_style_lora_z_image_turbo",
-      "filename": null,
+      "filename": "pixel_art_style_z_image_turbo.safetensors",
       "base_model": "Tongyi-MAI/Z-Image-Turbo",
       "trigger": "Pixel art style.",
       "prompt_suffix": ", Pixel art style.",

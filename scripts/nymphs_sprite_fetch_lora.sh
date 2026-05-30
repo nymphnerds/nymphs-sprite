@@ -101,7 +101,7 @@ while [[ $# -gt 0 ]]; do
     --mks0813)
       candidate="mks0813_pixel_art"
       repo_id="mks0813/z-image-turbo-pixel-art-lora"
-      filename="z-image-turbo-pixel-art-lora.safetensors"
+      filename="epoch-1.safetensors"
       shift
       ;;
     -h|--help)
@@ -167,10 +167,6 @@ if [[ -z "${repo_id}" ]]; then
   exit 1
 fi
 
-if [[ -z "${filename}" && "${repo_id}" == "mks0813/z-image-turbo-pixel-art-lora" ]]; then
-  filename="z-image-turbo-pixel-art-lora.safetensors"
-fi
-
 nymphs_sprite_ensure_dirs
 python_bin="$(nymphs_sprite_python_bin)"
 
@@ -184,12 +180,13 @@ if [[ -n "${hf_token}" ]]; then
 fi
 
 echo "LORA FETCH STARTED: repo=${repo_id} target=${NYMPHS_SPRITE_LORA_DIR}"
+echo "MODEL FETCH STARTED: step=1/1 repo=${repo_id}"
 echo "lora_candidate=${candidate:-custom}"
 echo "lora_repo=${repo_id}"
 echo "lora_filename=${filename:-auto}"
 echo "lora_target_dir=${NYMPHS_SPRITE_LORA_DIR}"
 
-"${python_bin}" - "${repo_id}" "${filename}" "${NYMPHS_SPRITE_LORA_DIR}" "${trigger}" "${lora_scale}" "${NYMPHS_SPRITE_LORA_PRESET_FILE}" <<'PY'
+"${python_bin}" - "${repo_id}" "${filename}" "${NYMPHS_SPRITE_LORA_DIR}" "${trigger}" "${lora_scale}" "${NYMPHS_SPRITE_LORA_PRESET_FILE}" "${candidate:-custom}" <<'PY'
 from __future__ import annotations
 
 import shutil
@@ -212,6 +209,7 @@ target_dir = Path(sys.argv[3]).expanduser()
 trigger = sys.argv[4].strip()
 lora_scale = sys.argv[5].strip()
 preset_file = Path(sys.argv[6]).expanduser()
+candidate = sys.argv[7].strip()
 target_dir.mkdir(parents=True, exist_ok=True)
 repo_slug = repo_id.replace("/", "--")
 repo_dir = target_dir / repo_slug
@@ -256,8 +254,8 @@ def heartbeat(stop: threading.Event) -> None:
     while not stop.wait(5):
         _, size = local_summary(repo_dir)
         print(
-            "LORA FETCH STATUS: "
-            f"repo={repo_id} status=downloading "
+            "MODEL FETCH STATUS: "
+            f"step=1/1 repo={repo_id} status=downloading "
             f"this_repo_cache={format_bytes(size)} "
             f"active_download_files={active_download_files(repo_dir)}",
             flush=True,
@@ -273,8 +271,8 @@ def with_retries(action):
             if attempt >= attempts:
                 raise
             print(
-                "LORA FETCH STATUS: "
-                f"repo={repo_id} status=retrying attempt={attempt + 1}/{attempts} "
+                "MODEL FETCH STATUS: "
+                f"step=1/1 repo={repo_id} status=retrying attempt={attempt + 1}/{attempts} "
                 f"error={type(exc).__name__}",
                 flush=True,
             )
@@ -282,18 +280,37 @@ def with_retries(action):
 
 
 print("LORA FETCH STATUS: status=metadata repo=" + repo_id, flush=True)
+available_safetensors: list[str] = []
 try:
     info = HfApi().model_info(repo_id, files_metadata=True)
-    safetensors = sorted(
+    available_safetensors = sorted(
         sibling.rfilename
         for sibling in (info.siblings or [])
         if sibling.rfilename.lower().endswith(".safetensors")
     )
-    print(f"LORA FETCH PLAN: repo={repo_id} safetensors={len(safetensors)}", flush=True)
-    for index, item in enumerate(safetensors[:12], start=1):
+    print(f"LORA FETCH PLAN: repo={repo_id} safetensors={len(available_safetensors)}", flush=True)
+    for index, item in enumerate(available_safetensors[:12], start=1):
         print(f"LORA FETCH PLAN: file_{index}={item}", flush=True)
 except Exception as exc:
     print(f"LORA FETCH STATUS: repo={repo_id} metadata_warning={type(exc).__name__}", flush=True)
+
+if filename and available_safetensors and filename not in available_safetensors:
+    print(
+        "MODEL FETCH STATUS: "
+        f"step=1/1 repo={repo_id} status=filename_missing "
+        f"requested={filename} available={','.join(available_safetensors[:8])}",
+        flush=True,
+    )
+    filename = ""
+
+_, initial_size = local_summary(repo_dir)
+print(
+    "MODEL FETCH STATUS: "
+    f"step=1/1 repo={repo_id} status=downloading "
+    f"this_repo_cache={format_bytes(initial_size)} "
+    f"active_download_files={active_download_files(repo_dir)}",
+    flush=True,
+)
 
 stop = threading.Event()
 thread = threading.Thread(target=heartbeat, args=(stop,), daemon=True)
@@ -338,6 +355,7 @@ preset_file.parent.mkdir(parents=True, exist_ok=True)
 preset_file.write_text(
     "\n".join([
         f"NYMPHS_SPRITE_SELECTED_LORA_REPO={repo_id}",
+        f"NYMPHS_SPRITE_SELECTED_LORA_CANDIDATE={candidate}",
         f"NYMPHS_SPRITE_SELECTED_LORA_FILE={dest.name}",
         f"NYMPHS_SPRITE_SELECTED_LORA_PATH={dest}",
         f"NYMPHS_SPRITE_SELECTED_LORA_TRIGGER={trigger}",
@@ -348,8 +366,10 @@ preset_file.write_text(
 )
 
 _, repo_size = local_summary(repo_dir)
+print(f"MODEL FETCH COMPLETE: step=1/1 repo={repo_id}", flush=True)
 print(f"LORA FETCH COMPLETE: repo={repo_id} path={dest} size={format_bytes(dest.stat().st_size)}", flush=True)
 print(f"lora_repo={repo_id}")
+print(f"lora_candidate={candidate}")
 print(f"repo_id={repo_id}")
 print(f"lora_path={dest}")
 print(f"lora_trigger={trigger}")

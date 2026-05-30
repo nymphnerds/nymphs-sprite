@@ -35,10 +35,14 @@ done
 nymphs_sprite_ensure_dirs
 python_bin="$(nymphs_sprite_python_bin)"
 
+echo "MODEL FETCH STARTED: step=1/1 repo=${repo_id}"
+
 "${python_bin}" - "${repo_id}" "${NYMPHS_SPRITE_DEPTH_MODELS_DIR}" <<'PY'
 from __future__ import annotations
 
 import sys
+import threading
+import time
 from pathlib import Path
 
 try:
@@ -53,20 +57,79 @@ repo_id = sys.argv[1]
 target_dir = Path(sys.argv[2]).expanduser()
 target_dir.mkdir(parents=True, exist_ok=True)
 local_dir = target_dir / repo_id.replace("/", "--")
-path = snapshot_download(
-    repo_id=repo_id,
-    local_dir=str(local_dir),
-    local_dir_use_symlinks=False,
-    allow_patterns=[
-        "*.json",
-        "*.txt",
-        "*.md",
-        "*.safetensors",
-        "*.bin",
-        "*.model",
-        "*.py",
-    ],
-)
+
+def format_bytes(value: int) -> str:
+    size = float(max(value, 0))
+    for unit in ("B", "KB", "MB", "GB", "TB"):
+        if size < 1024 or unit == "TB":
+            return f"{size:.1f} {unit}" if unit != "B" else f"{int(size)} B"
+        size /= 1024
+    return f"{value} B"
+
+def local_summary(root: Path) -> tuple[int, int]:
+    count = 0
+    total = 0
+    if not root.exists():
+        return count, total
+    for path in root.rglob("*"):
+        if not path.is_file():
+            continue
+        count += 1
+        try:
+            total += path.stat().st_size
+        except OSError:
+            pass
+    return count, total
+
+def active_download_files(root: Path) -> int:
+    total = 0
+    if not root.exists():
+        return total
+    for path in root.rglob("*"):
+        if not path.is_file():
+            continue
+        name = path.name.lower()
+        if name.endswith((".incomplete", ".lock", ".tmp", ".part")) or ".incomplete" in name:
+            total += 1
+    return total
+
+def print_status() -> None:
+    _, size = local_summary(local_dir)
+    print(
+        "MODEL FETCH STATUS: "
+        f"step=1/1 repo={repo_id} status=downloading "
+        f"this_repo_cache={format_bytes(size)} "
+        f"active_download_files={active_download_files(local_dir)}",
+        flush=True,
+    )
+
+def heartbeat(stop: threading.Event) -> None:
+    while not stop.wait(5):
+        print_status()
+
+print_status()
+stop = threading.Event()
+thread = threading.Thread(target=heartbeat, args=(stop,), daemon=True)
+thread.start()
+try:
+    path = snapshot_download(
+        repo_id=repo_id,
+        local_dir=str(local_dir),
+        local_dir_use_symlinks=False,
+        allow_patterns=[
+            "*.json",
+            "*.txt",
+            "*.md",
+            "*.safetensors",
+            "*.bin",
+            "*.model",
+            "*.py",
+        ],
+    )
+finally:
+    stop.set()
+    thread.join(timeout=1)
+print(f"MODEL FETCH COMPLETE: step=1/1 repo={repo_id}", flush=True)
 print(f"repo_id={repo_id}")
 print(f"depth_model_path={path}")
 PY
