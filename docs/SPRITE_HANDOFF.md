@@ -154,6 +154,11 @@ MODEL FETCH STATUS ... this_repo_cache=... active_download_files=...
 MODEL FETCH COMPLETE
 ```
 
+- The Manager action group intentionally uses the existing `fetch_lora`
+  capability with an `--asset` argument. This keeps the Fetch button enabled in
+  Manager sessions that have refreshed controls but still hold older capability
+  data.
+
 - The default `mks0813/z-image-turbo-pixel-art-lora` file is currently:
 
 ```text

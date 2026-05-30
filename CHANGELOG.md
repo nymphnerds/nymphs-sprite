@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.6 - 2026-05-30
+
+- Routed the Asset Fetch dropdown through the existing `fetch_lora` capability
+  so Manager sessions with stale capability data do not grey out the Fetch
+  button.
+- Let `nymphs_sprite_fetch_lora.sh` dispatch package, ControlNet, and Depth
+  asset choices via `--asset`.
+
 ## 0.1.5 - 2026-05-30
 
 - Changed Complete Sprite Package to fetch both starter LoRAs, plus staged

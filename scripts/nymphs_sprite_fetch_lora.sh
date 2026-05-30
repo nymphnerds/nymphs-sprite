@@ -11,6 +11,7 @@ if [[ ! -f "${PROFILE_FILE}" ]]; then
 fi
 
 candidate=""
+asset=""
 repo_id="mks0813/z-image-turbo-pixel-art-lora"
 filename=""
 trigger=""
@@ -19,6 +20,18 @@ hf_token=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --asset|--download)
+      if [[ $# -lt 2 ]]; then
+        echo "$1 requires an asset id." >&2
+        exit 2
+      fi
+      asset="${2:-}"
+      shift 2
+      ;;
+    --asset=*|--download=*)
+      asset="${1#*=}"
+      shift
+      ;;
     --candidate|--model|--lora)
       if [[ $# -lt 2 ]]; then
         echo "$1 requires a LoRA candidate id." >&2
@@ -126,6 +139,34 @@ EOF
       ;;
   esac
 done
+
+if [[ -n "${asset}" ]]; then
+  case "${asset}" in
+    mks0813_pixel_art|tarn59_pixel_art)
+      candidate="${asset}"
+      ;;
+    complete_sprite|all_sprite_assets)
+      echo "asset_fetch_plan=LoRA:mks0813_pixel_art,LoRA:tarn59_pixel_art,ControlNet:union,Depth:small"
+      "${BASH_SOURCE[0]}" --candidate tarn59_pixel_art
+      "${BASH_SOURCE[0]}" --candidate mks0813_pixel_art
+      "${SCRIPT_DIR}/nymphs_sprite_fetch_controlnet.sh"
+      "${SCRIPT_DIR}/nymphs_sprite_fetch_depth_anything.sh" --small
+      echo "asset_fetch_complete=complete_sprite"
+      echo "selected_lora=mks0813_pixel_art"
+      exit 0
+      ;;
+    controlnet_union)
+      exec "${SCRIPT_DIR}/nymphs_sprite_fetch_controlnet.sh"
+      ;;
+    depth_anything_small)
+      exec "${SCRIPT_DIR}/nymphs_sprite_fetch_depth_anything.sh" --small
+      ;;
+    *)
+      echo "ERROR: unknown sprite asset id: ${asset}" >&2
+      exit 2
+      ;;
+  esac
+fi
 
 if [[ -n "${candidate}" && -f "${PROFILE_FILE}" ]]; then
   candidate_values="$(python3 - "${PROFILE_FILE}" "${candidate}" <<'PY'

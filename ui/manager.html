@@ -566,7 +566,7 @@
     document.getElementById("openZImage").addEventListener("click", () => runAction("start_zimage").catch(() => {}));
     document.getElementById("checkRuntime").addEventListener("click", () => runAction("check_runtime").catch(() => {}));
     document.getElementById("fetchAssets").addEventListener("click", () => {
-      runAction("fetch_assets", { asset: document.getElementById("assetSource").value }).catch(() => {});
+      runAction("fetch_lora", { asset: document.getElementById("assetSource").value }).catch(() => {});
     });
     document.getElementById("clearOutput").addEventListener("click", () => {
       output.textContent = "Ready.";
