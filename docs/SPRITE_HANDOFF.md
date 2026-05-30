@@ -132,6 +132,20 @@ $HOME/NymphsData/config/nymphs-sprite/selected_lora.env
 ```
 
 - LoRA fetch now follows the module guide:
+- LoRA, ControlNet, and Depth are exposed through one module-owned
+  `Asset Fetch` dropdown:
+
+```text
+Complete Sprite Package -> mks0813 LoRA + ControlNet Union + Depth Anything
+Complete Alt Package    -> tarn59 LoRA + ControlNet Union + Depth Anything
+Individual choices      -> LoRA only, ControlNet only, Depth only
+```
+
+- The actual model/LoRA files are not committed into git. The module owns the
+  recipes, UI choices, paths, fetch scripts, status, and delete behavior; fetched
+  assets live under the declared module/cache roots.
+
+- Fetch output follows the module guide:
 
 ```text
 MODEL FETCH STARTED
@@ -364,6 +378,8 @@ Replace these assumptions:
 1. Install/update `nymphs-sprite` from the dev registry in the test WSL.
    - Confirm module appears only in dev mode.
    - Confirm detail page layout matches other modules.
+   - Confirm the old standalone ControlNet/Depth fetch blocks are gone.
+   - Confirm the Asset Fetch dropdown includes complete packages and individual assets.
    - Confirm LoRA/ControlNet/Depth fetches use the compact progress display.
    - Confirm downloaded LoRAs show in status/model cache after refresh.
 

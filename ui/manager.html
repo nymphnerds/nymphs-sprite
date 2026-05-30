@@ -317,17 +317,19 @@
         <div class="section-body">
           <div class="actions">
             <button id="openZImage" class="primary" type="button">Open Z-Image</button>
-            <button id="fetchLora" type="button">Fetch LoRA</button>
-            <button id="fetchControlnet" type="button">Fetch ControlNet</button>
-            <button id="fetchDepth" type="button">Fetch Depth</button>
+            <button id="fetchAssets" type="button">Fetch Assets</button>
             <button id="checkRuntime" type="button">Check Runtime</button>
           </div>
 
           <label>
-            LoRA source
-            <select id="loraSource">
-              <option value="mks0813_pixel_art">mks0813 / Z-Image Turbo Pixel Art</option>
-              <option value="tarn59_pixel_art">tarn59 / Pixel Art Style</option>
+            Sprite assets
+            <select id="assetSource">
+              <option value="complete_mks0813">Complete package / mks0813 LoRA + ControlNet + Depth</option>
+              <option value="complete_tarn59">Complete package / tarn59 LoRA + ControlNet + Depth</option>
+              <option value="mks0813_pixel_art">LoRA only / mks0813 Z-Image Turbo Pixel Art</option>
+              <option value="tarn59_pixel_art">LoRA only / tarn59 Pixel Art Style</option>
+              <option value="controlnet_union">ControlNet only / Z-Image Turbo Union</option>
+              <option value="depth_anything_small">Depth only / Depth Anything V2 Small</option>
             </select>
           </label>
 
@@ -564,10 +566,8 @@
     document.getElementById("refreshStatus").addEventListener("click", refreshStatus);
     document.getElementById("openZImage").addEventListener("click", () => runAction("start_zimage").catch(() => {}));
     document.getElementById("checkRuntime").addEventListener("click", () => runAction("check_runtime").catch(() => {}));
-    document.getElementById("fetchControlnet").addEventListener("click", () => runAction("fetch_controlnet").catch(() => {}));
-    document.getElementById("fetchDepth").addEventListener("click", () => runAction("fetch_depth_anything").catch(() => {}));
-    document.getElementById("fetchLora").addEventListener("click", () => {
-      runAction("fetch_lora", { candidate: document.getElementById("loraSource").value }).catch(() => {});
+    document.getElementById("fetchAssets").addEventListener("click", () => {
+      runAction("fetch_assets", { asset: document.getElementById("assetSource").value }).catch(() => {});
     });
     document.getElementById("clearOutput").addEventListener("click", () => {
       output.textContent = "Ready.";

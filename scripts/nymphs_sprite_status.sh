@@ -227,7 +227,7 @@ elif [[ "${installed}" == "true" ]]; then
   else
     state=model_download_needed
     health=model-download-needed
-    detail="Sprite LoRA needs downloading. Use Fetch LoRA to download a Z-Image Turbo-compatible pixel-art LoRA."
+    detail="Sprite assets need downloading. Use Asset Fetch to download a complete sprite package or an individual LoRA, ControlNet, or Depth asset."
   fi
 elif [[ "${data_present}" == "true" ]]; then
   detail="${NYMPHS_SPRITE_MODULE_NAME} data remains, but runtime files are not installed."
