@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -91,7 +91,7 @@
         "entrypoint": "fetch_assets",
         "result": "show_logs",
         "visibility": "installed",
-        "description": "Download module-owned sprite assets. Complete packages fetch one Z-Image Turbo pixel LoRA plus ControlNet Union and Depth Anything. Base Z-Image/Nunchaku/Qwen weights stay owned by Nymphs Image.",
+        "description": "Download module-owned sprite assets. Complete fetches both Z-Image Turbo pixel LoRAs plus staged ControlNet Union and Depth Anything assets. Base Z-Image/Nunchaku/Qwen weights stay owned by Nymphs Image.",
         "links": [
           {
             "label": "mks0813 pixel art LoRA",
@@ -120,17 +120,12 @@
             "type": "select",
             "label": "Download",
             "arg": "--asset",
-            "default": "complete_mks0813",
+            "default": "complete_sprite",
             "options": [
               {
                 "label": "Complete Sprite Package",
-                "value": "complete_mks0813",
-                "description": "Recommended: mks0813 LoRA, ControlNet Union, and Depth Anything"
-              },
-              {
-                "label": "Complete Alt Package",
-                "value": "complete_tarn59",
-                "description": "Alternative LoRA package: tarn59 LoRA, ControlNet Union, and Depth Anything"
+                "value": "complete_sprite",
+                "description": "Both LoRAs, staged ControlNet Union, and Depth Anything; LoRA choice can be switched later"
               },
               {
                 "label": "Z-Image Turbo Pixel Art LoRA",
@@ -145,7 +140,7 @@
               {
                 "label": "Z-Image ControlNet Union",
                 "value": "controlnet_union",
-                "description": "Guidance asset for future morphology/depth/canny control"
+                "description": "Staged guidance asset for future morphology/depth/canny control"
               },
               {
                 "label": "Depth Anything V2 Small",
@@ -238,6 +233,7 @@
     "v0.1.1 writes Sprite Foundry-style batch artifacts: copied direction images, sprite_batch.json, and an optional contact sheet when Pillow is available.",
     "v0.1.2 ports the MIT-licensed Sprite Foundry post-processing method and exposes --sprite-size from 24 to 512 pixels, defaulting to 96 for Z-Image detail retention.",
     "v0.1.3 fixes the default mks0813 LoRA filename, emits standard MODEL FETCH progress, reports downloaded sprite assets in status, and adds module-owned LoRA weight deletion.",
-    "v0.1.4 consolidates LoRA, ControlNet, and Depth downloads into one module-owned Asset Fetch dropdown with complete package choices."
+    "v0.1.4 consolidates LoRA, ControlNet, and Depth downloads into one module-owned Asset Fetch dropdown.",
+    "v0.1.5 makes Complete Sprite Package fetch both LoRAs, with mks0813 selected by default until the UI exposes LoRA switching."
   ]
 }

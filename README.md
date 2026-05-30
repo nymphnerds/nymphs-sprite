@@ -101,10 +101,10 @@ The module includes a starter catalog in
 `profiles/zimage_turbo_lora_candidates.json`.
 
 The Manager detail page exposes module-owned downloads through one native
-`Asset Fetch` dropdown. Complete package choices fetch a sprite LoRA,
-ControlNet Union, and Depth Anything together; individual choices remain
-available for repair/testing. Pick an asset package from the dropdown and press
-Fetch. The fetcher stores the selected LoRA preset at:
+`Asset Fetch` dropdown. The complete package fetches both starter sprite LoRAs,
+plus the staged ControlNet Union and Depth Anything assets; individual choices
+remain available for repair/testing. Pick an asset package from the dropdown and
+press Fetch. The fetcher stores the selected LoRA preset at:
 
 ```text
 $HOME/NymphsData/config/nymphs-sprite/selected_lora.env

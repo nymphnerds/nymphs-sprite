@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-asset="complete_mks0813"
+asset="complete_sprite"
 hf_token=""
 
 while [[ $# -gt 0 ]]; do
@@ -48,8 +48,7 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       cat <<'EOF'
 Usage:
-  nymphs_sprite_fetch_assets.sh --asset complete_mks0813
-  nymphs_sprite_fetch_assets.sh --asset complete_tarn59
+  nymphs_sprite_fetch_assets.sh --asset complete_sprite
   nymphs_sprite_fetch_assets.sh --asset mks0813_pixel_art
   nymphs_sprite_fetch_assets.sh --asset controlnet_union
   nymphs_sprite_fetch_assets.sh --asset depth_anything_small
@@ -86,19 +85,14 @@ case "${asset}" in
     echo "asset_fetch_plan=Depth:Depth-Anything-V2-Small-hf"
     exec "${SCRIPT_DIR}/nymphs_sprite_fetch_depth_anything.sh" --small
     ;;
-  complete_mks0813|all_sprite_assets)
-    echo "asset_fetch_plan=LoRA:mks0813_pixel_art,ControlNet:union,Depth:small"
+  complete_sprite|all_sprite_assets)
+    echo "asset_fetch_plan=LoRA:mks0813_pixel_art,LoRA:tarn59_pixel_art,ControlNet:union,Depth:small"
+    "${SCRIPT_DIR}/nymphs_sprite_fetch_lora.sh" --candidate tarn59_pixel_art
     "${SCRIPT_DIR}/nymphs_sprite_fetch_lora.sh" --candidate mks0813_pixel_art
     "${SCRIPT_DIR}/nymphs_sprite_fetch_controlnet.sh"
     "${SCRIPT_DIR}/nymphs_sprite_fetch_depth_anything.sh" --small
-    echo "asset_fetch_complete=complete_mks0813"
-    ;;
-  complete_tarn59)
-    echo "asset_fetch_plan=LoRA:tarn59_pixel_art,ControlNet:union,Depth:small"
-    "${SCRIPT_DIR}/nymphs_sprite_fetch_lora.sh" --candidate tarn59_pixel_art
-    "${SCRIPT_DIR}/nymphs_sprite_fetch_controlnet.sh"
-    "${SCRIPT_DIR}/nymphs_sprite_fetch_depth_anything.sh" --small
-    echo "asset_fetch_complete=complete_tarn59"
+    echo "asset_fetch_complete=complete_sprite"
+    echo "selected_lora=mks0813_pixel_art"
     ;;
   *)
     echo "ERROR: unknown sprite asset id: ${asset}" >&2

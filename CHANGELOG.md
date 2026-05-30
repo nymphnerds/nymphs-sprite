@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.5 - 2026-05-30
+
+- Changed Complete Sprite Package to fetch both starter LoRAs, plus staged
+  ControlNet Union and Depth Anything assets.
+- Removed the duplicate alternate complete package option.
+- Kept `mks0813_pixel_art` selected after a complete fetch until the UI exposes
+  LoRA switching.
+
 ## 0.1.4 - 2026-05-30
 
 - Replaced separate LoRA, ControlNet, and Depth fetch blocks with one

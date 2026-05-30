@@ -136,14 +136,15 @@ $HOME/NymphsData/config/nymphs-sprite/selected_lora.env
   `Asset Fetch` dropdown:
 
 ```text
-Complete Sprite Package -> mks0813 LoRA + ControlNet Union + Depth Anything
-Complete Alt Package    -> tarn59 LoRA + ControlNet Union + Depth Anything
+Complete Sprite Package -> mks0813 LoRA + tarn59 LoRA + ControlNet Union + Depth Anything
 Individual choices      -> LoRA only, ControlNet only, Depth only
 ```
 
 - The actual model/LoRA files are not committed into git. The module owns the
   recipes, UI choices, paths, fetch scripts, status, and delete behavior; fetched
   assets live under the declared module/cache roots.
+- Complete fetch leaves `mks0813_pixel_art` selected by default for first-run
+  generation. A later UI pass should expose switching between downloaded LoRAs.
 
 - Fetch output follows the module guide:
 
@@ -379,7 +380,7 @@ Replace these assumptions:
    - Confirm module appears only in dev mode.
    - Confirm detail page layout matches other modules.
    - Confirm the old standalone ControlNet/Depth fetch blocks are gone.
-   - Confirm the Asset Fetch dropdown includes complete packages and individual assets.
+   - Confirm the Asset Fetch dropdown includes one complete package and individual assets.
    - Confirm LoRA/ControlNet/Depth fetches use the compact progress display.
    - Confirm downloaded LoRAs show in status/model cache after refresh.
 
