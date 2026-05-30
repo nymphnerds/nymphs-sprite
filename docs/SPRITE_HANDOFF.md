@@ -23,7 +23,8 @@ Nymphs Sprite UI
 ```text
 nymphnerds/nymphs-sprite
   NymphsCore module surface, Manager page, sprite LoRA fetch, sprite runner.
-  Current workspace target: v0.1.3, pending/pushed after LoRA fetch/status fix.
+  Current workspace target: v0.1.7, module UI reset to the Nymphs Image
+  rail/stage standard.
 
 nymphnerds/sprite-foundry
   Fork of mcp-tool-shop-org/sprite-foundry. Full upstream orchestration
@@ -41,7 +42,8 @@ nymphnerds/NymphsCore
 
 nymphnerds/nymphs-registry
   Public/dev registry.
-  Current pushed commit: daedfda, registry_version 244.
+  Dev registry entry points at nymphs-sprite main and is bumped with each
+  module release.
 ```
 
 ## Current Decisions
@@ -124,6 +126,24 @@ $HOME/Nymphs-Sprite
 ```text
 ui/manager.html
 ```
+
+- `ui/manager.html` now follows the Nymphs Image custom UI pattern:
+
+```text
+left rail  -> runtime, assets, prompt, Z-Image controls, sprite controls
+right pane -> image preview stage, progress, generated batch strip, compact log
+```
+
+- The sidebar width and collapse point are copied from Nymphs Image:
+
+```css
+grid-template-columns: clamp(260px, 28vw, 300px) minmax(300px, 1fr);
+@media (max-width: 600px)
+```
+
+- The old generic dashboard/card layout is gone. Module UI actions use the
+  Manager WebView2 bridge; the page does not run shell directly and does not
+  add its own bottom chrome.
 
 - Selected LoRA config is stored at:
 
@@ -383,8 +403,8 @@ Replace these assumptions:
 
 1. Install/update `nymphs-sprite` from the dev registry in the test WSL.
    - Confirm module appears only in dev mode.
-   - Confirm detail page layout matches other modules.
-   - Confirm the old standalone ControlNet/Depth fetch blocks are gone.
+   - Confirm the custom UI opens as a Nymphs Image-style rail/stage screen.
+   - Confirm the sidebar width and mobile collapse match Nymphs Image.
    - Confirm the Asset Fetch dropdown includes one complete package and individual assets.
    - Confirm LoRA/ControlNet/Depth fetches use the compact progress display.
    - Confirm downloaded LoRAs show in status/model cache after refresh.
@@ -399,6 +419,8 @@ Replace these assumptions:
    - Target size: `96`.
    - Subject: simple creature/gnome test.
    - Output: one eight-direction batch.
+   - Confirm the right-side preview picks up `sprite_contact_sheet=` and
+     per-direction `output_*=` paths.
    - Inspect raw outputs, transparent albedo files, and contact sheet.
 
 4. Compare against Sprite Foundry.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.7 - 2026-05-30
+
+- Rebuilt the module-owned UI around the Nymphs Image rail/stage pattern.
+- Matched the Nymphs Image sidebar width and mobile collapse breakpoint.
+- Added a right-side image preview stage, generated-batch thumbnail strip, and
+  contact-sheet/output path detection from generation logs.
+- Removed the generic dashboard-card layout and duplicate in-page bottom bar.
+
 ## 0.1.6 - 2026-05-30
 
 - Routed the Asset Fetch dropdown through the existing `fetch_lora` capability
