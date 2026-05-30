@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -239,6 +239,7 @@
   "notes": [
     "Initial scaffold captures Sprite Foundry ComfyUI workflow templates, Z-Image Turbo request profiles, pixel-art LoRA candidates, Z-Image ControlNet Union, Depth Anything, a sprite-specific Manager UI, and the NymphsCore module contract.",
     "The direction runner calls Nymphs Image /generate with the chosen Z-Image Turbo LoRA. ControlNet and Depth Anything fetch/status surfaces are first-class; Z-Image ControlNet generation needs a backend path because the installed diffusers runtime exposes ZImagePipeline but not ZImageControlNetPipeline.",
-    "v0.1.1 writes Sprite Foundry-style batch artifacts: copied direction images, sprite_batch.json, and an optional contact sheet when Pillow is available."
+    "v0.1.1 writes Sprite Foundry-style batch artifacts: copied direction images, sprite_batch.json, and an optional contact sheet when Pillow is available.",
+    "v0.1.2 ports the MIT-licensed Sprite Foundry post-processing method and exposes --sprite-size from 24 to 512 pixels, defaulting to 96 for Z-Image detail retention."
   ]
 }

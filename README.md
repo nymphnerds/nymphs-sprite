@@ -171,6 +171,21 @@ sprite_batch.json    prompts, seeds, LoRA settings, source Z-Image responses, an
 contact_sheet.png    quick visual sheet when Pillow is available
 ```
 
+The sprite processor uses the MIT-licensed Sprite Foundry method as its
+reference: background cleanup, foreground crop, square padding, nearest-neighbor
+resize, alpha mechanical checks, and review sheets. The sprite size is a choice,
+not hard-coded to Foundry's original 48px. `--sprite-size` accepts `24..512`
+and defaults to `96` for Z-Image's more detailed pixel style. Useful test sizes:
+
+```text
+48   strict classic sprite
+64   small but less brutal than 48
+96   default; preserves more Z-Image detail
+128  larger action-RPG / HD-2D sprite
+192  chunky preview/game token scale
+256  large portrait-token sprite
+```
+
 ## ControlNet And Depth
 
 The current local Z-Image runtime has:

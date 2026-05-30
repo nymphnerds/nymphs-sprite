@@ -388,6 +388,14 @@
               Height
               <input id="height" type="number" min="256" max="2048" step="64" value="1024">
             </label>
+            <label>
+              Sprite size
+              <input id="spriteSize" type="number" min="24" max="512" step="8" value="96">
+            </label>
+            <label>
+              Palette colors
+              <input id="paletteColors" type="number" min="0" max="256" step="1" value="0">
+            </label>
           </div>
 
           <div>
@@ -580,6 +588,8 @@
         steps: value("steps"),
         width: value("width"),
         height: value("height"),
+        "sprite-size": value("spriteSize"),
+        "palette-colors": value("paletteColors"),
         directions: directions.join(",")
       })).catch(() => {});
     });

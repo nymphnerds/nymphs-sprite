@@ -20,6 +20,9 @@ echo "install_root=${NYMPHS_SPRITE_INSTALL_DIR}"
 
 install -m 644 "${REPO_DIR}/nymph.json" "${staging_dir}/nymph.json"
 install -m 644 "${REPO_DIR}/README.md" "${staging_dir}/README.md"
+if [[ -f "${REPO_DIR}/THIRD_PARTY_NOTICES.md" ]]; then
+  install -m 644 "${REPO_DIR}/THIRD_PARTY_NOTICES.md" "${staging_dir}/THIRD_PARTY_NOTICES.md"
+fi
 
 mkdir -p "${staging_dir}/scripts" "${staging_dir}/docs" "${staging_dir}/comfyui_workflows" "${staging_dir}/profiles" "${staging_dir}/ui"
 install -m 755 "${REPO_DIR}/scripts/"*.sh "${staging_dir}/scripts/"

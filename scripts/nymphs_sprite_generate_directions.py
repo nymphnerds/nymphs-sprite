@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+"""Nymphs Sprite direction runner.
+
+The post-processing stage adapts the MIT-licensed Sprite Foundry normalization
+method: background cleanup, square crop, nearest-neighbor sprite resize,
+mechanical alpha checks, and review/contact sheets.
+"""
 from __future__ import annotations
 
 import argparse
@@ -24,6 +30,8 @@ DIRECTIONS = {
     "right": "facing right, right side profile view",
     "front_right": "facing front-right, 3/4 view from the right, looking slightly right",
 }
+
+ORDERED_DIRECTIONS = list(DIRECTIONS.keys())
 
 
 def request_json(method: str, url: str, payload: dict[str, Any] | None = None, timeout: int = 1800) -> dict[str, Any]:
@@ -69,55 +77,351 @@ def response_output_path(response: dict[str, Any]) -> Path | None:
     return Path(value).expanduser()
 
 
-def copy_direction_image(source: Path, target_dir: Path, index: int, direction: str) -> Path | None:
+def copy_direction_image(source: Path, target_dir: Path, index: int, direction: str, label_suffix: str = "") -> Path | None:
     if not source.exists() or not source.is_file():
         return None
     suffix = source.suffix or ".png"
-    target = target_dir / f"{index:02d}_{direction}{suffix}"
+    target = target_dir / f"{index:02d}_{direction}{label_suffix}{suffix}"
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(source, target)
     return target
 
 
-def write_contact_sheet(items: list[dict[str, Any]], target_path: Path, cell_size: int = 192) -> Path | None:
-    image_items = [item for item in items if item.get("artifact_path")]
-    if not image_items:
-        return None
+def load_pillow():
     try:
         from PIL import Image, ImageDraw, ImageFont, ImageOps
     except Exception:
+        return None
+    return Image, ImageDraw, ImageFont, ImageOps
+
+
+def load_default_font(ImageFont, size: int):
+    for name in ("consola.ttf", "cour.ttf"):
+        try:
+            return ImageFont.truetype(name, size)
+        except (OSError, IOError):
+            pass
+    return ImageFont.load_default()
+
+
+def remove_foundry_background(image, tolerance: int = 35, green_screen: bool = True):
+    """Foundry-style background removal: corner-color fallback plus green-screen key."""
+    Image, _, _, _ = load_pillow()
+    rgba = image.convert("RGBA")
+    pixels = rgba.load()
+    width, height = rgba.size
+    corners = [
+        pixels[0, 0],
+        pixels[width - 1, 0],
+        pixels[0, height - 1],
+        pixels[width - 1, height - 1],
+    ]
+    bg = tuple(sum(pixel[channel] for pixel in corners) / len(corners) for channel in range(3))
+    tol_sq = tolerance * tolerance
+
+    for y in range(height):
+        for x in range(width):
+            red, green, blue, alpha = pixels[x, y]
+            if alpha == 0:
+                continue
+            dist_sq = (red - bg[0]) ** 2 + (green - bg[1]) ** 2 + (blue - bg[2]) ** 2
+            green_key = green_screen and green > 145 and green > red + 38 and green > blue + 38
+            if dist_sq < tol_sq or green_key:
+                pixels[x, y] = (red, green, blue, 0)
+    return rgba
+
+
+def foreground_bbox(image):
+    rgba = image.convert("RGBA")
+    alpha = rgba.getchannel("A")
+    return alpha.getbbox()
+
+
+def normalize_to_square(image, padding_ratio: float = 0.08):
+    """Crop to foreground bounds, pad to square, preserve the full visible figure."""
+    Image, _, _, _ = load_pillow()
+    rgba = image.convert("RGBA")
+    bbox = foreground_bbox(rgba)
+    if bbox is None:
+        side = max(rgba.size)
+        square = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+        square.paste(rgba, ((side - rgba.width) // 2, (side - rgba.height) // 2), rgba)
+        return square, None
+
+    left, top, right, bottom = bbox
+    width = right - left
+    height = bottom - top
+    pad = max(2, int(max(width, height) * padding_ratio))
+    left = max(0, left - pad)
+    top = max(0, top - pad)
+    right = min(rgba.width, right + pad)
+    bottom = min(rgba.height, bottom + pad)
+    cropped = rgba.crop((left, top, right, bottom))
+    side = max(cropped.width, cropped.height)
+    square = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+    square.paste(cropped, ((side - cropped.width) // 2, (side - cropped.height) // 2), cropped)
+    return square, [left, top, right, bottom]
+
+
+def pixelate_sprite_image(image, target_size: int, palette_colors: int | None = None):
+    Image, _, _, _ = load_pillow()
+    result = image.convert("RGBA").resize((target_size, target_size), Image.NEAREST)
+    if palette_colors is not None and palette_colors > 0:
+        alpha = result.getchannel("A")
+        quantized = result.convert("RGB").quantize(colors=palette_colors, method=Image.Quantize.MEDIANCUT)
+        result = quantized.convert("RGB").convert("RGBA")
+        result.putalpha(alpha)
+    return result
+
+
+def raw_source_check(image, tolerance: int = 40) -> dict[str, Any]:
+    """Small port of Foundry's raw source sanity check: empty frame and off-center content."""
+    rgba = image.convert("RGBA")
+    width, height = rgba.size
+    pixels = rgba.load()
+    corners = [
+        pixels[0, 0],
+        pixels[width - 1, 0],
+        pixels[0, height - 1],
+        pixels[width - 1, height - 1],
+    ]
+    bg = tuple(sum(pixel[channel] for pixel in corners) / len(corners) for channel in range(3))
+    tol_sq = tolerance * tolerance
+    total = 0
+    sum_x = 0
+    left_count = 0
+    center_count = 0
+    right_count = 0
+    third = max(1, width // 3)
+
+    for y in range(height):
+        for x in range(width):
+            red, green, blue, alpha = pixels[x, y]
+            if alpha == 0:
+                continue
+            dist_sq = (red - bg[0]) ** 2 + (green - bg[1]) ** 2 + (blue - bg[2]) ** 2
+            if dist_sq <= tol_sq:
+                continue
+            total += 1
+            sum_x += x
+            if x < third:
+                left_count += 1
+            elif x < third * 2:
+                center_count += 1
+            else:
+                right_count += 1
+
+    if total == 0:
+        return {"pass": False, "issues": ["empty_frame"]}
+
+    issues: list[str] = []
+    left_ratio = left_count / total
+    right_ratio = right_count / total
+    center_ratio = center_count / total
+    if left_ratio > 0.25 and right_ratio > 0.25 and center_ratio < 0.35:
+        issues.append("multi_subject_composition")
+
+    center_of_mass = sum_x / total / width
+    if center_of_mass < 0.30 or center_of_mass > 0.70:
+        issues.append(f"off_center:{center_of_mass:.2f}")
+
+    return {
+        "pass": len(issues) == 0,
+        "issues": issues,
+        "foreground_pixels": total,
+        "center_of_mass_x": round(center_of_mass, 4),
+    }
+
+
+def mechanical_check_sprite(image, target_size: int) -> dict[str, Any]:
+    issues: list[str] = []
+    if image.size != (target_size, target_size):
+        issues.append(f"wrong_size:{image.size}")
+    if image.mode != "RGBA":
+        issues.append(f"no_alpha:{image.mode}")
+    else:
+        max_index = target_size - 1
+        corners = [
+            image.getpixel((0, 0)),
+            image.getpixel((max_index, 0)),
+            image.getpixel((0, max_index)),
+            image.getpixel((max_index, max_index)),
+        ]
+        opaque = sum(1 for corner in corners if corner[3] > 128)
+        if opaque >= 3:
+            issues.append("background_opaque")
+    return {"pass": len(issues) == 0, "issues": issues}
+
+
+def make_checkerboard(Image, ImageDraw, size: int, tile: int = 8):
+    checker = Image.new("RGB", (size, size), (35, 35, 45))
+    draw = ImageDraw.Draw(checker)
+    for y in range(0, size, tile):
+        for x in range(0, size, tile):
+            color = (45, 45, 55) if (x // tile + y // tile) % 2 == 0 else (35, 35, 45)
+            draw.rectangle([x, y, min(size - 1, x + tile - 1), min(size - 1, y + tile - 1)], fill=color)
+    return checker
+
+
+def write_pixel_contact_sheet(items: list[dict[str, Any]], target_path: Path, cell_size: int = 128) -> Path | None:
+    pillow = load_pillow()
+    if pillow is None:
         print("contact_sheet=skipped reason=Pillow-unavailable")
         return None
+    Image, ImageDraw, ImageFont, _ = pillow
+    by_direction = {str(item["direction"]): item for item in items if item.get("albedo_path")}
+    if not by_direction:
+        return None
 
-    columns = min(4, max(1, len(image_items)))
-    rows = (len(image_items) + columns - 1) // columns
-    label_h = 28
-    gutter = 12
-    width = columns * cell_size + (columns + 1) * gutter
-    height = rows * (cell_size + label_h) + (rows + 1) * gutter
-    sheet = Image.new("RGB", (width, height), (12, 17, 16))
+    label_w = 88
+    pad = 4
+    header_h = 30
+    cell_w = cell_size + pad * 2
+    cell_h = cell_size + pad * 2
+    width = label_w + len(ORDERED_DIRECTIONS) * cell_w + 20
+    height = 10 + 24 + header_h + cell_h + 78
+    sheet = Image.new("RGB", (width, height), (24, 24, 32))
     draw = ImageDraw.Draw(sheet)
-    font = ImageFont.load_default()
+    font_sm = load_default_font(ImageFont, 11)
+    font_md = load_default_font(ImageFont, 13)
+    font_lg = load_default_font(ImageFont, 15)
 
-    for index, item in enumerate(image_items):
-        row, col = divmod(index, columns)
-        x = gutter + col * (cell_size + gutter)
-        y = gutter + row * (cell_size + label_h + gutter)
-        path = Path(str(item["artifact_path"]))
-        try:
-            with Image.open(path) as handle:
-                image = ImageOps.contain(handle.convert("RGBA"), (cell_size, cell_size))
-                px = x + (cell_size - image.width) // 2
-                py = y + (cell_size - image.height) // 2
-                sheet.paste(image, (px, py), image)
-        except Exception as exc:
-            draw.text((x, y + 8), f"load failed: {type(exc).__name__}", fill=(255, 141, 141), font=font)
-        label = str(item.get("direction") or "")
-        draw.text((x, y + cell_size + 8), label, fill=(215, 231, 223), font=font)
+    ox, oy = 10, 10
+    draw.text((ox, oy), "Nymphs Sprite - Foundry-style albedo contact sheet", fill=(120, 200, 120), font=font_lg)
+    oy += 24
+    for col, direction in enumerate(ORDERED_DIRECTIONS):
+        draw.text((ox + label_w + col * cell_w + pad, oy + 2), direction.replace("_", "\n"), fill=(210, 210, 220), font=font_sm)
+    oy += header_h
+    draw.text((ox + 4, oy + cell_size // 2), "Albedo", fill=(120, 200, 120), font=font_md)
+    for col, direction in enumerate(ORDERED_DIRECTIONS):
+        cx = ox + label_w + col * cell_w + pad
+        cy = oy + pad
+        item = by_direction.get(direction)
+        if item:
+            with Image.open(Path(str(item["albedo_path"]))) as handle:
+                sprite = handle.convert("RGBA").resize((cell_size, cell_size), Image.NEAREST)
+            checker = make_checkerboard(Image, ImageDraw, cell_size)
+            checker.paste(sprite, (0, 0), sprite)
+            sheet.paste(checker, (cx, cy))
+        else:
+            draw.rectangle([cx, cy, cx + cell_size, cy + cell_size], fill=(60, 30, 30), outline=(50, 50, 60))
+
+    oy += cell_h + 10
+    draw.line([(ox, oy), (width - 10, oy)], fill=(50, 50, 60))
+    oy += 8
+    draw.text((ox, oy), "Transparent sprite outputs, nearest-neighbor preview.", fill=(200, 200, 210), font=font_sm)
 
     target_path.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(target_path)
     return target_path
+
+
+def write_raw_inspection_sheet(items: list[dict[str, Any]], target_path: Path, cell_size: int = 192) -> Path | None:
+    pillow = load_pillow()
+    if pillow is None:
+        return None
+    Image, ImageDraw, ImageFont, ImageOps = pillow
+    by_direction = {str(item["direction"]): item for item in items if item.get("raw_artifact_path")}
+    if not by_direction:
+        return None
+
+    label_w = 92
+    pad = 4
+    header_h = 30
+    cell_w = cell_size + pad * 2
+    cell_h = cell_size + pad * 2
+    width = label_w + len(ORDERED_DIRECTIONS) * cell_w + 20
+    height = 10 + 24 + header_h + cell_h + 78
+    sheet = Image.new("RGB", (width, height), (24, 24, 32))
+    draw = ImageDraw.Draw(sheet)
+    font_sm = load_default_font(ImageFont, 11)
+    font_md = load_default_font(ImageFont, 13)
+    font_lg = load_default_font(ImageFont, 15)
+
+    ox, oy = 10, 10
+    draw.text((ox, oy), "Nymphs Sprite - raw source inspection", fill=(200, 120, 120), font=font_lg)
+    oy += 24
+    for col, direction in enumerate(ORDERED_DIRECTIONS):
+        draw.text((ox + label_w + col * cell_w + pad, oy + 2), direction.replace("_", "\n"), fill=(210, 210, 220), font=font_sm)
+    oy += header_h
+    draw.text((ox + 2, oy + cell_size // 2 - 8), "Raw", fill=(200, 120, 120), font=font_md)
+    for col, direction in enumerate(ORDERED_DIRECTIONS):
+        cx = ox + label_w + col * cell_w + pad
+        cy = oy + pad
+        item = by_direction.get(direction)
+        if item:
+            with Image.open(Path(str(item["raw_artifact_path"]))) as handle:
+                thumb = ImageOps.contain(handle.convert("RGB"), (cell_size, cell_size))
+            px = cx + (cell_size - thumb.width) // 2
+            py = cy + (cell_size - thumb.height) // 2
+            sheet.paste(thumb, (px, py))
+        else:
+            draw.rectangle([cx, cy, cx + cell_size, cy + cell_size], fill=(60, 30, 30), outline=(50, 50, 60))
+
+    oy += cell_h + 10
+    draw.line([(ox, oy), (width - 10, oy)], fill=(50, 50, 60))
+    oy += 8
+    draw.text((ox, oy), "Check identity, single subject, centering, and background residue before accepting.", fill=(200, 200, 210), font=font_sm)
+
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    sheet.save(target_path)
+    return target_path
+
+
+def process_foundry_sprite(source: Path, batch_dir: Path, item: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
+    result: dict[str, Any] = {
+        "raw_artifact_path": "",
+        "albedo_path": "",
+        "preview_path": "",
+        "crop_bbox": None,
+        "source_check": {"pass": False, "issues": ["not_processed"]},
+        "mechanical": {"pass": False, "issues": ["not_processed"]},
+    }
+    if not source.exists() or not source.is_file():
+        result["source_check"] = {"pass": False, "issues": ["source_missing"]}
+        result["mechanical"] = {"pass": False, "issues": ["source_missing"]}
+        return result
+
+    raw_path = copy_direction_image(source, batch_dir / "raw", int(item["index"]), str(item["direction"]), "_raw")
+    if raw_path is not None:
+        result["raw_artifact_path"] = str(raw_path)
+
+    pillow = load_pillow()
+    if pillow is None:
+        result["source_check"] = {"pass": False, "issues": ["Pillow-unavailable"]}
+        result["mechanical"] = {"pass": False, "issues": ["Pillow-unavailable"]}
+        return result
+
+    Image, _, _, _ = pillow
+    with Image.open(source) as handle:
+        raw_img = handle.convert("RGBA")
+
+    source_check = raw_source_check(raw_img)
+    cleaned = remove_foundry_background(raw_img, tolerance=args.bg_tolerance, green_screen=not args.no_green_screen)
+    square, bbox = normalize_to_square(cleaned, padding_ratio=args.crop_padding)
+    pixel = pixelate_sprite_image(square, args.sprite_size, args.palette_colors)
+    mechanical = mechanical_check_sprite(pixel, args.sprite_size)
+
+    albedo_path = batch_dir / "albedo" / f"{int(item['index']):02d}_{item['direction']}.png"
+    albedo_path.parent.mkdir(parents=True, exist_ok=True)
+    pixel.save(albedo_path, "PNG")
+
+    preview_size = max(args.sprite_size, args.preview_size)
+    preview = pixel.resize((preview_size, preview_size), Image.NEAREST)
+    preview_path = batch_dir / "preview" / f"{int(item['index']):02d}_{item['direction']}_preview.png"
+    preview_path.parent.mkdir(parents=True, exist_ok=True)
+    preview.save(preview_path, "PNG")
+
+    result.update(
+        {
+            "albedo_path": str(albedo_path),
+            "preview_path": str(preview_path),
+            "crop_bbox": bbox,
+            "source_check": source_check,
+            "mechanical": mechanical,
+        }
+    )
+    return result
 
 
 def write_sprite_artifacts(
@@ -138,8 +442,11 @@ def write_sprite_artifacts(
         response = item["response"]
         source = response_output_path(response)
         artifact_path = None
+        processed: dict[str, Any] = {}
         if source is not None and args.copy_images:
             artifact_path = copy_direction_image(source, directions_dir, int(item["index"]), str(item["direction"]))
+        if source is not None and args.post_process:
+            processed = process_foundry_sprite(source, batch_dir, item, args)
         copied_items.append(
             {
                 "direction": item["direction"],
@@ -150,11 +457,20 @@ def write_sprite_artifacts(
                 "source_metadata_path": str(response.get("metadata_path") or ""),
                 "source_url": str(response.get("url") or ""),
                 "artifact_path": str(artifact_path) if artifact_path else "",
+                "raw_artifact_path": processed.get("raw_artifact_path", ""),
+                "albedo_path": processed.get("albedo_path", ""),
+                "preview_path": processed.get("preview_path", ""),
+                "crop_bbox": processed.get("crop_bbox"),
+                "source_check": processed.get("source_check", {}),
+                "mechanical": processed.get("mechanical", {}),
                 "zimage_response": response,
             }
         )
 
-    contact_sheet = write_contact_sheet(copied_items, batch_dir / "contact_sheet.png", args.contact_cell_size)
+    contact_sheet = write_pixel_contact_sheet(copied_items, batch_dir / "preview" / "contact_sheet.png", args.contact_cell_size)
+    raw_sheet = write_raw_inspection_sheet(copied_items, batch_dir / "preview" / "raw_inspection.png", args.raw_cell_size)
+    processed_count = sum(1 for item in copied_items if item.get("albedo_path"))
+    mechanical_passes = sum(1 for item in copied_items if (item.get("mechanical") or {}).get("pass") is True)
     manifest = {
         "schema": "nymphs-sprite.batch.v1",
         "created_at": dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z"),
@@ -172,8 +488,13 @@ def write_sprite_artifacts(
         "guidance_scale": args.guidance_scale,
         "base_seed": args.seed,
         "seed_step": args.seed_step,
+        "sprite_size": args.sprite_size,
+        "post_process": args.post_process,
+        "processed_count": processed_count,
+        "mechanical_passes": mechanical_passes,
         "directions": copied_items,
         "contact_sheet": str(contact_sheet) if contact_sheet else "",
+        "raw_inspection": str(raw_sheet) if raw_sheet else "",
     }
     batch_dir.mkdir(parents=True, exist_ok=True)
     manifest_path = batch_dir / "sprite_batch.json"
@@ -182,6 +503,7 @@ def write_sprite_artifacts(
         "batch_dir": str(batch_dir),
         "manifest_path": str(manifest_path),
         "contact_sheet": str(contact_sheet) if contact_sheet else "",
+        "raw_inspection": str(raw_sheet) if raw_sheet else "",
     }
 
 
@@ -206,12 +528,27 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--profile", default="")
     parser.add_argument("--directions", default=",".join(DIRECTIONS.keys()))
     parser.add_argument("--contact-cell-size", type=int, default=192)
+    parser.add_argument("--raw-cell-size", type=int, default=192)
+    parser.add_argument("--preview-size", type=int, default=192)
+    parser.add_argument("--sprite-size", type=int, default=96)
+    parser.add_argument("--bg-tolerance", type=int, default=35)
+    parser.add_argument("--crop-padding", type=float, default=0.08)
+    parser.add_argument("--palette-colors", type=int, default=0)
     parser.add_argument("--copy-images", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--post-process", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--green-screen", dest="no_green_screen", action="store_false", default=False)
+    parser.add_argument("--no-green-screen", dest="no_green_screen", action="store_true")
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
+    if args.sprite_size < 24 or args.sprite_size > 512:
+        raise SystemExit("ERROR: --sprite-size must be between 24 and 512.")
+    if args.palette_colors < 0:
+        raise SystemExit("ERROR: --palette-colors must be zero or greater.")
+    if args.crop_padding < 0 or args.crop_padding > 0.5:
+        raise SystemExit("ERROR: --crop-padding must be between 0 and 0.5.")
     zimage_url = args.zimage_url.rstrip("/")
     profile = {}
     if args.profile:
