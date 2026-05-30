@@ -23,7 +23,7 @@ Nymphs Sprite UI
 ```text
 nymphnerds/nymphs-sprite
   NymphsCore module surface, Manager page, sprite LoRA fetch, sprite runner.
-  Current workspace target: v0.1.11, module UI is being tightened against the
+  Current workspace target: v0.1.12, module UI is being tightened against the
   Nymphs Image rail/stage standard and Sprite Foundry's source-review flow.
 
 nymphnerds/sprite-foundry
@@ -172,6 +172,11 @@ choose Foundry-style prompt + LoRA
   post-processes those selected source images instead of generating a fresh
   set. Browser-picked folders remain preview/select only unless their absolute
   paths are later bridged by Manager.
+- Custom UI generation arguments must respect Manager's module-action filter:
+  values are max 256 chars and only shell-safe characters are allowed. Long
+  prompts, LoRA trigger/path values, and selected source-image lists are passed
+  as base64url chunks and decoded by `nymphs_sprite_generate_directions.sh`.
+  Direction lists use `+` instead of comma for the same reason.
 - The Nymphs Image forest background is copied into the module and referenced
   from installed Manager HTML as a `file://` URI. Do not inline it as a data URI:
   that made the HTML too large for WebView2 `NavigateToString` and caused

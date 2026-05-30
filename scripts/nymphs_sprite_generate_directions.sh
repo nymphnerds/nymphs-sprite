@@ -8,6 +8,85 @@ source "${SCRIPT_DIR}/_nymphs_sprite_common.sh"
 python_bin="$(nymphs_sprite_python_bin)"
 
 extra_args=()
+pass_args=()
+declare -A encoded_parts=()
+
+decode_base64url() {
+  "${python_bin}" - "$1" <<'PY'
+from __future__ import annotations
+
+import base64
+import sys
+
+value = sys.argv[1].strip()
+padding = "=" * ((4 - len(value) % 4) % 4)
+print(base64.urlsafe_b64decode((value + padding).encode("ascii")).decode("utf-8"))
+PY
+}
+
+collect_encoded_arg() {
+  local key="$1"
+  local value="$2"
+  case "${key}" in
+    subject-prompt-b64-*|negative-prompt-b64-*|lora-path-b64-*|lora-trigger-b64-*|source-images-b64-*)
+      encoded_parts["${key}"]="${value}"
+      return 0
+      ;;
+  esac
+  return 1
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --*=*)
+      key="${1%%=*}"
+      key="${key#--}"
+      value="${1#*=}"
+      if collect_encoded_arg "${key}" "${value}"; then
+        shift
+      else
+        pass_args+=("$1")
+        shift
+      fi
+      ;;
+    --subject-prompt-b64-*|--negative-prompt-b64-*|--lora-path-b64-*|--lora-trigger-b64-*|--source-images-b64-*)
+      key="${1#--}"
+      value="${2:-}"
+      collect_encoded_arg "${key}" "${value}"
+      shift 2
+      ;;
+    *)
+      pass_args+=("$1")
+      shift
+      ;;
+  esac
+done
+
+append_decoded_arg() {
+  local prefix="$1"
+  local target="$2"
+  local encoded=""
+  local index=0
+  local key=""
+  while true; do
+    key="${prefix}-b64-${index}"
+    if [[ -z "${encoded_parts[${key}]+set}" ]]; then
+      break
+    fi
+    encoded+="${encoded_parts[${key}]}"
+    index=$((index + 1))
+  done
+  if [[ -n "${encoded}" ]]; then
+    pass_args+=("--${target}" "$(decode_base64url "${encoded}")")
+  fi
+}
+
+append_decoded_arg "subject-prompt" "subject-prompt"
+append_decoded_arg "negative-prompt" "negative-prompt"
+append_decoded_arg "lora-path" "lora-path"
+append_decoded_arg "lora-trigger" "lora-trigger"
+append_decoded_arg "source-images" "source-images"
+
 if [[ -f "${NYMPHS_SPRITE_LORA_PRESET_FILE}" ]]; then
   selected_lora_path="$(sed -n 's/^NYMPHS_SPRITE_SELECTED_LORA_PATH=//p' "${NYMPHS_SPRITE_LORA_PRESET_FILE}" | tail -n 1)"
   selected_lora_trigger="$(sed -n 's/^NYMPHS_SPRITE_SELECTED_LORA_TRIGGER=//p' "${NYMPHS_SPRITE_LORA_PRESET_FILE}" | tail -n 1)"
@@ -27,4 +106,4 @@ exec "${python_bin}" "${SCRIPT_DIR}/nymphs_sprite_generate_directions.py" \
   --zimage-url "${NYMPHS_SPRITE_ZIMAGE_URL}" \
   --outputs-root "${NYMPHS_SPRITE_OUTPUTS_ROOT}" \
   "${extra_args[@]}" \
-  "$@"
+  "${pass_args[@]}"

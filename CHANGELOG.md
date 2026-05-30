@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.12 - 2026-05-30
+
+- Fixed generation from the custom UI by sending prompts, LoRA trigger/path,
+  and selected source images through Manager as safe base64url chunks.
+- Changed direction selection from comma-separated to `+`-separated for the
+  Manager action bridge.
+
 ## 0.1.11 - 2026-05-30
 
 - Fixed the custom UI failing to open in WebView2 by replacing the oversized

@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -246,6 +246,7 @@
     "v0.1.8 removes asset download controls from the custom generation UI, keeps asset fetch in the module detail action group, adds run-level downloaded-LoRA selection, and restores the Nymphs Image strip organizer/folder picker pattern.",
     "v0.1.9 adds a sprite prompt preset dropdown, separates source-image generation from generate-and-process, and removes the always-visible log from the UI stage.",
     "v0.1.10 replaces the starter prompt presets with Sprite Foundry-derived subjects, inlines the Nymphs Image forest background during install, moves source generation into the Z-Image stage, and lets the strip picker load recent Z-Image outputs.",
-    "v0.1.11 keeps the forest background as an installed file URI instead of a huge data URI so WebView2 can load the module UI."
+    "v0.1.11 keeps the forest background as an installed file URI instead of a huge data URI so WebView2 can load the module UI.",
+    "v0.1.12 base64url-chunks long prompt, LoRA trigger/path, and selected source-image arguments so Manager's safe module-action argument filter does not reject generation."
   ]
 }

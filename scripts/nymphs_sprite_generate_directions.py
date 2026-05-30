@@ -620,7 +620,7 @@ def main() -> int:
         raise SystemExit("ERROR: no LoRA path supplied and /api/loras returned no available LoRAs.")
 
     lora_trigger = args.lora_trigger.strip() or str(profile.get("lora_trigger") or "").strip()
-    direction_names = [item.strip() for item in args.directions.split(",") if item.strip()]
+    direction_names = [item.strip() for item in re.split(r"[,+]", args.directions) if item.strip()]
     invalid = [name for name in direction_names if name not in DIRECTIONS]
     if invalid:
         raise SystemExit(f"ERROR: unknown direction(s): {', '.join(invalid)}")
