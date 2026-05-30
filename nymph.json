@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -55,6 +55,7 @@
     "check_runtime": "scripts/nymphs_sprite_check_runtime.sh",
     "generate_sources": "scripts/nymphs_sprite_generate_sources.sh",
     "generate_directions": "scripts/nymphs_sprite_generate_directions.sh",
+    "list_outputs": "scripts/nymphs_sprite_list_zimage_outputs.sh",
     "logs": "scripts/nymphs_sprite_logs.sh",
     "uninstall": "scripts/nymphs_sprite_uninstall.sh"
   },
@@ -68,6 +69,7 @@
     "open_outputs",
     "generate_sources",
     "generate_directions",
+    "list_outputs",
     "fetch_assets",
     "fetch_lora",
     "select_lora",
@@ -242,6 +244,7 @@
     "v0.1.6 routes Asset Fetch through the existing fetch_lora capability so older Manager sessions do not grey out the submit button.",
     "v0.1.7 rebuilds the module-owned UI from the Nymphs Image rail/stage pattern, with a generated sprite preview, contact-sheet thumbnails, compact status, and no dashboard-card layout.",
     "v0.1.8 removes asset download controls from the custom generation UI, keeps asset fetch in the module detail action group, adds run-level downloaded-LoRA selection, and restores the Nymphs Image strip organizer/folder picker pattern.",
-    "v0.1.9 adds a sprite prompt preset dropdown, separates source-image generation from generate-and-process, and removes the always-visible log from the UI stage."
+    "v0.1.9 adds a sprite prompt preset dropdown, separates source-image generation from generate-and-process, and removes the always-visible log from the UI stage.",
+    "v0.1.10 replaces the starter prompt presets with Sprite Foundry-derived subjects, inlines the Nymphs Image forest background during install, moves source generation into the Z-Image stage, and lets the strip picker load recent Z-Image outputs."
   ]
 }

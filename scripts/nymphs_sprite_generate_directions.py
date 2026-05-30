@@ -70,6 +70,27 @@ def safe_name(value: str, fallback: str = "sprite") -> str:
     return cleaned[:80] or fallback
 
 
+def split_source_images(value: str) -> list[Path]:
+    text = value.strip()
+    if not text:
+        return []
+    separator = "|" if "|" in text else ","
+    paths = []
+    for item in text.split(separator):
+        clean = item.strip()
+        if clean and not clean.startswith(("http://", "https://", "manual:")):
+            paths.append(Path(clean).expanduser())
+    return paths
+
+
+def source_direction_name(path: Path, index: int) -> str:
+    stem = safe_name(path.stem, f"source-{index}").lower()
+    for direction in sorted(ORDERED_DIRECTIONS, key=len, reverse=True):
+        if direction in stem:
+            return direction
+    return f"source_{index:02d}"
+
+
 def response_output_path(response: dict[str, Any]) -> Path | None:
     value = str(response.get("output_path") or "").strip()
     if not value:
@@ -527,6 +548,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--nunchaku-precision", default="auto", choices=["auto", "int4", "fp4"])
     parser.add_argument("--profile", default="")
     parser.add_argument("--directions", default=",".join(DIRECTIONS.keys()))
+    parser.add_argument("--source-images", default="")
     parser.add_argument("--contact-cell-size", type=int, default=192)
     parser.add_argument("--raw-cell-size", type=int, default=192)
     parser.add_argument("--preview-size", type=int, default=192)
@@ -554,6 +576,43 @@ def main() -> int:
     if args.profile:
         profile = load_profile(Path(args.profile).expanduser())
 
+    source_images = split_source_images(args.source_images)
+    batch_id = f"nymphs-sprite-{args.subject_id}-{uuid.uuid4().hex[:8]}"
+    if source_images:
+        missing = [str(path) for path in source_images if not path.is_file()]
+        if missing:
+            raise SystemExit(f"ERROR: selected source image(s) not found: {', '.join(missing)}")
+        print(f"batch_id={batch_id}")
+        print(f"source_images={len(source_images)}")
+        generated = []
+        for index, source in enumerate(source_images, start=1):
+            direction = source_direction_name(source, index)
+            generated.append(
+                {
+                    "direction": direction,
+                    "index": index,
+                    "seed": args.seed + (index - 1) * args.seed_step,
+                    "prompt": args.subject_prompt,
+                    "response": {"output_path": str(source), "url": "", "metadata_path": ""},
+                }
+            )
+            print(f"output_{direction}={source}")
+        artifacts = write_sprite_artifacts(
+            outputs_root=Path(args.outputs_root),
+            subject_id=args.subject_id,
+            batch_id=batch_id,
+            lora_path=args.lora_path.strip() or str(profile.get("lora_path") or "").strip(),
+            lora_trigger=args.lora_trigger.strip() or str(profile.get("lora_trigger") or "").strip(),
+            args=args,
+            generated=generated,
+        )
+        print(f"sprite_batch_dir={artifacts['batch_dir']}")
+        print(f"sprite_manifest={artifacts['manifest_path']}")
+        if artifacts["contact_sheet"]:
+            print(f"sprite_contact_sheet={artifacts['contact_sheet']}")
+        print(json.dumps({"status": "ok", "batch_id": batch_id, "outputs": [], "artifacts": artifacts}, indent=2))
+        return 0
+
     lora_path = args.lora_path.strip() or str(profile.get("lora_path") or "").strip()
     if not lora_path:
         lora_path = latest_lora_path(zimage_url) or ""
@@ -566,7 +625,6 @@ def main() -> int:
     if invalid:
         raise SystemExit(f"ERROR: unknown direction(s): {', '.join(invalid)}")
 
-    batch_id = f"nymphs-sprite-{args.subject_id}-{uuid.uuid4().hex[:8]}"
     print(f"batch_id={batch_id}")
     print(f"lora_path={lora_path}")
 

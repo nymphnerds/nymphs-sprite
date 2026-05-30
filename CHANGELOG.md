@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.10 - 2026-05-30
+
+- Replaced the starter prompt presets with Sprite Foundry-derived subjects
+  from the character JSON contract.
+- Moved `Generate Sources` into the Z-Image section so source generation sits
+  before sprite post-processing in the flow.
+- Added a module action for loading recent Z-Image outputs into the strip
+  picker, so images can be previewed/chosen before processing work.
+- Let `Generate + Process` consume checked managed source images instead of
+  always regenerating when source images are selected.
+- Installed the Nymphs Image forest preview asset and inline it into the
+  Manager HTML during install so local HTML can render the same background.
+
 ## 0.1.9 - 2026-05-30
 
 - Added a single sprite prompt preset dropdown for module-specific source

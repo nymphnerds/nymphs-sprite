@@ -316,6 +316,7 @@
       border: 1px solid rgba(40, 68, 70, 0.9);
       border-radius: 8px;
       background:
+        url("__NYMPHS_SPRITE_FOREST_DATA_URI__") center center / cover no-repeat,
         url("nymphs_preview_forest.png") center center / cover no-repeat,
         rgba(4, 12, 11, 0.82);
       display: grid;
@@ -709,10 +710,10 @@
           <label for="subject-id">Subject ID</label>
           <input id="subject-id" maxlength="80" value="hero_test" autocomplete="off">
         </div>
-        <textarea id="subject-prompt" spellcheck="false" maxlength="320">armored forest knight with a short cloak</textarea>
+        <textarea id="subject-prompt" spellcheck="false" maxlength="1800">solo, 1character, single character only, one figure, a goblin scout assassin, in a deep predatory crouch with a dark tattered hood, glowing pale yellow eyes, lean compact body wrapped in a ragged cloak, holding twin curved rusty daggers, mottled dark green skin barely visible, fully visible full body</textarea>
         <details>
           <summary>Negative</summary>
-          <textarea id="negative-prompt" spellcheck="false" maxlength="320">blurry, low detail, extra limbs, cropped body</textarea>
+          <textarea id="negative-prompt" spellcheck="false" maxlength="1800">multiple people, two characters, group, couple, pair, reflection, mirror, turnaround sheet, model sheet, reference sheet, split view, blurry, smooth, photorealistic, 3D render, low quality, deformed, extra limbs, text, watermark, signature, frame, border, cropped, cut off, partial body</textarea>
         </details>
       </section>
 
@@ -726,6 +727,9 @@
           <div class="field wide"><label for="lora-choice">LoRA</label><select id="lora-choice"></select></div>
           <div class="field"><label for="lora-trigger">Trigger</label><input id="lora-trigger" maxlength="80" value="pxlstl"></div>
           <div class="field"><label for="lora-scale">Scale</label><input id="lora-scale" type="number" min="0" max="2" step="0.05" value="0.85"></div>
+        </div>
+        <div class="command-row">
+          <button id="generate-sources" class="primary" type="button">Generate Sources</button>
         </div>
       </section>
 
@@ -746,9 +750,6 @@
           <label class="check"><input type="checkbox" value="front_right" checked>Front right</label>
         </div>
         <div class="command-row">
-          <button id="generate-sources" class="primary" type="button">Generate Sources</button>
-        </div>
-        <div class="command-row no-top">
           <button id="generate-process" type="button">Generate + Process</button>
         </div>
       </section>
@@ -807,31 +808,56 @@
   <script>
     const $ = (id) => document.getElementById(id);
     const pending = new Map();
+    const sharedFoundryNegative = "multiple people, two characters, group, couple, pair, reflection, mirror, turnaround sheet, model sheet, reference sheet, split view, blurry, smooth, photorealistic, 3D render, low quality, deformed, extra limbs, text, watermark, signature, frame, border, busy background, cropped, cut off, partial body";
     const promptPresets = {
-      forest_knight: {
-        label: "Forest knight",
-        subject: "armored forest knight with a short cloak",
-        negative: "blurry, low detail, extra limbs, cropped body"
+      goblin_scout: {
+        label: "Foundry: Goblin scout",
+        subjectId: "goblin_scout",
+        seed: "810500",
+        subject: "solo, 1character, single character only, one figure, a goblin scout assassin, in a deep predatory crouch with weight on balls of feet ready to spring, dark tattered hood pulled low over face hiding features except two glowing pale yellow eyes, lean compact body wrapped in a dark grey-brown ragged cloak, holding a curved rusty dagger forward and a second dagger reverse grip behind, mottled dark green skin barely visible under wrappings, fully visible full body",
+        negative: `${sharedFoundryNegative}, standing upright, face visible, no hood, no daggers visible, single weapon only, heavy armor, bulky build`
       },
-      tiny_gnome: {
-        label: "Tiny gnome",
-        subject: "small garden gnome adventurer with a pointed red hat",
-        negative: "realistic photo, blurry, cropped body, extra limbs"
+      goblin_warchief: {
+        label: "Foundry: Goblin warchief",
+        subjectId: "goblin_warchief",
+        seed: "810700",
+        subject: "solo, 1character, single character only, one figure, a goblin warchief commander, tallest goblin in the warband, commanding upright posture with chest out, dark iron tusked helmet and cheek guards, snarling lower jaw with large fangs, eyes hidden in helmet shadow, crude dark iron pauldrons and riveted chest plate, tattered red war banner strapped to back, notched iron short sword, scarred commanding presence, fully visible full body",
+        negative: `${sharedFoundryNegative}, no helmet, bare head, no banner, no armor, hunched posture, submissive, small, mount`
       },
-      dungeon_slime: {
-        label: "Dungeon slime",
-        subject: "round translucent green slime creature with bright eyes",
-        negative: "messy silhouette, realistic, blurry, cropped body"
+      zombie_shambler: {
+        label: "Foundry: Zombie shambler",
+        subjectId: "zombie_shambler",
+        seed: "800100",
+        subject: "solo, 1character, single character only, one figure, a shambling zombie undead creature, hunched broken posture, head tilted to one side, dragging one leg, arms hanging loose and limp, torn dirty grey-green shirt with dark stains, ripped dark pants exposing decayed skin, pale grey-green rotting skin, hollow eye sockets, slack open jaw, matted filthy dark hair, slow lurching stance, fully visible full body",
+        negative: `${sharedFoundryNegative}, clean clothes, bright colors, athletic build, upright posture, running, healthy skin, living appearance, weapon, armor`
       },
-      hooded_rogue: {
-        label: "Hooded rogue",
-        subject: "hooded rogue with a dagger and dark leather armor",
-        negative: "low detail, realistic, extra fingers, cropped body"
+      beast_root_puppet: {
+        label: "Foundry: Root puppet",
+        subjectId: "beast_root_puppet",
+        seed: "819000",
+        subject: "solo, single creature only, one monster, standing humanoid corpse animated by parasitic tree roots, thick roots growing through cracked pale skin on arms and torso, bark-covered lower legs, green leaves sprouting from shoulders, tattered peasant clothing torn by root growth, head tilted to one side with roots emerging from mouth, stiff upright puppet-like pose, ruined medieval peasant garb, fully visible full body",
+        negative: sharedFoundryNegative
       },
-      clockwork_bot: {
-        label: "Clockwork bot",
-        subject: "small brass clockwork robot with glowing blue eyes",
-        negative: "photorealistic, noisy, blurry, cropped body"
+      beast_clock_golem: {
+        label: "Foundry: Clock golem",
+        subjectId: "beast_clock_golem",
+        seed: "818700",
+        subject: "solo, single creature only, one monster, mechanical humanoid construct made of exposed clockwork gears springs and cogs, brass and copper metal body, visible ticking mechanisms inside open chest cavity, steam venting from shoulder and elbow joints, oversized gear wheel embedded in right shoulder, clock face embedded in chest, heavy riveted limbs, amber furnace light glowing from inside, fully visible full body",
+        negative: sharedFoundryNegative
+      },
+      scav_raider: {
+        label: "Foundry: Scav raider",
+        subjectId: "scav_raider",
+        seed: "661122",
+        subject: "solo, 1man, single character only, one person, hostile space pirate raider, medium-heavy scrappy build, slightly hunched aggressive forward-leaning stance, dark balaclava mask showing only eyes, torn patched dark grey-brown salvaged EVA vest, irregular metal shoulder plate on left shoulder, improvised blade gauntlet on right forearm, heavy utility belt, dirty worn hostile appearance, fully clothed",
+        negative: `${sharedFoundryNegative}, clean armor, polished metal, military uniform, friendly expression, smiling, exposed face, bright colors, cape, medieval, magic`
+      },
+      drift_lurker: {
+        label: "Foundry: Drift lurker",
+        subjectId: "drift_lurker",
+        seed: "445588",
+        subject: "solo, 1creature, single creature only, one alien animal, medium-sized predatory four-legged quadrupedal alien ambush creature called a Drift Lurker, not humanoid, not bipedal, low-slung monitor lizard body plan, horizontal spine parallel to the floor, four thick muscular legs with wide splayed clawed feet, long armored body held close to ground, broad flat wedge predator head, long tapered tail, crouched low ready stance",
+        negative: `${sharedFoundryNegative}, humanoid, bipedal, standing upright on two legs, human proportions, anthropomorphic, cute, friendly, wings, robot`
       },
       custom: {
         label: "Custom",
@@ -846,6 +872,7 @@
       selectedOutputPaths: new Set(),
       localObjectUrls: [],
       manualFolderName: "",
+      viewerSource: "outputs",
       selectedLoraPath: "",
       statusValues: {},
     };
@@ -977,11 +1004,6 @@
       $("selected-model-text").textContent = values.selected_lora_path ? basename(values.selected_lora_path) : (loras.join(", ") || "none");
       $("progress-detail").textContent = `LoRA ${loras.length || 0} | Control ${controlReady ? "ready" : "staged"} | Depth ${depthReady ? "ready" : "staged"}`;
       populateLoraChoices(values);
-      if (values.zimage_url) {
-        document.querySelector(".image-shell").style.background =
-          `url("${values.zimage_url}/ui/nymphs_preview_forest.png") center center / cover no-repeat, rgba(4, 12, 11, 0.82)`;
-      }
-
       if (values.selected_lora_trigger) $("lora-trigger").value = values.selected_lora_trigger;
       if (values.selected_lora_scale) $("lora-scale").value = values.selected_lora_scale;
       setProgress("Idle", $("progress-detail").textContent, 0);
@@ -998,6 +1020,7 @@
       if (!/\.(png|jpg|jpeg|webp)$/i.test(path)) return;
       if (state.outputs.some((item) => item.path === path)) return;
       state.outputs.unshift({ path, label: label || basename(path), url: pathToFileUrl(path), managed: true });
+      state.viewerSource = "batch";
       renderGallery();
       showOutput(0);
     }
@@ -1040,7 +1063,7 @@
     function renderGallery() {
       const gallery = $("gallery");
       gallery.innerHTML = "";
-      const label = state.manualFolderName || "Current batch";
+      const label = state.manualFolderName || (state.viewerSource === "batch" ? "Current batch" : "Recent");
       $("strip-label").textContent = `${label} (${state.outputs.length})`;
       syncOutputFolder(label);
       updateSelectionCount();
@@ -1062,6 +1085,35 @@
         gallery.appendChild(node);
       }
       updateStripControls();
+    }
+
+    function normalizeManagedOutput(item, index) {
+      const rawPath = item.path || item.output_path || item.relative_path || item.url || "";
+      const url = item.url || pathToFileUrl(rawPath);
+      return {
+        path: rawPath || url || `output:${index}`,
+        relative_path: item.relative_path || rawPath,
+        label: item.item_label || item.name || basename(rawPath || url) || `image-${index + 1}`,
+        url,
+        managed: true,
+        created: item.created || item.mtime || 0,
+        folder: item.folder || item.batch_id || "",
+      };
+    }
+
+    async function refreshRecentOutputs(selectFirst = false) {
+      if (state.viewerSource === "manual" || state.viewerSource === "batch") return;
+      try {
+        const text = await moduleAction("list_outputs", { limit: "80" }, { quiet: true, busy: false });
+        const body = JSON.parse(String(text || "{}"));
+        state.outputs = (body.outputs || []).map(normalizeManagedOutput);
+        state.selectedOutputPaths.clear();
+        state.manualFolderName = "";
+        renderGallery();
+        if (selectFirst && state.outputs[0]) showOutput(0);
+      } catch {
+        syncOutputFolder("Recent");
+      }
     }
 
     function showOutput(index) {
@@ -1150,6 +1202,7 @@
       });
       state.selectedOutputPaths.clear();
       state.manualFolderName = images[0]?.webkitRelativePath?.split("/")[0] || "Chosen folder";
+      state.viewerSource = "manual";
       state.selectedIndex = -1;
       renderGallery();
       if (state.outputs[0]) showOutput(0);
@@ -1227,12 +1280,14 @@
         option.textContent = preset.label;
         select.appendChild(option);
       }
-      select.value = "forest_knight";
+      select.value = "goblin_scout";
     }
 
     function applyPromptPreset(id) {
       const preset = promptPresets[id];
       if (!preset || id === "custom") return;
+      if (preset.subjectId) $("subject-id").value = preset.subjectId;
+      if (preset.seed) $("seed").value = preset.seed;
       $("subject-prompt").value = preset.subject;
       $("negative-prompt").value = preset.negative;
     }
@@ -1245,6 +1300,7 @@
       try {
         const text = await moduleAction("status", {}, { quiet: true, busy: false });
         renderStatus(text);
+        await refreshRecentOutputs(true);
       } catch {
         setProgress("Status", "Could not read module status.", 0);
       }
@@ -1280,15 +1336,20 @@
         append("ERROR: choose at least one direction.");
         return;
       }
+      const selectedSources = action === "generate_directions"
+        ? Array.from(state.selectedOutputPaths).filter((path) => path && !/^(https?:|manual:)/i.test(path))
+        : [];
       state.outputs = [];
       state.selectedIndex = -1;
       state.manualFolderName = "";
+      state.viewerSource = "batch";
       state.selectedOutputPaths.clear();
       renderGallery();
       $("result-image").style.display = "none";
       $("empty").hidden = false;
       const sourcesOnly = action === "generate_sources";
-      setProgress("Generate", sourcesOnly ? "Generating source directions." : "Generating and processing batch.", 10);
+      const processingSelected = selectedSources.length > 0;
+      setProgress("Generate", sourcesOnly ? "Generating source directions." : (processingSelected ? "Processing selected source images." : "Generating and processing batch."), 10);
       moduleAction(action, compactArgs({
         "subject-id": value("subject-id"),
         "subject-prompt": value("subject-prompt"),
@@ -1302,6 +1363,7 @@
         height: value("height"),
         "sprite-size": value("sprite-size"),
         "palette-colors": value("palette-colors"),
+        "source-images": selectedSources.join("|"),
         directions: directions.join(",")
       })).then((text) => {
         parseOutputPaths(text);
@@ -1316,6 +1378,7 @@
     $("generate-process").addEventListener("click", () => runGeneration("generate_directions"));
 
     populatePromptPresets();
+    applyPromptPreset("goblin_scout");
     renderGallery();
     refreshStatus();
   </script>

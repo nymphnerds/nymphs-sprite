@@ -23,8 +23,8 @@ Nymphs Sprite UI
 ```text
 nymphnerds/nymphs-sprite
   NymphsCore module surface, Manager page, sprite LoRA fetch, sprite runner.
-  Current workspace target: v0.1.7, module UI reset to the Nymphs Image
-  rail/stage standard.
+  Current workspace target: v0.1.10, module UI is being tightened against the
+  Nymphs Image rail/stage standard and Sprite Foundry's source-review flow.
 
 nymphnerds/sprite-foundry
   Fork of mcp-tool-shop-org/sprite-foundry. Full upstream orchestration
@@ -150,13 +150,31 @@ grid-template-columns: clamp(260px, 28vw, 300px) minmax(300px, 1fr);
   Sprite Foundry-style run contract: choose the style/LoRA, then generate raw
   source directions, then post-process the batch.
 - Prompt selection is a single module-specific preset dropdown, not the full
-  general Nymphs Image Subject/Style/View composer.
-- The UI separates `Generate Sources` from `Generate + Process`. The intended
-  review loop is to make source direction images first, choose/inspect images in
-  the strip, then tighten the sprite post-process path.
+  general Nymphs Image Subject/Style/View composer. Presets now come from
+  Sprite Foundry character JSON `subject_prompt` / `negative_prompt` material.
+- `Generate Sources` belongs to the Z-Image section. The intended review loop
+  is:
+
+```text
+choose Foundry-style prompt + LoRA
+  -> generate Z-Image source directions
+  -> preview/pick images in the strip
+  -> run Foundry-style sprite post-process
+```
+
 - The preview strip should match Nymphs Image behavior: browse the current
   generated batch, choose a local image folder, click one image into the main
   preview, and select/clear visible thumbnails for review.
+- The strip now has a module-owned `list_outputs` action that reads recent
+  Z-Image outputs through the Z-Image `/api/outputs` endpoint because the
+  module UI is local HTML, not served directly by Z-Image.
+- If checked strip items are managed file paths, `Generate + Process` now
+  post-processes those selected source images instead of generating a fresh
+  set. Browser-picked folders remain preview/select only unless their absolute
+  paths are later bridged by Manager.
+- The Nymphs Image forest background is copied into the module and inlined into
+  the installed Manager HTML so WebView2 local HTML can render it without a
+  served `/ui/...` base URL.
 
 - Selected LoRA config is stored at:
 
