@@ -23,7 +23,7 @@ Nymphs Sprite UI
 ```text
 nymphnerds/nymphs-sprite
   NymphsCore module surface, Manager page, sprite LoRA fetch, sprite runner.
-  Current workspace target: v0.1.10, module UI is being tightened against the
+  Current workspace target: v0.1.11, module UI is being tightened against the
   Nymphs Image rail/stage standard and Sprite Foundry's source-review flow.
 
 nymphnerds/sprite-foundry
@@ -172,9 +172,10 @@ choose Foundry-style prompt + LoRA
   post-processes those selected source images instead of generating a fresh
   set. Browser-picked folders remain preview/select only unless their absolute
   paths are later bridged by Manager.
-- The Nymphs Image forest background is copied into the module and inlined into
-  the installed Manager HTML so WebView2 local HTML can render it without a
-  served `/ui/...` base URL.
+- The Nymphs Image forest background is copied into the module and referenced
+  from installed Manager HTML as a `file://` URI. Do not inline it as a data URI:
+  that made the HTML too large for WebView2 `NavigateToString` and caused
+  "Value does not fall within the expected range."
 
 - Selected LoRA config is stored at:
 

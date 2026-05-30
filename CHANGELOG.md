@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.11 - 2026-05-30
+
+- Fixed the custom UI failing to open in WebView2 by replacing the oversized
+  inlined forest background data URI with an installed `file://` asset URI.
+
 ## 0.1.10 - 2026-05-30
 
 - Replaced the starter prompt presets with Sprite Foundry-derived subjects
