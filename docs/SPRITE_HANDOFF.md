@@ -149,6 +149,11 @@ grid-template-columns: clamp(260px, 28vw, 300px) minmax(300px, 1fr);
 - LoRA selection is in the custom generation UI because it is part of the
   Sprite Foundry-style run contract: choose the style/LoRA, then generate raw
   source directions, then post-process the batch.
+- Prompt selection is a single module-specific preset dropdown, not the full
+  general Nymphs Image Subject/Style/View composer.
+- The UI separates `Generate Sources` from `Generate + Process`. The intended
+  review loop is to make source direction images first, choose/inspect images in
+  the strip, then tighten the sprite post-process path.
 - The preview strip should match Nymphs Image behavior: browse the current
   generated batch, choose a local image folder, click one image into the main
   preview, and select/clear visible thumbnails for review.

@@ -324,6 +324,15 @@
       position: relative;
     }
 
+    .image-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: inherit;
+      opacity: 0.92;
+    }
+
     .image-shell img {
       width: 100%;
       height: 100%;
@@ -693,6 +702,10 @@
       <section class="section">
         <div class="section-title"><span>Prompt</span><span>8-way</span></div>
         <div class="field">
+          <label for="prompt-preset">Prompt</label>
+          <select id="prompt-preset"></select>
+        </div>
+        <div class="field">
           <label for="subject-id">Subject ID</label>
           <input id="subject-id" maxlength="80" value="hero_test" autocomplete="off">
         </div>
@@ -733,7 +746,10 @@
           <label class="check"><input type="checkbox" value="front_right" checked>Front right</label>
         </div>
         <div class="command-row">
-          <button id="generate" class="primary" type="button">Generate</button>
+          <button id="generate-sources" class="primary" type="button">Generate Sources</button>
+        </div>
+        <div class="command-row no-top">
+          <button id="generate-process" type="button">Generate + Process</button>
         </div>
       </section>
     </aside>
@@ -783,7 +799,7 @@
         </div>
         <input id="folder-picker" type="file" accept="image/*" webkitdirectory multiple hidden>
         <div class="gallery" id="gallery"></div>
-        <pre id="output">Ready.</pre>
+        <pre id="output" hidden>Ready.</pre>
       </section>
     </section>
   </main>
@@ -791,6 +807,38 @@
   <script>
     const $ = (id) => document.getElementById(id);
     const pending = new Map();
+    const promptPresets = {
+      forest_knight: {
+        label: "Forest knight",
+        subject: "armored forest knight with a short cloak",
+        negative: "blurry, low detail, extra limbs, cropped body"
+      },
+      tiny_gnome: {
+        label: "Tiny gnome",
+        subject: "small garden gnome adventurer with a pointed red hat",
+        negative: "realistic photo, blurry, cropped body, extra limbs"
+      },
+      dungeon_slime: {
+        label: "Dungeon slime",
+        subject: "round translucent green slime creature with bright eyes",
+        negative: "messy silhouette, realistic, blurry, cropped body"
+      },
+      hooded_rogue: {
+        label: "Hooded rogue",
+        subject: "hooded rogue with a dagger and dark leather armor",
+        negative: "low detail, realistic, extra fingers, cropped body"
+      },
+      clockwork_bot: {
+        label: "Clockwork bot",
+        subject: "small brass clockwork robot with glowing blue eyes",
+        negative: "photorealistic, noisy, blurry, cropped body"
+      },
+      custom: {
+        label: "Custom",
+        subject: "",
+        negative: ""
+      }
+    };
     const state = {
       busy: false,
       outputs: [],
@@ -1170,6 +1218,29 @@
       return Object.fromEntries(Object.entries(args).filter(([, val]) => String(val).trim() !== ""));
     }
 
+    function populatePromptPresets() {
+      const select = $("prompt-preset");
+      select.innerHTML = "";
+      for (const [id, preset] of Object.entries(promptPresets)) {
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent = preset.label;
+        select.appendChild(option);
+      }
+      select.value = "forest_knight";
+    }
+
+    function applyPromptPreset(id) {
+      const preset = promptPresets[id];
+      if (!preset || id === "custom") return;
+      $("subject-prompt").value = preset.subject;
+      $("negative-prompt").value = preset.negative;
+    }
+
+    function markPromptCustom() {
+      if ($("prompt-preset").value !== "custom") $("prompt-preset").value = "custom";
+    }
+
     async function refreshStatus() {
       try {
         const text = await moduleAction("status", {}, { quiet: true, busy: false });
@@ -1202,7 +1273,7 @@
         .then(refreshStatus)
         .catch(() => {});
     });
-    $("generate").addEventListener("click", () => {
+    function runGeneration(action) {
       if (state.busy) return;
       const directions = Array.from(document.querySelectorAll("#directions input:checked")).map((input) => input.value);
       if (!directions.length) {
@@ -1216,8 +1287,9 @@
       renderGallery();
       $("result-image").style.display = "none";
       $("empty").hidden = false;
-      setProgress("Generate", "Starting batch.", 10);
-      moduleAction("generate_directions", compactArgs({
+      const sourcesOnly = action === "generate_sources";
+      setProgress("Generate", sourcesOnly ? "Generating source directions." : "Generating and processing batch.", 10);
+      moduleAction(action, compactArgs({
         "subject-id": value("subject-id"),
         "subject-prompt": value("subject-prompt"),
         "negative-prompt": value("negative-prompt"),
@@ -1233,10 +1305,17 @@
         directions: directions.join(",")
       })).then((text) => {
         parseOutputPaths(text);
-        setProgress("Done", state.outputs.length ? "Batch ready." : "Finished.", 100);
+        setProgress("Done", state.outputs.length ? (sourcesOnly ? "Source images ready." : "Batch ready.") : "Finished.", 100);
       }).catch(() => {});
-    });
+    }
 
+    $("prompt-preset").addEventListener("change", () => applyPromptPreset($("prompt-preset").value));
+    $("subject-prompt").addEventListener("input", markPromptCustom);
+    $("negative-prompt").addEventListener("input", markPromptCustom);
+    $("generate-sources").addEventListener("click", () => runGeneration("generate_sources"));
+    $("generate-process").addEventListener("click", () => runGeneration("generate_directions"));
+
+    populatePromptPresets();
     renderGallery();
     refreshStatus();
   </script>

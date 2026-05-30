@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -53,6 +53,7 @@
     "fetch_depth_anything": "scripts/nymphs_sprite_fetch_depth_anything.sh",
     "delete_models": "scripts/nymphs_sprite_delete_models.sh",
     "check_runtime": "scripts/nymphs_sprite_check_runtime.sh",
+    "generate_sources": "scripts/nymphs_sprite_generate_sources.sh",
     "generate_directions": "scripts/nymphs_sprite_generate_directions.sh",
     "logs": "scripts/nymphs_sprite_logs.sh",
     "uninstall": "scripts/nymphs_sprite_uninstall.sh"
@@ -65,6 +66,7 @@
     "start_zimage",
     "open_lora",
     "open_outputs",
+    "generate_sources",
     "generate_directions",
     "fetch_assets",
     "fetch_lora",
@@ -239,6 +241,7 @@
     "v0.1.5 makes Complete Sprite Package fetch both LoRAs, with mks0813 selected by default until the UI exposes LoRA switching.",
     "v0.1.6 routes Asset Fetch through the existing fetch_lora capability so older Manager sessions do not grey out the submit button.",
     "v0.1.7 rebuilds the module-owned UI from the Nymphs Image rail/stage pattern, with a generated sprite preview, contact-sheet thumbnails, compact status, and no dashboard-card layout.",
-    "v0.1.8 removes asset download controls from the custom generation UI, keeps asset fetch in the module detail action group, adds run-level downloaded-LoRA selection, and restores the Nymphs Image strip organizer/folder picker pattern."
+    "v0.1.8 removes asset download controls from the custom generation UI, keeps asset fetch in the module detail action group, adds run-level downloaded-LoRA selection, and restores the Nymphs Image strip organizer/folder picker pattern.",
+    "v0.1.9 adds a sprite prompt preset dropdown, separates source-image generation from generate-and-process, and removes the always-visible log from the UI stage."
   ]
 }

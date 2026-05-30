@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.9 - 2026-05-30
+
+- Added a single sprite prompt preset dropdown for module-specific source
+  prompts.
+- Split the run controls into source image generation and generate-plus-process
+  so the Sprite Foundry-style source review step is visible.
+- Removed the always-visible raw log from the custom UI stage; logs stay behind
+  the strip menu's Logs action.
+
 ## 0.1.8 - 2026-05-30
 
 - Removed asset download controls from the custom generation UI.
