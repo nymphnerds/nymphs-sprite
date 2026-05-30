@@ -23,7 +23,7 @@ Nymphs Sprite UI
 ```text
 nymphnerds/nymphs-sprite
   NymphsCore module surface, Manager page, sprite LoRA fetch, sprite runner.
-  Current workspace target: v0.1.12, module UI is being tightened against the
+  Current workspace target: v0.1.13, module UI is being tightened against the
   Nymphs Image rail/stage standard and Sprite Foundry's source-review flow.
 
 nymphnerds/sprite-foundry
@@ -141,9 +141,10 @@ grid-template-columns: clamp(260px, 28vw, 300px) minmax(300px, 1fr);
 @media (max-width: 600px)
 ```
 
-- The old generic dashboard/card layout is gone. Module UI actions use the
-  Manager WebView2 bridge; the page does not run shell directly and does not
-  add its own bottom chrome.
+- The old generic dashboard/card layout is gone. Module-owned shell work uses
+  the Manager WebView2 bridge; Z-Image source generation should call the
+  Z-Image HTTP API directly like Nymphs Image does. The page does not run shell
+  directly and does not add its own bottom chrome.
 - Asset fetching is not in the custom generation UI. It belongs to the module
   detail action group.
 - LoRA selection is in the custom generation UI because it is part of the
@@ -157,9 +158,9 @@ grid-template-columns: clamp(260px, 28vw, 300px) minmax(300px, 1fr);
 
 ```text
 choose Foundry-style prompt + LoRA
-  -> generate Z-Image source directions
+  -> generate Z-Image source directions through Z-Image /generate
   -> preview/pick images in the strip
-  -> run Foundry-style sprite post-process
+  -> run Foundry-style sprite post-process through module action
 ```
 
 - The preview strip should match Nymphs Image behavior: browse the current
@@ -172,11 +173,17 @@ choose Foundry-style prompt + LoRA
   post-processes those selected source images instead of generating a fresh
   set. Browser-picked folders remain preview/select only unless their absolute
   paths are later bridged by Manager.
-- Custom UI generation arguments must respect Manager's module-action filter:
+- Custom UI post-process arguments must respect Manager's module-action filter:
   values are max 256 chars and only shell-safe characters are allowed. Long
   prompts, LoRA trigger/path values, and selected source-image lists are passed
   as base64url chunks and decoded by `nymphs_sprite_generate_directions.sh`.
   Direction lists use `+` instead of comma for the same reason.
+- Do not send source-image generation through Manager module actions. That
+  bridge is single-action and collides with status/output refresh actions,
+  causing `Manager is busy with another module action.` Source generation is
+  Z-Image-owned and should use HTTP `POST /generate` when the WebView permits
+  it. Because the sprite UI is Manager `local_html` rather than Z-Image-served
+  HTML, keep a queued Manager-action fallback for CORS/WebView cases.
 - The Nymphs Image forest background is copied into the module and referenced
   from installed Manager HTML as a `file://` URI. Do not inline it as a data URI:
   that made the HTML too large for WebView2 `NavigateToString` and caused

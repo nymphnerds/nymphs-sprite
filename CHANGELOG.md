@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.13 - 2026-05-30
+
+- Rewired `Generate Sources` to call the Z-Image `/generate` API directly,
+  matching Nymphs Image's generation path.
+- Kept Manager module actions for module-owned work such as status, folders,
+  and Foundry-style post-processing so the UI no longer collides with its own
+  status/output refresh actions during image generation.
+- Added a queued module-bridge fallback for source generation when local HTML
+  cannot call the Z-Image API directly.
+
 ## 0.1.12 - 2026-05-30
 
 - Fixed generation from the custom UI by sending prompts, LoRA trigger/path,
