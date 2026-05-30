@@ -21,6 +21,8 @@ runtime.
   as a local reference while the sprite module owns its own controls.
 - `docs/SPRITE_FOUNDRY_COMFYUI_PIPELINE.md`: the deep-dive notes for what
   those workflows do and what NymphsCore needs to replace.
+- `docs/SPRITE_HANDOFF.md`: the current handoff and next-step tracker for the
+  Nymphs Sprite / Sprite Foundry adaptation.
 - `scripts/`: standard Nymphs module lifecycle scripts.
 - `nymph.json`: module manifest for NymphsCore Manager.
 
