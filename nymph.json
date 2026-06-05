@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.27",
+  "version": "0.1.28",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -56,6 +56,7 @@
     "fetch_depth_anything": "scripts/nymphs_sprite_fetch_depth_anything.sh",
     "delete_models": "scripts/nymphs_sprite_delete_models.sh",
     "check_runtime": "scripts/nymphs_sprite_check_runtime.sh",
+    "generate_sources": "scripts/nymphs_sprite_generate_sources.sh",
     "generate_directions": "scripts/nymphs_sprite_generate_directions.sh",
     "foundry_status": "scripts/nymphs_sprite_foundry_status.sh",
     "foundry_generate": "scripts/nymphs_sprite_foundry_generate.sh",
@@ -72,6 +73,7 @@
     "fetch_models",
     "open_lora",
     "open_outputs",
+    "generate_sources",
     "generate_directions",
     "foundry_status",
     "foundry_generate",
@@ -317,6 +319,7 @@
     "v0.1.24 makes the Sprite generation UI rank-only with r32, r128, and r256, restores the Nymphs Image-style strip browser/forest preview, and keeps hardware-specific INT4/FP4 choices in the Manager model fetch page.",
     "v0.1.25 restarts and reloads the shared Z-Image backend once when a stale Nunchaku transformer rank causes a qkv_proj_down LoRA shape mismatch during source generation.",
     "v0.1.26 aligns Sprite's Z-Image model choices, selected LoRA path precedence, LoRA strength default, and generate payload with the working Nymphs Image UI contract: auto_r32, auto_r128, int4_r256, no Sprite-owned rank-mismatch restart.",
-    "v0.1.27 removes Sprite's source-generation module bridge action from the manifest and custom UI path. The Manager Generate Sources button now only uses the direct Nymphs Image-style Z-Image /generate flow, with Fast 512 defaults and one front source selected by default for smoke testing."
+    "v0.1.27 removes Sprite's source-generation module bridge action from the manifest and custom UI path. The Manager Generate Sources button now only uses the direct Nymphs Image-style Z-Image /generate flow, with Fast 512 defaults and one front source selected by default for smoke testing.",
+    "v0.1.28 restores generate_sources as the local_html Manager transport while keeping the shared Nymphs Image/Z-Image runtime, venv, model cache, and LoRA library. Sprite no longer browser-fetches the Z-Image API directly from its local_html UI."
   ]
 }

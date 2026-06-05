@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.28 - 2026-06-05
+
+- Restored `generate_sources` as the Manager action transport for Sprite's
+  `local_html` UI.
+- Removed browser-side source-generation `fetch()` calls to the Z-Image API
+  from the active path, avoiding WebView cross-origin `Failed to fetch`.
+- Kept the backend shared with Nymphs Image/Z-Image: same installed runtime,
+  same venv, same `$HOME/NymphsData/cache/huggingface` model cache, and same
+  `$HOME/LoRA/loras` LoRA library.
+
 ## 0.1.27 - 2026-06-05
 
 - Removed the Sprite `generate_sources` module action from the advertised

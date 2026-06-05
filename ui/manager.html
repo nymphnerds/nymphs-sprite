@@ -720,7 +720,7 @@
       </section>
 
       <section class="section">
-        <div class="section-title"><span>Z-Image</span><span id="model-chip">auto r32</span></div>
+        <div class="section-title"><span>Z-Image</span><span id="model-chip">r32</span></div>
         <div class="grid">
           <div class="field wide">
             <label for="z-model-choice">Model</label>
@@ -1029,7 +1029,6 @@
       const controlReady = yes(values.controlnet_ready);
       const depthReady = yes(values.depth_models_ready);
       const zReady = yes(values.zimage_models_ready);
-      const zProfile = values.zimage_weight_profile_selected || values.weight_profile_selected || "int4_r32";
       if (!state.zModelTouched) $("z-model-choice").value = zModelChoiceFromStatus(values);
 
       $("status-pill").textContent = statusLabel();
@@ -1509,11 +1508,6 @@
       return negative ? `${negative}, ${bg}` : bg;
     }
 
-    function absoluteZUrl(path) {
-      const base = (state.statusValues.zimage_url || "http://127.0.0.1:8090").replace(/\/$/, "");
-      return String(path || "").startsWith("/") ? `${base}${path}` : String(path || "");
-    }
-
     function zModelChoiceFromStatus(values) {
       const profile = String(values.zimage_weight_profile_selected || "").replace(/^zimage_/, "");
       const match = profile.match(/^(auto|int4|fp4)_r(32|128|256)$/);
@@ -1524,8 +1518,8 @@
     }
 
     function zModelChipText() {
-      const [precision, rawRank] = String($("z-model-choice")?.value || "auto_r32").split("_r");
-      return `${precision || "auto"} r${rawRank || "32"}`;
+      const [, rawRank] = String($("z-model-choice")?.value || "auto_r32").split("_r");
+      return `r${rawRank || "32"}`;
     }
 
     function zImageSelection() {
@@ -1540,106 +1534,14 @@
       };
     }
 
-    async function probeZImage(base) {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 2500);
-      try {
-        const response = await fetch(`${base}/server_info`, { cache: "no-store", signal: controller.signal });
-        if (!response.ok) throw new Error(`Z-Image health returned HTTP ${response.status}.`);
-      } finally {
-        clearTimeout(timeout);
-      }
-    }
-
-    async function waitForZImageRestart(base) {
-      for (let attempt = 0; attempt < 45; attempt += 1) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        try {
-          const response = await fetch(`${base}/health`, { cache: "no-store" });
-          if (response.ok) {
-            await refreshStatus();
-            return true;
-          }
-        } catch {
-          setProgress("Restarting", "Waiting for Z-Image to come back.", 5);
-        }
-      }
-      return false;
-    }
-
-    async function requestZImageModelLoad(base, selection) {
-      const response = await fetch(`${base}/api/model/load`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(selection)
-      });
-      const body = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(body.detail || `Z-Image model load failed with HTTP ${response.status}.`);
-      return body;
-    }
-
-    async function loadZImageModel(base) {
-      const selection = zImageSelection();
-      setProgress("Loading", `Loading ${selection.nunchaku_precision} r${selection.nunchaku_rank}.`, 5);
-      let body = await requestZImageModelLoad(base, selection);
-      if (!body.loaded && body.restart === "scheduled") {
-        setProgress("Restarting", `Restarting Z-Image for ${selection.nunchaku_precision} r${selection.nunchaku_rank}.`, 5);
-        const restarted = await waitForZImageRestart(base);
-        if (!restarted) throw new Error("Z-Image restart is taking longer than expected.");
-        setProgress("Loading", `Loading ${selection.nunchaku_precision} r${selection.nunchaku_rank}.`, 8);
-        body = await requestZImageModelLoad(base, selection);
-      }
-      if (!body.loaded) throw new Error("Z-Image selected the model but did not load it yet.");
-      return selection;
-    }
-
     async function generateZImageSources(directions) {
-      const base = (state.statusValues.zimage_url || "http://127.0.0.1:8090").replace(/\/$/, "");
-      await probeZImage(base);
-      const zSelection = await loadZImageModel(base);
-      const batchId = `nymphs-sprite-${value("subject-id")}-${Date.now().toString(36)}`;
-      const generatedPaths = [];
-      for (const [offset, direction] of directions.entries()) {
-        const seed = (parseInt(value("seed") || "0", 10) || 0) + offset;
-        setProgress("Z-Image", `Generating ${direction.replace(/_/g, " ")}.`, Math.max(8, Math.round((offset / directions.length) * 85)));
-        const payload = {
-          provider: "zimage",
-          mode: "txt2img",
-          model_id: zSelection.model_id,
-          nunchaku_rank: zSelection.nunchaku_rank,
-          nunchaku_precision: zSelection.nunchaku_precision,
-          width: parseInt(value("width") || "512", 10),
-          height: parseInt(value("height") || "512", 10),
-          steps: parseInt(value("steps") || "8", 10),
-          guidance_scale: 0,
-          seed,
-          prompt: spritePrompt(direction),
-          negative_prompt: foundryNegativePrompt(),
-          lora_path: state.selectedLoraPath,
-          lora_scale: parseFloat(value("lora-scale") || "1"),
-          batch_id: batchId,
-          batch_label: `Nymphs Sprite: ${value("subject-id")}`,
-          batch_type: "sprite_source",
-          item_label: direction,
-          item_index: offset + 1,
-          item_total: directions.length
-        };
-        const response = await fetch(`${base}/generate`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        const body = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(body.detail || `Z-Image generation failed with HTTP ${response.status}.`);
-        const outputPath = body.output_path || body.path || "";
-        const outputUrl = absoluteZUrl(body.url || "");
-        const path = outputPath || outputUrl;
-        if (path) {
-          generatedPaths.push(path);
-          addOutput(path, direction);
-          if (outputUrl && state.outputs[0]) state.outputs[0].url = outputUrl;
-        }
-      }
+      setProgress("Z-Image", "Generating through shared Nymphs Image runtime.", 10);
+      const before = new Set(state.outputs.map(outputKey));
+      const text = await moduleAction("generate_sources", buildModuleArgs(directions), { busy: false });
+      parseOutputPaths(text);
+      const generatedPaths = state.outputs
+        .map(outputKey)
+        .filter((key) => key && !before.has(key) && !/^https?:/i.test(key));
       setProgress("Done", `${generatedPaths.length} source image${generatedPaths.length === 1 ? "" : "s"} ready.`, 100);
       return generatedPaths;
     }
