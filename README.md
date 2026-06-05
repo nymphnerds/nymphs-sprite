@@ -104,8 +104,9 @@ first-run Sprite requirements:
 
 ```text
 shared Z-Image INT4 r32 backend
-tarn59 pixel-art LoRA
 mks0813 pixel-art LoRA
+SkyAsl Pixel-artist-Z LoRA
+tarn59 pixel-art LoRA
 Z-Image ControlNet Union
 Depth Anything V2 Small
 ```
@@ -118,10 +119,11 @@ $HOME/NymphsData/cache/huggingface
 $HOME/NymphsData/config/zimage/generation-preset.env
 ```
 
-Hugging Face model assets use that same shared cache. Sprite LoRAs use the
-shared LoRA library at `$HOME/LoRA/loras/nymphs-sprite`, so either Nymphs Image
-or Nymphs Sprite can prepare the backend without creating duplicate model
-caches.
+Hugging Face model assets use that same shared cache. Sprite LoRAs publish into
+the LoRA module's shared library at `$HOME/LoRA/loras`, using the same
+`<name>/<name>.safetensors` shape that trained LoRAs use. That keeps Nymphs
+Image, Nymphs Sprite, the LoRA module, the Blender addon, and future remote UI
+work on one LoRA root.
 
 ## Pixel Art LoRA
 
@@ -129,7 +131,7 @@ The module includes a starter catalog in
 `profiles/zimage_turbo_lora_candidates.json`.
 
 The same `Model Fetch` dropdown also includes Sprite-only choices for repair or
-testing. The complete asset package fetches both starter sprite LoRAs, plus the
+testing. The complete asset package fetches all starter sprite LoRAs, plus the
 staged ControlNet Union and Depth Anything assets without touching shared
 Z-Image backend weights. The fetcher stores the selected LoRA preset at:
 
@@ -143,30 +145,46 @@ $HOME/NymphsData/config/nymphs-sprite/selected_lora.env
 Current default candidate:
 
 ```text
-repo:     tarn59/pixel_art_style_lora_z_image_turbo
-file:     pixel_art_style_z_image_turbo.safetensors
-trigger:  Pixel art style.
+repo:     mks0813/z-image-turbo-pixel-lora
+file:     epoch-1.safetensors
+library:  $HOME/LoRA/loras/mks0813_pixel_art/mks0813_pixel_art.safetensors
+trigger:  pxlstl
 base:     Tongyi-MAI/Z-Image-Turbo
 ```
 
 Alternative candidate:
 
 ```text
-repo:     mks0813/z-image-turbo-pixel-art-lora
-file:     epoch-1.safetensors
-trigger:  pxlstl
+repo:     SkyAsl/Pixel-artist-Z
+file:     adapter_model.safetensors
+library:  $HOME/LoRA/loras/skyasl_pixel_artist/skyasl_pixel_artist.safetensors
+trigger:  a pixel art character
 base:     Tongyi-MAI/Z-Image-Turbo
 ```
 
-The mks0813 file is retained as an alternate asset, but the current Nunchaku
-LoRA runtime rejects it with a tensor-shape mismatch during composition. The
-tarn59 LoRA has passed a one-direction Sprite generation smoke test.
-
-After install, the fetch script can place a selected LoRA under:
+Backup style candidate:
 
 ```text
-$HOME/LoRA/loras/nymphs-sprite
+repo:     tarn59/pixel_art_style_lora_z_image_turbo
+file:     pixel_art_style_z_image_turbo.safetensors
+library:  $HOME/LoRA/loras/tarn59_pixel_art/tarn59_pixel_art.safetensors
+trigger:  Pixel art style.
+base:     Tongyi-MAI/Z-Image-Turbo
 ```
+
+After install, the fetch script places selected LoRAs under:
+
+```text
+$HOME/LoRA/loras/<lora-id>/<lora-id>.safetensors
+$HOME/LoRA/loras/<lora-id>/nymphs_lora.json
+```
+
+Fetched third-party LoRAs are normalized into that shared runtime copy for
+Z-Image/Nunchaku. Public Z-Image LoRAs use several key roots
+(`base_model.model.`, `diffusion_model.`, adapter-name `.default` segments).
+Nunchaku's Z-Image adapter mapper expects transformer-local keys, so Sprite
+normalizes the copy in `$HOME/LoRA/loras` while recording source repo/file and
+rank hints in `nymphs_lora.json`.
 
 Your Nymphs Image source already owns LoRA loading:
 
@@ -181,8 +199,8 @@ Nymphs Sprite uses that path directly. The direction runner is:
 scripts/nymphs_sprite_generate_directions.sh \
   --subject-id hero_test \
   --subject-prompt "armored forest knight with a short cloak" \
-  --lora-path "$HOME/LoRA/loras/nymphs-sprite/tarn59--pixel_art_style_lora_z_image_turbo/pixel_art_style_z_image_turbo.safetensors" \
-  --lora-trigger "Pixel art style."
+  --lora-path "$HOME/LoRA/loras/mks0813_pixel_art/mks0813_pixel_art.safetensors" \
+  --lora-trigger "pxlstl"
 ```
 
 If `--lora-path` is omitted, the runner asks Nymphs Image `/api/loras` for the

@@ -57,6 +57,8 @@ while [[ $# -gt 0 ]]; do
       cat <<'EOF'
 Usage:
   nymphs_sprite_select_lora.sh --candidate mks0813_pixel_art
+  nymphs_sprite_select_lora.sh --candidate skyasl_pixel_artist
+  nymphs_sprite_select_lora.sh --candidate tarn59_pixel_art
   nymphs_sprite_select_lora.sh --path /path/to/lora.safetensors [--trigger TOKEN] [--lora-scale 0.85]
 
 Selects an already-downloaded sprite LoRA for the next Nymphs Sprite run.
@@ -93,6 +95,22 @@ scale_arg = sys.argv[7].strip()
 def clean(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.:-]+", "_", value).strip("_") or "custom"
 
+def candidate_paths(lora_dir: Path, item: dict) -> list[Path]:
+    repo_id = str(item.get("repo_id") or "")
+    filename = str(item.get("filename") or "")
+    library_filename = str(item.get("library_filename") or "")
+    paths: list[Path] = []
+    if library_filename:
+        library_id = Path(library_filename).stem
+        paths.append(lora_dir / library_id / library_filename)
+        paths.append(lora_dir / library_filename)
+    repo_dir = lora_dir / repo_id.replace("/", "--")
+    if filename:
+        paths.append(repo_dir / filename)
+    elif repo_dir.exists():
+        paths.extend(sorted(repo_dir.rglob("*.safetensors")))
+    return paths
+
 
 try:
     data = json.loads(profile_file.read_text(encoding="utf-8"))
@@ -115,15 +133,10 @@ if candidate:
             trigger = str(item.get("trigger") or "")
         if not scale:
             scale = str(item.get("recommended_lora_scale") or "")
-        repo_dir = lora_dir / repo_id.replace("/", "--")
-        if filename:
-            maybe = repo_dir / filename
+        for maybe in candidate_paths(lora_dir, item):
             if maybe.is_file():
                 path = maybe
-        elif repo_dir.exists():
-            matches = sorted(repo_dir.rglob("*.safetensors"))
-            if matches:
-                path = matches[0]
+                break
     else:
         matches = sorted(lora_dir.rglob("*.safetensors"))
         for maybe in matches:
@@ -147,7 +160,8 @@ if not candidate:
 if not repo_id:
     repo_id = "custom"
 if not trigger:
-    trigger = "pxlstl" if "mks0813" in str(path).lower() else "Pixel art style."
+    lower_path = str(path).lower()
+    trigger = "pxlstl" if "mks0813" in lower_path else ("a pixel art character" if "skyasl" in lower_path else "Pixel art style.")
 if not scale:
     scale = "0.85"
 

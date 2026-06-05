@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.18",
+  "version": "0.1.20",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -105,7 +105,7 @@
         "entrypoint": "fetch_assets",
         "result": "show_logs",
         "visibility": "installed",
-        "description": "Download everything Sprite needs from one dropdown. The complete stack fetches the shared Z-Image INT4 r32 backend through Nymphs Image's cache plus Sprite's LoRAs, staged ControlNet Union, and Depth Anything assets. Hugging Face models use the same shared cache as Nymphs Image, TRELLIS, and Pixal3D; Sprite LoRAs use the shared LoRA library.",
+    "description": "Download everything Sprite needs from one dropdown. The complete stack fetches the shared Z-Image INT4 r32 backend through Nymphs Image's cache plus Sprite's LoRAs, staged ControlNet Union, and Depth Anything assets. Hugging Face models use the same shared cache as Nymphs Image, TRELLIS, and Pixal3D; Sprite LoRAs publish into the LoRA module's shared $HOME/LoRA/loras library.",
         "links": [
           {
             "label": "Z-Image Turbo",
@@ -117,7 +117,11 @@
           },
           {
             "label": "mks0813 pixel art LoRA",
-            "url": "https://huggingface.co/mks0813/z-image-turbo-pixel-art-lora"
+            "url": "https://huggingface.co/mks0813/z-image-turbo-pixel-lora"
+          },
+          {
+            "label": "SkyAsl Pixel-artist-Z LoRA",
+            "url": "https://huggingface.co/SkyAsl/Pixel-artist-Z"
           },
           {
             "label": "tarn59 pixel art LoRA",
@@ -143,12 +147,12 @@
               {
                 "label": "Complete Sprite Stack",
                 "value": "complete_sprite_stack",
-                "description": "Fetch all first-run Sprite needs: shared Z-Image INT4 r32 backend, both LoRAs, ControlNet Union, and Depth Anything"
+                "description": "Fetch all first-run Sprite needs: shared Z-Image INT4 r32 backend, mks0813, SkyAsl, and tarn59 LoRAs, ControlNet Union, and Depth Anything"
               },
               {
                 "label": "Complete Sprite Assets",
                 "value": "complete_sprite",
-                "description": "Fetch both LoRAs, staged ControlNet Union, and Depth Anything without touching shared Z-Image backend weights"
+                "description": "Fetch mks0813, SkyAsl, and tarn59 LoRAs, staged ControlNet Union, and Depth Anything without touching shared Z-Image backend weights"
               },
               {
                 "label": "Sprite backend - Z-Image INT4 r32",
@@ -171,14 +175,19 @@
                 "description": "Fetch only the fast RTX 50 / Blackwell-oriented shared backend weight"
               },
               {
-                "label": "Z-Image Turbo Pixel Art LoRA",
+                "label": "mks0813 Z-Image Turbo Pixel LoRA",
                 "value": "mks0813_pixel_art",
-                "description": "Fetch only the mks0813 LoRA; retained as an alternate because current Nunchaku LoRA composition rejects it"
+                "description": "Fetch only the mks0813 pixel LoRA into the shared LoRA library"
+              },
+              {
+                "label": "SkyAsl Pixel-artist-Z LoRA",
+                "value": "skyasl_pixel_artist",
+                "description": "Fetch only the SkyAsl character-focused pixel-art LoRA into the shared LoRA library"
               },
               {
                 "label": "Pixel Art Style LoRA",
                 "value": "tarn59_pixel_art",
-                "description": "Fetch only the recommended first sprite LoRA for the current Nunchaku runtime"
+                "description": "Fetch only the tarn59 pixel-art style LoRA into the shared LoRA library"
               },
               {
                 "label": "Z-Image ControlNet Union",
@@ -296,6 +305,8 @@
     "v0.1.15 adds module actions for the canonical Sprite Foundry fork flow, including Foundry status/verify and generate-nymphscore from imported presets.",
     "v0.1.16 adds a Sprite-facing Model Fetch action that delegates to the shared Nymphs Image / Z-Image fetcher and cache before first run, and leaves the Nunchaku-compatible tarn59 LoRA selected after complete fetches.",
     "v0.1.17 rebuilds the prompt preset catalog from the original 92-entry Foundry export roster only and moves staged ControlNet/Depth downloads onto the shared Hugging Face cache.",
-    "v0.1.18 loads the selected Z-Image INT4 r32 model before Sprite generation and falls back from stale mks0813 LoRA selection to the runtime-compatible tarn59 LoRA when available."
+    "v0.1.18 loads the selected Z-Image INT4 r32 model before Sprite generation and falls back from stale mks0813 LoRA selection to the runtime-compatible tarn59 LoRA when available.",
+    "v0.1.19 switches Sprite LoRA fetches to the LoRA module's shared $HOME/LoRA/loras layout, uses the corrected mks0813/z-image-turbo-pixel-lora repo, and adds SkyAsl/Pixel-artist-Z alongside tarn59.",
+    "v0.1.20 normalizes fetched Z-Image LoRA key prefixes for Nunchaku, resolves stale legacy selected-LoRA paths to the shared LoRA library before generation, and keeps the Foundry bridge on the same selected LoRA path contract."
   ]
 }

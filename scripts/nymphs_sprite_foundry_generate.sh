@@ -226,9 +226,58 @@ if [[ ! -f "${config_path}" ]]; then
 fi
 
 if [[ -f "${NYMPHS_SPRITE_LORA_PRESET_FILE}" ]]; then
+  selected_candidate="$(sed -n 's/^NYMPHS_SPRITE_SELECTED_LORA_CANDIDATE=//p' "${NYMPHS_SPRITE_LORA_PRESET_FILE}" | tail -n 1)"
   selected_path="$(sed -n 's/^NYMPHS_SPRITE_SELECTED_LORA_PATH=//p' "${NYMPHS_SPRITE_LORA_PRESET_FILE}" | tail -n 1)"
   selected_trigger="$(sed -n 's/^NYMPHS_SPRITE_SELECTED_LORA_TRIGGER=//p' "${NYMPHS_SPRITE_LORA_PRESET_FILE}" | tail -n 1)"
   selected_scale="$(sed -n 's/^NYMPHS_SPRITE_SELECTED_LORA_SCALE=//p' "${NYMPHS_SPRITE_LORA_PRESET_FILE}" | tail -n 1)"
+  profile_file="${NYMPHS_SPRITE_PROFILES_DIR}/zimage_turbo_lora_candidates.json"
+  if [[ ! -f "${profile_file}" ]]; then
+    profile_file="$(cd "${SCRIPT_DIR}/.." && pwd)/profiles/zimage_turbo_lora_candidates.json"
+  fi
+  resolved_path="$(python3 - "${profile_file}" "${NYMPHS_SPRITE_LORA_DIR}" "${selected_candidate}" "${selected_path}" <<'PY'
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+profile_file = Path(sys.argv[1])
+lora_dir = Path(sys.argv[2]).expanduser()
+candidate = sys.argv[3].strip()
+selected_path = Path(sys.argv[4]).expanduser() if sys.argv[4].strip() else None
+
+def candidate_paths(item: dict) -> list[Path]:
+    repo_id = str(item.get("repo_id") or "")
+    filename = str(item.get("filename") or "")
+    library_filename = str(item.get("library_filename") or "")
+    paths: list[Path] = []
+    if library_filename:
+        library_id = Path(library_filename).stem
+        paths.append(lora_dir / library_id / library_filename)
+        paths.append(lora_dir / library_filename)
+    repo_dir = lora_dir / repo_id.replace("/", "--")
+    if filename:
+        paths.append(repo_dir / filename)
+    elif repo_dir.exists():
+        paths.extend(sorted(repo_dir.rglob("*.safetensors")))
+    return paths
+
+try:
+    data = json.loads(profile_file.read_text(encoding="utf-8"))
+except Exception:
+    data = {"candidates": {}}
+
+item = (data.get("candidates") or {}).get(candidate)
+if item:
+    for path in candidate_paths(item):
+        if path.is_file():
+            print(path)
+            raise SystemExit(0)
+if selected_path and selected_path.is_file():
+    print(selected_path)
+PY
+)"
+  [[ -n "${resolved_path}" ]] && selected_path="${resolved_path}"
   [[ -z "${lora_path}" && -n "${selected_path}" ]] && lora_path="${selected_path}"
   [[ -z "${lora_trigger}" && -n "${selected_trigger}" ]] && lora_trigger="${selected_trigger}"
   [[ -z "${lora_scale}" && -n "${selected_scale}" ]] && lora_scale="${selected_scale}"

@@ -951,11 +951,10 @@
         option.textContent = `${choice.id.replace(/_/g, " ")} / ${choice.name}`;
         select.appendChild(option);
       }
-      const tarnOption = Array.from(select.options).find((option) => option.value === "tarn59_pixel_art");
       const selectedOption = Array.from(select.options).find((option) => option.value === selectedId)
         || Array.from(select.options).find((option) => option.dataset.path === values.selected_lora_path)
         || select.options[0];
-      const runtimeOption = selectedOption?.value === "mks0813_pixel_art" && tarnOption ? tarnOption : selectedOption;
+      const runtimeOption = selectedOption;
       if (runtimeOption) {
         select.value = runtimeOption.value;
         state.selectedLoraPath = runtimeOption.dataset.path || state.selectedLoraPath;
@@ -981,6 +980,8 @@
       populateLoraChoices(values);
       if (values.selected_lora_trigger) $("lora-trigger").value = values.selected_lora_trigger;
       if (values.selected_lora_scale) $("lora-scale").value = values.selected_lora_scale;
+      if ($("lora-choice").value === "mks0813_pixel_art") $("lora-trigger").value = "pxlstl";
+      if ($("lora-choice").value === "skyasl_pixel_artist") $("lora-trigger").value = "a pixel art character";
       if ($("lora-choice").value === "tarn59_pixel_art") $("lora-trigger").value = "Pixel art style.";
       setProgress("Idle", $("progress-detail").textContent, 0);
     }
@@ -1269,6 +1270,7 @@
     }
 
     function buildModuleArgs(directions, selectedSources = []) {
+      const zSelection = zImageSelection();
       const args = {
         "subject-id": value("subject-id"),
         "lora-scale": value("lora-scale"),
@@ -1278,6 +1280,8 @@
         height: value("height"),
         "sprite-size": value("sprite-size"),
         "palette-colors": value("palette-colors"),
+        "nunchaku-rank": String(zSelection.nunchaku_rank),
+        "nunchaku-precision": zSelection.nunchaku_precision,
         directions: directions.join("+")
       };
       addEncodedArg(args, "subject-prompt", value("subject-prompt"));
@@ -1337,6 +1341,19 @@
       return String(path || "").startsWith("/") ? `${base}${path}` : String(path || "");
     }
 
+    function zImageSelection() {
+      const values = state.statusValues || {};
+      const profile = String(values.zimage_weight_profile_selected || "").replace(/^zimage_/, "");
+      const match = profile.match(/^(auto|int4|fp4)_r(32|128|256)$/);
+      const rank = parseInt(values.zimage_nunchaku_rank || (match ? match[2] : "32"), 10);
+      const precision = String(values.zimage_nunchaku_precision || (match ? match[1] : "auto")).toLowerCase();
+      return {
+        model_id: "Tongyi-MAI/Z-Image-Turbo",
+        nunchaku_rank: [32, 128, 256].includes(rank) ? rank : 32,
+        nunchaku_precision: ["auto", "int4", "fp4"].includes(precision) ? precision : "auto"
+      };
+    }
+
     async function probeZImage(base) {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 2500);
@@ -1348,25 +1365,52 @@
       }
     }
 
-    async function loadZImageModel(base) {
+    async function waitForZImageRestart(base) {
+      for (let attempt = 0; attempt < 45; attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        try {
+          const response = await fetch(`${base}/health`, { cache: "no-store" });
+          if (response.ok) {
+            await refreshStatus();
+            return true;
+          }
+        } catch {
+          setProgress("Restarting", "Waiting for Z-Image to come back.", 5);
+        }
+      }
+      return false;
+    }
+
+    async function requestZImageModelLoad(base, selection) {
       const response = await fetch(`${base}/api/model/load`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model_id: "Tongyi-MAI/Z-Image-Turbo",
-          nunchaku_rank: 32,
-          nunchaku_precision: "int4"
-        })
+        body: JSON.stringify(selection)
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.detail || `Z-Image model load failed with HTTP ${response.status}.`);
-      if (!body.loaded) throw new Error("Z-Image selected the model but did not load it yet. Wait for restart, then generate again.");
+      return body;
+    }
+
+    async function loadZImageModel(base) {
+      const selection = zImageSelection();
+      setProgress("Loading", `Loading ${selection.nunchaku_precision} r${selection.nunchaku_rank}.`, 5);
+      let body = await requestZImageModelLoad(base, selection);
+      if (!body.loaded && body.restart === "scheduled") {
+        setProgress("Restarting", `Restarting Z-Image for ${selection.nunchaku_precision} r${selection.nunchaku_rank}.`, 5);
+        const restarted = await waitForZImageRestart(base);
+        if (!restarted) throw new Error("Z-Image restart is taking longer than expected.");
+        setProgress("Loading", `Loading ${selection.nunchaku_precision} r${selection.nunchaku_rank}.`, 8);
+        body = await requestZImageModelLoad(base, selection);
+      }
+      if (!body.loaded) throw new Error("Z-Image selected the model but did not load it yet.");
+      return selection;
     }
 
     async function generateZImageSources(directions) {
       const base = (state.statusValues.zimage_url || "http://127.0.0.1:8090").replace(/\/$/, "");
       await probeZImage(base);
-      await loadZImageModel(base);
+      const zSelection = await loadZImageModel(base);
       const batchId = `nymphs-sprite-${value("subject-id")}-${Date.now().toString(36)}`;
       const generatedPaths = [];
       for (const [offset, direction] of directions.entries()) {
@@ -1375,9 +1419,9 @@
         const payload = {
           provider: "zimage",
           mode: "txt2img",
-          model_id: "Tongyi-MAI/Z-Image-Turbo",
-          nunchaku_rank: 32,
-          nunchaku_precision: "int4",
+          model_id: zSelection.model_id,
+          nunchaku_rank: zSelection.nunchaku_rank,
+          nunchaku_precision: zSelection.nunchaku_precision,
           width: parseInt(value("width") || "1024", 10),
           height: parseInt(value("height") || "1024", 10),
           steps: parseInt(value("steps") || "9", 10),

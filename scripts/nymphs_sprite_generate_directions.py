@@ -73,17 +73,25 @@ def ensure_zimage_model_loaded(zimage_url: str, args: argparse.Namespace) -> Non
         "nunchaku_precision": args.nunchaku_precision,
     }
     response = request_json("POST", f"{zimage_url.rstrip('/')}/api/model/load", payload=payload, timeout=1800)
+    if not response.get("loaded") and response.get("restart") == "scheduled":
+        print(
+            "zimage_model_restart="
+            f"{payload['model_id']} precision={payload['nunchaku_precision']} rank={payload['nunchaku_rank']}"
+        )
+        for _attempt in range(45):
+            time.sleep(1.0)
+            try:
+                request_json("GET", f"{zimage_url.rstrip('/')}/health", timeout=5)
+                break
+            except SystemExit:
+                continue
+        response = request_json("POST", f"{zimage_url.rstrip('/')}/api/model/load", payload=payload, timeout=1800)
     if response.get("loaded"):
         print(
             "zimage_model_loaded="
             f"{payload['model_id']} precision={payload['nunchaku_precision']} rank={payload['nunchaku_rank']}"
         )
         return
-    if response.get("restart") == "scheduled":
-        raise SystemExit(
-            "ERROR: Z-Image scheduled a restart for the selected model. "
-            "Wait for it to come back, then run Generate again."
-        )
     raise SystemExit(f"ERROR: Z-Image did not load the selected model: {response}")
 
 
@@ -128,22 +136,6 @@ def response_output_path(response: dict[str, Any]) -> Path | None:
 def foundry_negative_prompt(negative_prompt: str) -> str:
     negative = negative_prompt.strip()
     return f"{negative}, {NEGATIVE_BG}" if negative else NEGATIVE_BG
-
-
-def prefer_runtime_compatible_lora(lora_path: str, lora_trigger: str) -> tuple[str, str]:
-    path = Path(lora_path).expanduser()
-    lowered = str(path).lower()
-    if "mks0813" not in lowered:
-        return lora_path, lora_trigger
-    try:
-        lora_root = path.parents[1]
-    except IndexError:
-        return lora_path, lora_trigger
-    preferred = lora_root / "tarn59--pixel_art_style_lora_z_image_turbo" / "pixel_art_style_z_image_turbo.safetensors"
-    if preferred.is_file():
-        print(f"lora_fallback=tarn59_pixel_art reason=mks0813_nunchaku_shape_mismatch previous={path}")
-        return str(preferred), "Pixel art style."
-    return lora_path, lora_trigger
 
 
 def copy_direction_image(source: Path, target_dir: Path, index: int, direction: str, label_suffix: str = "") -> Path | None:
@@ -668,7 +660,6 @@ def main() -> int:
         raise SystemExit("ERROR: no LoRA path supplied and /api/loras returned no available LoRAs.")
 
     lora_trigger = args.lora_trigger.strip() or str(profile.get("lora_trigger") or "").strip()
-    lora_path, lora_trigger = prefer_runtime_compatible_lora(lora_path, lora_trigger)
     direction_names = [item.strip() for item in re.split(r"[,+]", args.directions) if item.strip()]
     invalid = [name for name in direction_names if name not in DIRECTIONS]
     if invalid:

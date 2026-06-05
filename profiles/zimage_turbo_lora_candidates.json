@@ -1,21 +1,35 @@
 {
-  "default": "tarn59_pixel_art",
+  "default": "mks0813_pixel_art",
   "candidates": {
     "mks0813_pixel_art": {
-      "label": "Z-Image-Turbo Pixel Art LoRA",
-      "repo_id": "mks0813/z-image-turbo-pixel-art-lora",
+      "label": "Z-Image Turbo Pixel LoRA",
+      "repo_id": "mks0813/z-image-turbo-pixel-lora",
       "filename": "epoch-1.safetensors",
+      "library_filename": "mks0813_pixel_art.safetensors",
       "base_model": "Tongyi-MAI/Z-Image-Turbo",
       "trigger": "pxlstl",
       "prompt_suffix": ", pxlstl",
       "recommended_lora_scale": 0.85,
       "license_note": "Follows the license of Tongyi-MAI/Z-Image-Turbo.",
-      "source_url": "https://huggingface.co/mks0813/z-image-turbo-pixel-art-lora"
+      "source_url": "https://huggingface.co/mks0813/z-image-turbo-pixel-lora"
+    },
+    "skyasl_pixel_artist": {
+      "label": "Pixel-artist-Z Character LoRA",
+      "repo_id": "SkyAsl/Pixel-artist-Z",
+      "filename": "adapter_model.safetensors",
+      "library_filename": "skyasl_pixel_artist.safetensors",
+      "base_model": "Tongyi-MAI/Z-Image-Turbo",
+      "trigger": "a pixel art character",
+      "prompt_suffix": ", a pixel art character",
+      "recommended_lora_scale": 0.85,
+      "license_note": "Apache-2.0 model card license.",
+      "source_url": "https://huggingface.co/SkyAsl/Pixel-artist-Z"
     },
     "tarn59_pixel_art": {
       "label": "Pixel Art Style LoRA for Z-Image Turbo",
       "repo_id": "tarn59/pixel_art_style_lora_z_image_turbo",
       "filename": "pixel_art_style_z_image_turbo.safetensors",
+      "library_filename": "tarn59_pixel_art.safetensors",
       "base_model": "Tongyi-MAI/Z-Image-Turbo",
       "trigger": "Pixel art style.",
       "prompt_suffix": ", Pixel art style.",

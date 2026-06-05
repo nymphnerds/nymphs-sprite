@@ -8,7 +8,8 @@ This note compares three code lines:
 
 - Original upstream Sprite Foundry: `mcp-tool-shop-org/sprite-foundry`, local `upstream/main` at `0a05af9`.
 - Nymphs Foundry fork: `nymphnerds/sprite-foundry`, local `main` at `fb43975`.
-- Nymphs Sprite module: `nymphnerds/nymphs-sprite`, local `main` at `389dd4a` plus current uncommitted `0.1.14` work.
+- Nymphs Sprite module: `nymphnerds/nymphs-sprite`, local source prepared as
+  `0.1.20`.
 
 The goal is to make `nymphs-sprite` feel as close as possible to the original Foundry flow, including Foundry character presets, while using Nymphs-owned generation backends.
 
@@ -91,7 +92,8 @@ All checks passed.
 What exists now:
 
 - Installed module path: `/home/nymph/Nymphs-Sprite`.
-- Installed version: `0.1.14`.
+- Installed/runtime version may lag source until the module commit is pushed,
+  raw `nymph.json` is verified, and the dev registry is updated.
 - Custom Manager UI: `ui/manager.html`.
 - Module actions for status, asset fetch, LoRA selection, source generation, post-processing, output browsing, and logs.
 - Z-Image source generation through direct `POST /generate`, with a Manager-action fallback.
@@ -124,25 +126,35 @@ What is missing for close Foundry parity:
 
 ## Current Failure Diagnosis
 
-The screenshot failure is reproducible from status:
+The current failure mode has three separate layers:
 
-```text
-state=model_download_needed
-models_ready=false
-assets_ready=false
-downloaded_loras=none
-weight_profiles_missing=mks0813_pixel_art,tarn59_pixel_art
-zimage_url=http://127.0.0.1:8090
-```
+1. Source/available/installed drift.
+   - Local source can be ahead of the Manager-visible remote version until the
+     module commit is pushed and the registry points to the verified raw
+     manifest.
+   - Installed runtime state can therefore show old fetch dropdowns and old
+     selected paths even when source has moved on.
 
-And the backend health check currently fails:
+2. Legacy LoRA path drift.
+   - Older versions selected files under
+     `$HOME/LoRA/loras/nymphs-sprite/<repo-slug>/...`.
+   - The forward contract is the LoRA module layout:
+     `$HOME/LoRA/loras/<lora-id>/<lora-id>.safetensors`.
+   - `0.1.20` resolves stale selected candidates back to the shared library
+     before both fast source generation and Foundry bridge generation.
 
-```text
-curl http://127.0.0.1:8090/server_info
-http_code=000
-```
+3. Z-Image/Nunchaku LoRA key format.
+   - Public Z-Image LoRAs use inconsistent key roots:
+     `base_model.model.`, `diffusion_model.`, adapter-name `.default` segments,
+     or already-local transformer keys.
+   - Nunchaku's Z-Image mapper expects transformer-local keys such as
+     `layers.0.attention.to_q.lora_A.weight`.
+   - `0.1.20` normalizes fetched starter LoRAs into the shared LoRA-library
+     runtime copy and records source/rank metadata next to the file.
 
-So `generate_sources` is failing before image generation begins because the Z-Image server is not reachable and the sprite LoRA assets are not downloaded. That is an environment/readiness blocker, not evidence that the post-process logic is broken.
+The module should not treat these as one generic generation failure. Status and
+logs should make it clear whether the blocker is version drift, asset
+readiness, selected path drift, Z-Image model load, or backend LoRA application.
 
 ## Recommendation
 
@@ -230,7 +242,7 @@ bash /home/nymph/Nymphs-Sprite/scripts/nymphs_sprite_status.sh
 
 Expected:
 
-- At least one Z-Image Turbo pixel-art LoRA exists under `/home/nymph/LoRA/loras/nymphs-sprite`.
+- At least one Z-Image Turbo pixel-art LoRA exists under `/home/nymph/LoRA/loras/<lora-id>/<lora-id>.safetensors`.
 - `lora_choices` is not `none`.
 - `selected_lora_candidate` is usable.
 

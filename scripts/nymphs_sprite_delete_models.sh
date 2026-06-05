@@ -85,6 +85,22 @@ def under_root(path: Path, root: Path) -> bool:
     except ValueError:
         return False
 
+def candidate_paths(lora_dir: Path, item: dict) -> list[Path]:
+    repo_id = str(item.get("repo_id") or "")
+    filename = str(item.get("filename") or "")
+    library_filename = str(item.get("library_filename") or "")
+    paths: list[Path] = []
+    if library_filename:
+        library_id = Path(library_filename).stem
+        paths.append(lora_dir / library_id / library_filename)
+        paths.append(lora_dir / library_filename)
+    repo_dir = lora_dir / repo_id.replace("/", "--")
+    if filename:
+        paths.append(repo_dir / filename)
+    elif repo_dir.exists():
+        paths.extend(sorted(path for path in repo_dir.rglob("*.safetensors") if path.is_file()))
+    return paths
+
 try:
     data = json.loads(profile_file.read_text(encoding="utf-8"))
 except Exception:
@@ -93,15 +109,9 @@ except Exception:
 targets: list[Path] = []
 item = (data.get("candidates") or {}).get(profile)
 if item:
-    repo_id = str(item.get("repo_id") or "")
-    filename = item.get("filename")
-    repo_dir = lora_dir / repo_id.replace("/", "--")
-    if filename:
-        path = repo_dir / str(filename)
+    for path in candidate_paths(lora_dir, item):
         if path.is_file():
             targets.append(path)
-    elif repo_dir.exists():
-        targets.extend(sorted(path for path in repo_dir.rglob("*.safetensors") if path.is_file()))
 else:
     custom_prefix = "custom_"
     if profile.startswith(custom_prefix) and lora_dir.exists():

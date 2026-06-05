@@ -37,6 +37,8 @@ zimage_installed=false
 zimage_models_ready=false
 zimage_weight_profile_selected=none
 zimage_weight_profile_ready=false
+zimage_nunchaku_rank=32
+zimage_nunchaku_precision=auto
 zimage_downloaded_models=none
 zimage_downloaded_weights=none
 zimage_missing_weights=none
@@ -118,6 +120,22 @@ def format_bytes(value: int) -> str:
         size /= 1024
     return f"{value}B"
 
+def candidate_paths(lora_dir: Path, item: dict) -> list[Path]:
+    repo_id = str(item.get("repo_id") or "")
+    filename = str(item.get("filename") or "")
+    library_filename = str(item.get("library_filename") or "")
+    paths: list[Path] = []
+    if library_filename:
+        library_id = Path(library_filename).stem
+        paths.append(lora_dir / library_id / library_filename)
+        paths.append(lora_dir / library_filename)
+    repo_dir = lora_dir / repo_id.replace("/", "--")
+    if filename:
+        paths.append(repo_dir / filename)
+    elif repo_dir.exists():
+        paths.extend(sorted(path for path in repo_dir.rglob("*.safetensors") if path.is_file()))
+    return paths
+
 try:
     data = json.loads(profile_file.read_text(encoding="utf-8"))
 except Exception:
@@ -139,22 +157,19 @@ missing: list[str] = []
 files: list[str] = []
 choices: list[str] = []
 seen_paths: set[Path] = set()
+download_paths: dict[str, Path] = {}
 total_bytes = 0
 
 for candidate_id, item in candidates.items():
-    repo_id = str(item.get("repo_id") or "")
-    filename = item.get("filename")
-    repo_dir = lora_dir / repo_id.replace("/", "--")
     matches: list[Path] = []
-    if filename:
-        path = repo_dir / str(filename)
+    for path in candidate_paths(lora_dir, item):
         if path.is_file():
             matches = [path]
-    elif repo_dir.exists():
-        matches = sorted(path for path in repo_dir.rglob("*.safetensors") if path.is_file())
+            break
     if matches:
         downloaded.append(candidate_id)
         path = matches[0]
+        download_paths[candidate_id] = path
         files.append(f"{candidate_id}:{path.name}")
         choices.append(f"{candidate_id}|{path.name}|{path}")
         if path not in seen_paths:
@@ -182,6 +197,8 @@ if lora_dir.exists():
 
 if not selected:
     selected = data.get("default") or (downloaded[0] if downloaded else "none")
+if selected in download_paths:
+    selected_path = str(download_paths[selected])
 selected_ready = Path(selected_path).expanduser().is_file() if selected_path else selected in downloaded
 
 emit("lora_count", str(len(seen_paths)))
@@ -190,6 +207,7 @@ emit("lora_cache_size", format_bytes(total_bytes))
 emit("lora_files", ",".join(files) if files else "none")
 emit("lora_choices", ",".join(choices) if choices else "none")
 emit("downloaded_loras", ",".join(downloaded) if downloaded else "none")
+emit("selected_lora_path_resolved", selected_path)
 emit("weight_profile_selected", selected)
 emit("weight_profiles_available", ",".join(available) if available else "none")
 emit("weight_profiles_downloaded", ",".join(downloaded) if downloaded else "none")
@@ -206,6 +224,7 @@ while IFS='=' read -r key value; do
     lora_files) lora_files="${value}" ;;
     lora_choices) lora_choices="${value}" ;;
     downloaded_loras) downloaded_loras="${value}" ;;
+    selected_lora_path_resolved) [[ "${value}" != "none" ]] && selected_lora_path="${value}" ;;
     weight_profile_selected) weight_profile_selected="${value}" ;;
     weight_profiles_available) weight_profiles_available="${value}" ;;
     weight_profiles_downloaded) weight_profiles_downloaded="${value}" ;;
@@ -246,6 +265,8 @@ if zimage_status_script="$(nymphs_sprite_zimage_script zimage_status.sh 2>/dev/n
       missing_weights) zimage_missing_weights="${value}" ;;
       weight_profile_selected) zimage_weight_profile_selected="${value}" ;;
       weight_profile_ready) zimage_weight_profile_ready="${value}" ;;
+      nunchaku_rank) zimage_nunchaku_rank="${value}" ;;
+      nunchaku_precision) zimage_nunchaku_precision="${value}" ;;
       hf_cache_dir) zimage_hf_cache_dir="${value}" ;;
       detail) zimage_status_detail="${value}" ;;
     esac
@@ -336,6 +357,8 @@ zimage_installed=${zimage_installed}
 zimage_models_ready=${zimage_models_ready}
 zimage_weight_profile_selected=${zimage_weight_profile_selected}
 zimage_weight_profile_ready=${zimage_weight_profile_ready}
+zimage_nunchaku_rank=${zimage_nunchaku_rank}
+zimage_nunchaku_precision=${zimage_nunchaku_precision}
 zimage_downloaded_models=${zimage_downloaded_models}
 zimage_downloaded_weights=${zimage_downloaded_weights}
 zimage_missing_weights=${zimage_missing_weights}

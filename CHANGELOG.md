@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.1.20 - 2026-06-05
+
+- Normalize fetched Z-Image LoRA keys into the runtime copy stored under the
+  shared `$HOME/LoRA/loras/<id>/<id>.safetensors` library. This strips common
+  PEFT/AI Toolkit prefixes such as `base_model.model.` and `diffusion_model.`
+  so Nymphs Image's Z-Image/Nunchaku adapter mapper can consume the files.
+- Preserve LoRA metadata with `normalized_for=zimage_nunchaku` and raw rank
+  hints in `nymphs_lora.json`.
+- Resolve stale legacy selected-LoRA paths to the current shared-library path
+  before both fast source generation and the Foundry bridge run.
+- Make status report the resolved selected LoRA path, so the Manager UI no
+  longer shows old Sprite-private paths after updating.
+
+## 0.1.19 - 2026-06-05
+
+- Switched Sprite LoRA fetches to the LoRA module's shared
+  `$HOME/LoRA/loras/<id>/<id>.safetensors` layout and writes
+  `nymphs_lora.json` metadata next to each fetched LoRA.
+- Updated the mks0813 candidate to the corrected
+  `mks0813/z-image-turbo-pixel-lora` repository and keeps it selected after
+  complete fetches.
+- Added `SkyAsl/Pixel-artist-Z` as a character-focused backup LoRA while
+  keeping `tarn59/pixel_art_style_lora_z_image_turbo` as the style fallback.
+- Removes the old Sprite-private LoRA layout from the normal path; the shared
+  LoRA module layout is now the forward-only storage contract.
+
 ## 0.1.18 - 2026-06-05
 
 - Load the selected Z-Image Turbo INT4 r32 model through `/api/model/load`
