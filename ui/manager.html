@@ -317,6 +317,7 @@
       border-radius: 8px;
       background:
         url("__NYMPHS_SPRITE_FOREST_URI__") center center / cover no-repeat,
+        url("/ui/nymphs_preview_forest.png") center center / cover no-repeat,
         url("nymphs_preview_forest.png") center center / cover no-repeat,
         rgba(4, 12, 11, 0.82);
       display: grid;
@@ -593,6 +594,7 @@
     .thumb::before { content: ""; display: none; }
     .thumb.selected { border-color: var(--green); }
     .thumb.checked { border-color: var(--cyan); }
+    .thumb.empty-strip { cursor: default; opacity: 0.72; }
     .thumb img {
       width: 100%;
       height: 60px;
@@ -723,11 +725,9 @@
           <div class="field wide">
             <label for="z-model-choice">Model</label>
             <select id="z-model-choice">
-              <option value="auto_r32">Auto r32</option>
-              <option value="auto_r128">Auto r128</option>
-              <option value="int4_r256">INT4 r256</option>
-              <option value="fp4_r32">FP4 r32</option>
-              <option value="fp4_r128">FP4 r128</option>
+              <option value="r32">r32</option>
+              <option value="r128">r128</option>
+              <option value="r256">r256</option>
             </select>
           </div>
           <div class="field"><label for="width">Width</label><input id="width" type="number" min="256" max="2048" step="64" value="1024"></div>
@@ -849,11 +849,13 @@
     const state = {
       busy: false,
       outputs: [],
+      visibleOutputs: [],
       selectedIndex: -1,
       selectedOutputPaths: new Set(),
       localObjectUrls: [],
       manualFolderName: "",
       viewerSource: "outputs",
+      outputView: "recent",
       selectedLoraPath: "",
       zModelTouched: false,
       statusValues: {},
@@ -1056,8 +1058,17 @@
       if (!path || path === "None") return;
       if (!/\.(png|jpg|jpeg|webp)$/i.test(path)) return;
       if (state.outputs.some((item) => item.path === path)) return;
-      state.outputs.unshift({ path, label: label || basename(path), url: pathToFileUrl(path), managed: true });
+      state.outputs.unshift({
+        path,
+        relative_path: path,
+        label: label || basename(path),
+        url: pathToFileUrl(path),
+        managed: true,
+        created: Date.now() / 1000,
+        folder: "Current batch"
+      });
       state.viewerSource = "batch";
+      state.outputView = "recent";
       renderGallery();
       showOutput(0);
     }
@@ -1097,17 +1108,120 @@
       }
     }
 
+    function outputCreatedMs(output) {
+      const raw = Number(output?.created || output?.mtime || 0);
+      if (!Number.isFinite(raw) || raw <= 0) return 0;
+      return raw > 100000000000 ? raw : raw * 1000;
+    }
+
+    function outputDateKey(output) {
+      const created = outputCreatedMs(output);
+      if (!created) return "Unknown Date";
+      const date = new Date(created);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function outputFolder(output) {
+      if (output?.folder) return output.folder;
+      const text = String(output?.relative_path || output?.path || "");
+      const parts = text.split(/[\\/]/).filter(Boolean);
+      if (parts.length > 1) return parts.at(-2);
+      return "";
+    }
+
+    function folderLabel(folder) {
+      return String(folder || "").split(/[\\/]/).filter(Boolean).pop() || folder || "Folder";
+    }
+
+    function sortedViewerOutputs() {
+      const outputs = [...state.outputs];
+      if (state.viewerSource === "batch") return outputs;
+      outputs.sort((a, b) => outputCreatedMs(b) - outputCreatedMs(a));
+      return outputs;
+    }
+
+    function syncOutputViewOptions(outputs) {
+      const select = $("output-folder");
+      const dates = [...new Set(outputs.map(outputDateKey))].sort().reverse();
+      const folders = [...new Set(outputs.map(outputFolder).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+      const validViews = new Set([
+        "recent",
+        ...dates.map((date) => `date:${date}`),
+        ...folders.map((folder) => `folder:${folder}`)
+      ]);
+      if (!validViews.has(state.outputView)) state.outputView = "recent";
+      select.innerHTML = "";
+      const recentOption = document.createElement("option");
+      recentOption.value = "recent";
+      recentOption.textContent = `${state.viewerSource === "batch" ? "Current batch" : "Recent"} (${outputs.length})`;
+      select.appendChild(recentOption);
+      for (const date of dates) {
+        const count = outputs.filter((output) => outputDateKey(output) === date).length;
+        const option = document.createElement("option");
+        option.value = `date:${date}`;
+        option.textContent = `${date} (${count})`;
+        select.appendChild(option);
+      }
+      for (const folder of folders) {
+        const count = outputs.filter((output) => outputFolder(output) === folder).length;
+        const option = document.createElement("option");
+        option.value = `folder:${folder}`;
+        option.textContent = `Folder: ${folderLabel(folder)} (${count})`;
+        select.appendChild(option);
+      }
+      select.value = state.outputView;
+      select.disabled = outputs.length === 0;
+    }
+
+    function stripOutputs() {
+      const outputs = sortedViewerOutputs();
+      syncOutputViewOptions(outputs);
+      if (state.outputView === "recent") return outputs;
+      if (state.outputView.startsWith("date:")) {
+        const date = state.outputView.slice(5);
+        return outputs.filter((output) => outputDateKey(output) === date);
+      }
+      if (state.outputView.startsWith("folder:")) {
+        const folder = state.outputView.slice(7);
+        return outputs.filter((output) => outputFolder(output) === folder);
+      }
+      return outputs;
+    }
+
+    function currentOutputViewLabel() {
+      if (state.outputView === "recent") {
+        if (state.viewerSource === "batch") return "Current batch";
+        if (state.viewerSource === "manual") return state.manualFolderName || "Chosen Folder";
+        return "Recent";
+      }
+      if (state.outputView.startsWith("date:")) return state.outputView.slice(5);
+      if (state.outputView.startsWith("folder:")) return folderLabel(state.outputView.slice(7));
+      return "Outputs";
+    }
+
     function renderGallery() {
       const gallery = $("gallery");
       gallery.innerHTML = "";
-      const label = state.manualFolderName || (state.viewerSource === "batch" ? "Current batch" : "Recent");
-      $("strip-label").textContent = `${label} (${state.outputs.length})`;
-      syncOutputFolder(label);
+      state.visibleOutputs = stripOutputs();
+      const label = currentOutputViewLabel();
+      $("strip-label").textContent = `${label} (${state.visibleOutputs.length})`;
       updateSelectionCount();
-      for (const [index, item] of state.outputs.entries()) {
+      if (!state.visibleOutputs.length) {
+        const node = document.createElement("div");
+        node.className = "thumb empty-strip";
+        node.innerHTML = `<span>No images yet</span>`;
+        gallery.appendChild(node);
+        updateStripControls();
+        return;
+      }
+      for (const [index, item] of state.visibleOutputs.entries()) {
         const key = outputKey(item);
         const node = document.createElement("div");
         node.className = `thumb ${index === state.selectedIndex ? "selected" : ""} ${state.selectedOutputPaths.has(key) ? "checked" : ""}`;
+        node.dataset.key = key;
         node.innerHTML = `
           <label class="thumb-check" title="Select output"><input type="checkbox" ${state.selectedOutputPaths.has(key) ? "checked" : ""}></label>
           <img src="${escapeHtml(item.url)}" alt="">
@@ -1144,17 +1258,19 @@
         const text = await moduleAction("list_outputs", { limit: "80" }, { quiet: true, busy: false });
         const body = JSON.parse(String(text || "{}"));
         state.outputs = (body.outputs || []).map(normalizeManagedOutput);
+        state.viewerSource = "outputs";
         state.selectedOutputPaths.clear();
         state.manualFolderName = "";
         renderGallery();
-        if (selectFirst && state.outputs[0]) showOutput(0);
+        if (selectFirst && state.visibleOutputs[0]) showOutput(0);
       } catch {
-        syncOutputFolder("Recent");
+        renderGallery();
       }
     }
 
     function showOutput(index) {
-      const item = state.outputs[index];
+      const visible = stripOutputs();
+      const item = visible[index];
       if (!item) return;
       state.selectedIndex = index;
       const image = $("result-image");
@@ -1169,27 +1285,18 @@
       return item?.path || item?.url || "";
     }
 
-    function syncOutputFolder(label) {
-      const select = $("output-folder");
-      select.innerHTML = "";
-      const option = document.createElement("option");
-      option.value = "current";
-      option.textContent = `${label} (${state.outputs.length})`;
-      select.appendChild(option);
-      select.value = "current";
-      select.disabled = state.outputs.length === 0;
-    }
-
     function updateSelectionCount() {
-      const count = state.selectedOutputPaths.size;
+      const visibleKeys = new Set((state.visibleOutputs || []).map(outputKey));
+      const count = [...state.selectedOutputPaths].filter((key) => visibleKeys.has(key)).length;
       $("selection-count").textContent = `${count} selected`;
     }
 
     function updateStripControls() {
-      $("strip-prev").disabled = state.outputs.length < 2 || state.busy;
-      $("strip-next").disabled = state.outputs.length < 2 || state.busy;
+      const visible = state.visibleOutputs || [];
+      $("strip-prev").disabled = visible.length < 2 || state.busy;
+      $("strip-next").disabled = visible.length < 2 || state.busy;
       $("select-visible").disabled = state.selectedIndex < 0 || state.busy;
-      $("select-all-visible").disabled = state.outputs.length === 0 || state.busy;
+      $("select-all-visible").disabled = visible.length === 0 || state.busy;
       $("clear-selection").disabled = state.selectedOutputPaths.size === 0 || state.busy;
       updateSelectionCount();
     }
@@ -1203,19 +1310,19 @@
     }
 
     function selectVisibleOutput() {
-      const item = state.outputs[state.selectedIndex];
+      const item = (state.visibleOutputs || [])[state.selectedIndex];
       if (!item) return;
       state.selectedOutputPaths.add(outputKey(item));
       renderGallery();
     }
 
     function selectAllVisibleOutputs() {
-      for (const item of state.outputs) state.selectedOutputPaths.add(outputKey(item));
+      for (const item of state.visibleOutputs || []) state.selectedOutputPaths.add(outputKey(item));
       renderGallery();
     }
 
     function clearOutputSelection() {
-      state.selectedOutputPaths.clear();
+      for (const item of state.visibleOutputs || []) state.selectedOutputPaths.delete(outputKey(item));
       renderGallery();
     }
 
@@ -1230,26 +1337,32 @@
       state.outputs = images.map((file, index) => {
         const url = URL.createObjectURL(file);
         state.localObjectUrls.push(url);
+        const relativePath = file.webkitRelativePath || file.name || url;
         return {
-          path: file.webkitRelativePath || file.name || url,
+          path: `manual:${index}:${relativePath}`,
+          relative_path: `manual:${index}:${relativePath}`,
           label: file.name || `image-${index + 1}`,
           url,
+          folder: images[0]?.webkitRelativePath?.split("/")[0] || "Chosen folder",
+          created: (file.lastModified || Date.now()) / 1000,
           managed: false,
         };
       });
       state.selectedOutputPaths.clear();
       state.manualFolderName = images[0]?.webkitRelativePath?.split("/")[0] || "Chosen folder";
       state.viewerSource = "manual";
+      state.outputView = `folder:${state.manualFolderName}`;
       state.selectedIndex = -1;
       renderGallery();
-      if (state.outputs[0]) showOutput(0);
+      if (state.visibleOutputs[0]) showOutput(0);
       $("folder-picker").value = "";
     }
 
     function stepOutput(offset) {
-      if (!state.outputs.length) return;
+      const visible = state.visibleOutputs || stripOutputs();
+      if (!visible.length) return;
       const current = state.selectedIndex < 0 ? 0 : state.selectedIndex;
-      showOutput((current + offset + state.outputs.length) % state.outputs.length);
+      showOutput((current + offset + visible.length) % visible.length);
     }
 
     function moduleAction(action, args = {}, options = {}) {
@@ -1405,23 +1518,23 @@
       const profile = String(values.zimage_weight_profile_selected || "").replace(/^zimage_/, "");
       const match = profile.match(/^(auto|int4|fp4)_r(32|128|256)$/);
       const rank = parseInt(values.zimage_nunchaku_rank || (match ? match[2] : "32"), 10);
-      let precision = String(values.zimage_nunchaku_precision || (match ? match[1] : "auto")).toLowerCase();
-      if (!["auto", "int4", "fp4"].includes(precision)) precision = "auto";
-      if (rank === 256) return "int4_r256";
-      if (rank === 128) return `${precision === "fp4" ? "fp4" : "auto"}_r128`;
-      if (precision === "fp4") return "fp4_r32";
-      return "auto_r32";
+      if (rank === 256) return "r256";
+      if (rank === 128) return "r128";
+      return "r32";
     }
 
     function zImageSelection() {
       const choice = $("z-model-choice")?.value || zModelChoiceFromStatus(state.statusValues || {});
-      const [rawPrecision, rawRank] = choice.split("_r");
-      const rank = parseInt(rawRank || "32", 10);
-      const precision = String(rawPrecision || "auto").toLowerCase();
+      const rank = parseInt(String(choice).replace(/^r/, "") || "32", 10);
+      const profile = String(state.statusValues.zimage_weight_profile_selected || "").replace(/^zimage_/, "");
+      const match = profile.match(/^(auto|int4|fp4)_r(32|128|256)$/);
+      let precision = String(state.statusValues.zimage_nunchaku_precision || (match ? match[1] : "int4")).toLowerCase();
+      if (!["int4", "fp4"].includes(precision)) precision = "int4";
+      if (rank === 256 && precision === "fp4") precision = "int4";
       return {
         model_id: "Tongyi-MAI/Z-Image-Turbo",
         nunchaku_rank: [32, 128, 256].includes(rank) ? rank : 32,
-        nunchaku_precision: ["auto", "int4", "fp4"].includes(precision) ? precision : "auto"
+        nunchaku_precision: precision
       };
     }
 
@@ -1587,6 +1700,12 @@
       $("folder-picker").click();
     });
     $("folder-picker").addEventListener("change", (event) => chooseFolderImages(event.target.files));
+    $("output-folder").addEventListener("change", () => {
+      state.outputView = $("output-folder").value || "recent";
+      state.selectedIndex = -1;
+      renderGallery();
+      if (state.visibleOutputs[0]) showOutput(0);
+    });
     $("select-visible").addEventListener("click", selectVisibleOutput);
     $("select-all-visible").addEventListener("click", selectAllVisibleOutputs);
     $("clear-selection").addEventListener("click", clearOutputSelection);
@@ -1697,6 +1816,7 @@
     applyPromptPreset("goblin_scout");
     renderGallery();
     refreshStatus();
+    refreshRecentOutputs(true);
   </script>
 </body>
 </html>

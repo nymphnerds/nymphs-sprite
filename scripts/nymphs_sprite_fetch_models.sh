@@ -42,9 +42,9 @@ It writes to the same shared Hugging Face cache and Z-Image generation preset:
   $HOME/NymphsData/config/zimage/generation-preset.env
 
 Sprite-friendly aliases:
-  sprite_starter     -> Z-Image Turbo INT4 r32
-  zimage_int4_r128   -> Z-Image Turbo INT4 r128
-  zimage_int4_r256   -> Z-Image Turbo INT4 r256
+  sprite_starter     -> Z-Image Turbo r32
+  zimage_int4_r128   -> Z-Image Turbo r128
+  zimage_int4_r256   -> Z-Image Turbo r256
   zimage_fp4_r32     -> Z-Image Turbo FP4 r32
   zimage_fp4_r128    -> Z-Image Turbo FP4 r128
 

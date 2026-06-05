@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.23",
+  "version": "0.1.24",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -155,24 +155,29 @@
                 "description": "Fetch mks0813, SkyAsl, and tarn59 LoRAs, staged ControlNet Union, and Depth Anything without touching shared Z-Image backend weights"
               },
               {
-                "label": "Sprite backend - Z-Image INT4 r32",
+                "label": "Z-Image Turbo r32",
                 "value": "sprite_starter",
-                "description": "Fetch only the shared Z-Image backend model/weight needed for the default Sprite run"
+                "description": "Fetch the default shared INT4 r32 Z-Image backend weight for Sprite"
               },
               {
-                "label": "Z-Image Turbo INT4 r128",
+                "label": "Z-Image Turbo r128",
                 "value": "zimage_int4_r128",
-                "description": "Fetch only the balanced RTX 20/30/40 shared backend weight"
+                "description": "Fetch the shared INT4 r128 Z-Image backend weight for Sprite"
               },
               {
-                "label": "Z-Image Turbo INT4 r256",
+                "label": "Z-Image Turbo r256",
                 "value": "zimage_int4_r256",
-                "description": "Fetch only the highest-rank INT4 shared backend weight"
+                "description": "Fetch the shared INT4 r256 Z-Image backend weight for Sprite"
               },
               {
                 "label": "Z-Image Turbo FP4 r32",
                 "value": "zimage_fp4_r32",
-                "description": "Fetch only the fast RTX 50 / Blackwell-oriented shared backend weight"
+                "description": "Fetch the shared FP4 r32 Z-Image backend weight for RTX 50 / Blackwell systems"
+              },
+              {
+                "label": "Z-Image Turbo FP4 r128",
+                "value": "zimage_fp4_r128",
+                "description": "Fetch the shared FP4 r128 Z-Image backend weight for RTX 50 / Blackwell systems"
               },
               {
                 "label": "mks0813 Z-Image Turbo Pixel LoRA",
@@ -310,6 +315,7 @@
     "v0.1.20 normalizes fetched Z-Image LoRA key prefixes for Nunchaku, resolves stale legacy selected-LoRA paths to the shared LoRA library before generation, and keeps the Foundry bridge on the same selected LoRA path contract.",
     "v0.1.21 adds the Sprite UI Z-Image model/rank selector and normalizes shared-LoRA dropdown labels/triggers for mks0813, SkyAsl, and tarn59, including custom-discovered shared library paths.",
     "v0.1.22 keeps all three canonical Sprite LoRA candidates visible in the UI and marks missing shared-library files instead of hiding absent candidates from the dropdown.",
-    "v0.1.23 makes the generation bridges prefer the resolved shared LoRA library path over stale legacy UI arguments so old nymphs-sprite LoRA paths cannot override the selected shared LoRA."
+    "v0.1.23 makes the generation bridges prefer the resolved shared LoRA library path over stale legacy UI arguments so old nymphs-sprite LoRA paths cannot override the selected shared LoRA.",
+    "v0.1.24 makes the Sprite generation UI rank-only with r32, r128, and r256, restores the Nymphs Image-style strip browser/forest preview, and keeps hardware-specific INT4/FP4 choices in the Manager model fetch page."
   ]
 }
