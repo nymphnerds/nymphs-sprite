@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -322,6 +322,7 @@
     "v0.1.27 removes Sprite's source-generation module bridge action from the manifest and custom UI path. The Manager Generate Sources button now only uses the direct Nymphs Image-style Z-Image /generate flow, with Fast 512 defaults and one front source selected by default for smoke testing.",
     "v0.1.28 restores generate_sources as the local_html Manager transport while keeping the shared Nymphs Image/Z-Image runtime, venv, model cache, and LoRA library. Sprite no longer browser-fetches the Z-Image API directly from its local_html UI.",
     "v0.1.29 flushes Sprite bridge progress immediately and merges Z-Image JSON preview URLs back onto their local output paths so source generation feels less frozen and the strip does not show duplicate blank tiles.",
-    "v0.1.30 restores the Nymphs Image forest stage background in Sprite by simplifying the viewer CSS to use the installed local forest PNG directly instead of the darker overlay/fallback stack."
+    "v0.1.30 restores the Nymphs Image forest stage background in Sprite by simplifying the viewer CSS to use the installed local forest PNG directly instead of the darker overlay/fallback stack.",
+    "v0.1.31 embeds the forest PNG into the installed local_html UI and makes the Recent strip proxy Nymphs Image /api/outputs with a filesystem fallback over the shared Z-Image output folders."
   ]
 }

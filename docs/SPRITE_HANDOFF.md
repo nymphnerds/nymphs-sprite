@@ -25,7 +25,7 @@ later dedicated conversion module.
 Current source version target:
 
 ```text
-nymphs-sprite 0.1.30
+nymphs-sprite 0.1.31
 ```
 
 Latest pushed/tested state from 2026-06-05:
@@ -53,8 +53,12 @@ Remaining roughness found during test:
   already present and identical to Nymphs Image's asset, but Sprite's viewer CSS
   used a darker overlay/fallback stack that made the stage read as plain black.
   The CSS now uses the installed local `ui/nymphs_preview_forest.png` directly.
+- `0.1.31` makes the forest robust for `local_html` by embedding it as a data
+  URI during install/update. It also fixes the Recent strip to proxy the same
+  Nymphs Image `/api/outputs?limit=80` source and fall back to scanning shared
+  Z-Image output folders if the API returns empty or is unavailable.
 
-Current source tree may have uncommitted changes while preparing `0.1.30`.
+Current source tree may have uncommitted changes while preparing `0.1.31`.
 Do not update the registry until:
 
 1. The source diff is reviewed.
@@ -559,6 +563,18 @@ After the final 2026-06-05 test, the source image displayed successfully, but
 the strip briefly showed duplicate/blank entries. `0.1.29` changes the parser
 to merge final Z-Image JSON preview URLs onto the existing local path entry.
 Retest this specifically.
+
+The Recent strip should mirror Nymphs Image. Its data source is now:
+
+```text
+primary:  shared Z-Image API /api/outputs?limit=80
+fallback: $HOME/NymphsData/outputs/zimage
+fallback: $HOME/Z-Image/outputs
+fallback: $HOME/NymphsModules/zimage/outputs
+```
+
+Do not invent a separate Sprite-only recent browser. Keep copying Nymphs Image's
+output object shape and strip behavior.
 
 ## Validation Done This Session
 

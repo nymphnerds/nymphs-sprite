@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.31 - 2026-06-05
+
+- Embed the forest PNG as a data URI during install/update so Sprite's
+  `local_html` stage does not depend on Manager resolving relative file assets.
+- Make the Recent strip use the same Nymphs Image output source by proxying
+  `/api/outputs?limit=80`, with a filesystem fallback over:
+  `$HOME/NymphsData/outputs/zimage`, `$HOME/Z-Image/outputs`, and
+  `$HOME/NymphsModules/zimage/outputs`.
+
 ## 0.1.30 - 2026-06-05
 
 - Restored the Nymphs Image forest stage look in Sprite by simplifying the

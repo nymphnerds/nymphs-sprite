@@ -42,12 +42,13 @@ if [[ -f "${staging_dir}/ui/nymphs_preview_forest.png" && -f "${staging_dir}/ui/
   python3 - "${staging_dir}/ui/manager.html" "${staging_dir}/ui/nymphs_preview_forest.png" <<'PY'
 from __future__ import annotations
 
+import base64
 import sys
 from pathlib import Path
 
 html_path = Path(sys.argv[1])
 image_path = Path(sys.argv[2])
-image_uri = image_path.resolve().as_uri()
+image_uri = "data:image/png;base64," + base64.b64encode(image_path.read_bytes()).decode("ascii")
 html = html_path.read_text(encoding="utf-8")
 html = html.replace("__NYMPHS_SPRITE_FOREST_URI__", image_uri)
 html_path.write_text(html, encoding="utf-8")
