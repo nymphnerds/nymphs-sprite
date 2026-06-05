@@ -147,12 +147,12 @@ if [[ -n "${asset}" ]]; then
       ;;
     complete_sprite|all_sprite_assets)
       echo "asset_fetch_plan=LoRA:mks0813_pixel_art,LoRA:tarn59_pixel_art,ControlNet:union,Depth:small"
-      "${BASH_SOURCE[0]}" --candidate tarn59_pixel_art
       "${BASH_SOURCE[0]}" --candidate mks0813_pixel_art
+      "${BASH_SOURCE[0]}" --candidate tarn59_pixel_art
       "${SCRIPT_DIR}/nymphs_sprite_fetch_controlnet.sh"
       "${SCRIPT_DIR}/nymphs_sprite_fetch_depth_anything.sh" --small
       echo "asset_fetch_complete=complete_sprite"
-      echo "selected_lora=mks0813_pixel_art"
+      echo "selected_lora=tarn59_pixel_art"
       exit 0
       ;;
     controlnet_union)

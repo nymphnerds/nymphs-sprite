@@ -118,9 +118,10 @@ $HOME/NymphsData/cache/huggingface
 $HOME/NymphsData/config/zimage/generation-preset.env
 ```
 
-Sprite-owned assets are still stored under the Sprite module paths below, so
-either Nymphs Image or Nymphs Sprite can prepare the shared backend without
-creating duplicate model caches.
+Hugging Face model assets use that same shared cache. Sprite LoRAs use the
+shared LoRA library at `$HOME/LoRA/loras/nymphs-sprite`, so either Nymphs Image
+or Nymphs Sprite can prepare the backend without creating duplicate model
+caches.
 
 ## Pixel Art LoRA
 
@@ -180,8 +181,8 @@ Nymphs Sprite uses that path directly. The direction runner is:
 scripts/nymphs_sprite_generate_directions.sh \
   --subject-id hero_test \
   --subject-prompt "armored forest knight with a short cloak" \
-  --lora-path "$HOME/LoRA/loras/nymphs-sprite/mks0813--z-image-turbo-pixel-art-lora/epoch-1.safetensors" \
-  --lora-trigger pxlstl
+  --lora-path "$HOME/LoRA/loras/nymphs-sprite/tarn59--pixel_art_style_lora_z_image_turbo/pixel_art_style_z_image_turbo.safetensors" \
+  --lora-trigger "Pixel art style."
 ```
 
 If `--lora-path` is omitted, the runner asks Nymphs Image `/api/loras` for the
@@ -230,17 +231,13 @@ profiles/foundry_character_presets.json
 profiles/foundry_export_roster.json
 ```
 
-The catalog is derived from the local `sprite-foundry/pipeline/chars` configs
-and preserves full subject prompts, negative prompts, seeds, roles, body
-classes, body locks, reject conditions, pack metadata, and source config paths.
-The custom Manager UI uses this catalog for the prompt preset dropdown instead
-of a small hand-written sample.
-
-The original public Foundry roster describes 92 production export packs. This
-module currently has direct generation presets for the Foundry character configs
-available in the local fork. `foundry_export_roster.json` carries the 92-pack
-lane/subject target; export-roster-only entries remain a parity target until
-their prompt configs are available or reconstructed.
+The catalog is derived from the original Foundry export roster and contains the
+92 production export packs only. Entries with matching local
+`sprite-foundry/pipeline/chars` configs also preserve full subject prompts,
+negative prompts, seeds, roles, body classes, body locks, reject conditions,
+pack metadata, and source config paths. Roster entries without a local prompt
+config remain visible as original roster entries but are disabled for direct
+generation until their prompt configs are available or reconstructed.
 
 ## Foundry Bridge
 

@@ -105,8 +105,10 @@ What exists now:
   - run basic source and mechanical checks
 - Batch manifest: `sprite_batch.json` with schema `nymphs-sprite.batch.v1`.
 - Foundry presets now imported into:
-  - `profiles/foundry_character_presets.json` with 67 local character presets
-  - `profiles/foundry_export_roster.json` with the 92-pack roster target
+  - `profiles/foundry_character_presets.json` with the original 92-pack roster
+    only; 51 entries currently have matching generation prompt configs in the
+    local fork
+  - `profiles/foundry_export_roster.json` with the same 92-pack roster target
 
 What is missing for close Foundry parity:
 
@@ -206,7 +208,7 @@ state=model_download_needed
 weight_profile_ready=false
 ```
 
-Expected after asset fetch:
+Expected after model fetch:
 
 ```text
 models_ready=true
@@ -215,14 +217,14 @@ downloaded_loras=...
 weight_profile_ready=true
 ```
 
-### 2. Asset Fetch
+### 2. Model Fetch
 
-In Manager, use `Asset Fetch -> Complete Sprite Package`.
+In Manager, use `Model Fetch -> Complete Sprite Stack`.
 
 CLI equivalent:
 
 ```bash
-bash /home/nymph/Nymphs-Sprite/scripts/nymphs_sprite_fetch_lora.sh --asset complete_sprite
+bash /home/nymph/Nymphs-Sprite/scripts/nymphs_sprite_fetch_assets.sh --asset complete_sprite_stack
 bash /home/nymph/Nymphs-Sprite/scripts/nymphs_sprite_status.sh
 ```
 

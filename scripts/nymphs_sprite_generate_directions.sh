@@ -87,6 +87,30 @@ append_decoded_arg "lora-path" "lora-path"
 append_decoded_arg "lora-trigger" "lora-trigger"
 append_decoded_arg "source-images" "source-images"
 
+zimage_probe() {
+  "${python_bin}" - "${NYMPHS_SPRITE_ZIMAGE_URL%/}/server_info" <<'PY' >/dev/null 2>&1
+from __future__ import annotations
+
+import sys
+from urllib.request import urlopen
+
+with urlopen(sys.argv[1], timeout=3):
+    pass
+PY
+}
+
+if ! zimage_probe; then
+  if [[ "${NYMPHS_SPRITE_AUTO_START_ZIMAGE:-1}" == "1" ]]; then
+    echo "Z-Image is not responding at ${NYMPHS_SPRITE_ZIMAGE_URL}; starting Nymphs Image..."
+    "${SCRIPT_DIR}/nymphs_sprite_start_zimage.sh"
+  fi
+fi
+
+if ! zimage_probe; then
+  echo "ERROR: Z-Image is not responding at ${NYMPHS_SPRITE_ZIMAGE_URL}. Start Nymphs Image from Manager, then try again." >&2
+  exit 1
+fi
+
 if [[ -f "${NYMPHS_SPRITE_LORA_PRESET_FILE}" ]]; then
   selected_lora_path="$(sed -n 's/^NYMPHS_SPRITE_SELECTED_LORA_PATH=//p' "${NYMPHS_SPRITE_LORA_PRESET_FILE}" | tail -n 1)"
   selected_lora_trigger="$(sed -n 's/^NYMPHS_SPRITE_SELECTED_LORA_TRIGGER=//p' "${NYMPHS_SPRITE_LORA_PRESET_FILE}" | tail -n 1)"

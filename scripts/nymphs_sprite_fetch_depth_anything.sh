@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=/dev/null
 source "${SCRIPT_DIR}/_nymphs_sprite_common.sh"
 
-repo_id="depth-anything/Depth-Anything-V2-Small-hf"
+repo_id="${NYMPHS_SPRITE_DEPTH_MODEL_REPO_ID}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -36,8 +36,9 @@ nymphs_sprite_ensure_dirs
 python_bin="$(nymphs_sprite_python_bin)"
 
 echo "MODEL FETCH STARTED: step=1/1 repo=${repo_id}"
+echo "shared_hf_cache_dir=${NYMPHS3D_HF_CACHE_DIR}"
 
-"${python_bin}" - "${repo_id}" "${NYMPHS_SPRITE_DEPTH_MODELS_DIR}" <<'PY'
+"${python_bin}" - "${repo_id}" "${NYMPHS3D_HF_CACHE_DIR}" <<'PY'
 from __future__ import annotations
 
 import sys
@@ -54,9 +55,9 @@ except Exception as exc:
     ) from exc
 
 repo_id = sys.argv[1]
-target_dir = Path(sys.argv[2]).expanduser()
-target_dir.mkdir(parents=True, exist_ok=True)
-local_dir = target_dir / repo_id.replace("/", "--")
+cache_dir = Path(sys.argv[2]).expanduser()
+cache_dir.mkdir(parents=True, exist_ok=True)
+local_dir = cache_dir / f"models--{repo_id.replace('/', '--')}"
 
 def format_bytes(value: int) -> str:
     size = float(max(value, 0))
@@ -114,8 +115,6 @@ thread.start()
 try:
     path = snapshot_download(
         repo_id=repo_id,
-        local_dir=str(local_dir),
-        local_dir_use_symlinks=False,
         allow_patterns=[
             "*.json",
             "*.txt",
@@ -132,4 +131,5 @@ finally:
 print(f"MODEL FETCH COMPLETE: step=1/1 repo={repo_id}", flush=True)
 print(f"repo_id={repo_id}")
 print(f"depth_model_path={path}")
+print(f"shared_hf_cache_dir={cache_dir}")
 PY

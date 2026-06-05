@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.17 - 2026-06-05
+
+- Rebuilt `foundry_character_presets.json` from the original 92-entry Sprite
+  Foundry export roster only, removing non-roster local character configs from
+  the Manager dropdown.
+- Kept original roster labels in the UI and disabled roster entries whose local
+  Foundry prompt/source config is not available yet.
+- Moved staged ControlNet and Depth Anything downloads onto the same shared
+  Hugging Face cache convention used by Nymphs Image, TRELLIS, and Pixal3D.
+- Made the module generation bridge auto-start Nymphs Image/Z-Image when the
+  `/server_info` probe is offline, and made the UI fail over quickly instead
+  of waiting on a dead `/generate` request.
+- Updated manifest/docs to report shared model cache roots and the exact roster
+  contract.
+
 ## 0.1.16 - 2026-06-05
 
 - Added a Sprite-facing fetch bridge to the shared Nymphs Image / Z-Image model

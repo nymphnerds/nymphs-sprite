@@ -164,12 +164,12 @@ profiles/foundry_character_presets.json
 profiles/foundry_export_roster.json
 ```
 
-  The catalog preserves available local Foundry `pipeline/chars` prompts,
-  negative prompts, seeds, roles, body classes, body locks, reject conditions,
-  pack metadata, and source config paths. The public Foundry roster has 92
-  export packs; `foundry_export_roster.json` carries that lane/subject target.
-  The local fork currently provides prompt configs for the selectable generation
-  presets, while roster-only entries remain parity targets.
+  The catalog is roster-first: it contains the original 92 Foundry production
+  export packs and no extra local character configs. Entries with matching
+  local Foundry `pipeline/chars` prompts preserve negative prompts, seeds,
+  roles, body classes, body locks, reject conditions, pack metadata, and source
+  config paths. Roster-only entries remain visible but disabled for direct
+  generation until their prompt configs are available or reconstructed.
 - `Generate Sources` belongs to the Z-Image section. The intended review loop
   is:
 
@@ -224,8 +224,9 @@ Individual choices      -> backend weight only, LoRA only, ControlNet only, Dept
 ```
 
 - The actual model/LoRA files are not committed into git. The module owns the
-  recipes, UI choices, paths, fetch scripts, status, and delete behavior; fetched
-  assets live under the declared module/cache roots.
+  recipes, UI choices, paths, fetch scripts, status, and delete behavior. Shared
+  Hugging Face model assets live under `$HOME/NymphsData/cache/huggingface`;
+  Sprite LoRAs live under `$HOME/LoRA/loras/nymphs-sprite`.
 - Complete fetch leaves `tarn59_pixel_art` selected by default for first-run
   generation. A one-direction smoke test passed with tarn59 on Z-Image INT4
   r32. The `mks0813_pixel_art` file is kept as an alternate asset, but currently

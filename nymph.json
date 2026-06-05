@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -29,9 +29,9 @@
     "outputs_root": "$HOME/NymphsData/outputs/nymphs-sprite",
     "config_root": "$HOME/NymphsData/config/nymphs-sprite",
     "logs_root": "$HOME/NymphsData/logs/nymphs-sprite",
-    "models_root": "$HOME/NymphsData/models/nymphs-sprite",
-    "controlnet_root": "$HOME/NymphsData/models/nymphs-sprite/controlnet",
-    "depth_models_root": "$HOME/NymphsData/models/nymphs-sprite/depth",
+    "models_root": "$HOME/NymphsData/cache/huggingface",
+    "controlnet_root": "$HOME/NymphsData/cache/huggingface/models--alibaba-pai--Z-Image-Turbo-Fun-Controlnet-Union",
+    "depth_models_root": "$HOME/NymphsData/cache/huggingface/models--depth-anything--Depth-Anything-V2-Small-hf",
     "shared_zimage_huggingface_cache": "$HOME/NymphsData/cache/huggingface",
     "shared_zimage_config_root": "$HOME/NymphsData/config/zimage",
     "profiles_root": "$HOME/Nymphs-Sprite/profiles",
@@ -105,7 +105,7 @@
         "entrypoint": "fetch_assets",
         "result": "show_logs",
         "visibility": "installed",
-        "description": "Download everything Sprite needs from one dropdown. The complete stack fetches the shared Z-Image INT4 r32 backend through Nymphs Image's cache plus Sprite's LoRAs, staged ControlNet Union, and Depth Anything assets. Backend model choices and Sprite-only asset choices remain available for repair/testing.",
+        "description": "Download everything Sprite needs from one dropdown. The complete stack fetches the shared Z-Image INT4 r32 backend through Nymphs Image's cache plus Sprite's LoRAs, staged ControlNet Union, and Depth Anything assets. Hugging Face models use the same shared cache as Nymphs Image, TRELLIS, and Pixal3D; Sprite LoRAs use the shared LoRA library.",
         "links": [
           {
             "label": "Z-Image Turbo",
@@ -294,6 +294,7 @@
     "v0.1.13 rewires source generation to call Z-Image /generate directly like Nymphs Image, leaving Manager module actions for status, folders, and Foundry-style post-processing.",
     "v0.1.14 replaces the small hand-written prompt sample with a generated Sprite Foundry character preset catalog and aligns source prompt composition with the Foundry NymphsCore runner.",
     "v0.1.15 adds module actions for the canonical Sprite Foundry fork flow, including Foundry status/verify and generate-nymphscore from imported presets.",
-    "v0.1.16 adds a Sprite-facing Model Fetch action that delegates to the shared Nymphs Image / Z-Image fetcher and cache before first run, and leaves the Nunchaku-compatible tarn59 LoRA selected after complete fetches."
+    "v0.1.16 adds a Sprite-facing Model Fetch action that delegates to the shared Nymphs Image / Z-Image fetcher and cache before first run, and leaves the Nunchaku-compatible tarn59 LoRA selected after complete fetches.",
+    "v0.1.17 rebuilds the prompt preset catalog from the original 92-entry Foundry export roster only and moves staged ControlNet/Depth downloads onto the shared Hugging Face cache."
   ]
 }
