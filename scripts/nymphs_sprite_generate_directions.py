@@ -10,8 +10,10 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 import re
 import shutil
+import subprocess
 import time
 import urllib.error
 import urllib.request
@@ -40,7 +42,22 @@ STYLE_SUFFIX = (
 NEGATIVE_BG = "white background, gray background, grey background, beige background, gradient background"
 
 
-def request_json(method: str, url: str, payload: dict[str, Any] | None = None, timeout: int = 1800) -> dict[str, Any]:
+class RequestJsonError(RuntimeError):
+    def __init__(self, method: str, url: str, status: int | None, body: str):
+        self.method = method
+        self.url = url
+        self.status = status
+        self.body = body
+        status_text = f"HTTP {status}" if status is not None else "request error"
+        super().__init__(f"ERROR: {method} {url} failed with {status_text}: {body}")
+
+
+def request_json_raw(
+    method: str,
+    url: str,
+    payload: dict[str, Any] | None = None,
+    timeout: int = 1800,
+) -> dict[str, Any]:
     data = None
     headers = {"Accept": "application/json"}
     if payload is not None:
@@ -52,9 +69,59 @@ def request_json(method: str, url: str, payload: dict[str, Any] | None = None, t
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
-        raise SystemExit(f"ERROR: {method} {url} failed with HTTP {exc.code}: {body}") from exc
+        raise RequestJsonError(method, url, exc.code, body) from exc
     except urllib.error.URLError as exc:
-        raise SystemExit(f"ERROR: cannot reach {url}: {exc.reason}") from exc
+        raise RequestJsonError(method, url, None, str(exc.reason)) from exc
+
+
+def request_json(method: str, url: str, payload: dict[str, Any] | None = None, timeout: int = 1800) -> dict[str, Any]:
+    try:
+        return request_json_raw(method, url, payload=payload, timeout=timeout)
+    except RequestJsonError as exc:
+        if exc.status is None:
+            raise SystemExit(f"ERROR: cannot reach {url}: {exc.body}") from exc
+        raise SystemExit(str(exc)) from exc
+
+
+def rank_shape_mismatch(body: str) -> bool:
+    text = body.lower()
+    return (
+        "trying to set a tensor of shape" in text
+        and "qkv_proj_down" in text
+        and "3840, 128" in text
+    )
+
+
+def zimage_restart_script() -> Path:
+    candidates = []
+    for raw in [
+        os.environ.get("NYMPHS_SPRITE_ZIMAGE_ROOT"),
+        os.environ.get("ZIMAGE_INSTALL_ROOT"),
+        str(Path.home() / "Z-Image"),
+    ]:
+        if raw:
+            candidates.append(Path(raw).expanduser() / "scripts" / "zimage_restart.sh")
+    for path in candidates:
+        if path.is_file():
+            return path
+    raise SystemExit("ERROR: Z-Image restart script was not found under $HOME/Z-Image/scripts.")
+
+
+def restart_zimage_for_rank_recovery(zimage_url: str, args: argparse.Namespace) -> None:
+    script = zimage_restart_script()
+    print(
+        "zimage_rank_mismatch_recovery="
+        f"restart precision={args.nunchaku_precision} rank={args.nunchaku_rank}"
+    )
+    subprocess.run([str(script)], check=True, timeout=180)
+    for _attempt in range(90):
+        time.sleep(1.0)
+        try:
+            request_json("GET", f"{zimage_url.rstrip('/')}/health", timeout=5)
+            return
+        except SystemExit:
+            continue
+    raise SystemExit("ERROR: Z-Image did not come back after rank-mismatch restart.")
 
 
 def latest_lora_path(zimage_url: str) -> str | None:
@@ -93,6 +160,24 @@ def ensure_zimage_model_loaded(zimage_url: str, args: argparse.Namespace) -> Non
         )
         return
     raise SystemExit(f"ERROR: Z-Image did not load the selected model: {response}")
+
+
+def generate_with_rank_recovery(
+    zimage_url: str,
+    payload: dict[str, Any],
+    args: argparse.Namespace,
+    recovered: bool = False,
+) -> dict[str, Any]:
+    url = f"{zimage_url.rstrip('/')}/generate"
+    try:
+        return request_json_raw("POST", url, payload=payload)
+    except RequestJsonError as exc:
+        if exc.status in {400, 500} and rank_shape_mismatch(exc.body) and not recovered:
+            print("zimage_rank_mismatch_retry=stale transformer detected; restarting shared Z-Image backend")
+            restart_zimage_for_rank_recovery(zimage_url, args)
+            ensure_zimage_model_loaded(zimage_url, args)
+            return generate_with_rank_recovery(zimage_url, payload, args, recovered=True)
+        raise SystemExit(str(exc)) from exc
 
 
 def load_profile(path: Path) -> dict[str, Any]:
@@ -702,7 +787,7 @@ def main() -> int:
             "item_total": len(direction_names),
         }
         print(f"generate={direction} seed={payload['seed']}")
-        response = request_json("POST", f"{zimage_url}/generate", payload=payload)
+        response = generate_with_rank_recovery(zimage_url, payload, args)
         outputs.append(response)
         generated.append(
             {
