@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -295,6 +295,7 @@
     "v0.1.14 replaces the small hand-written prompt sample with a generated Sprite Foundry character preset catalog and aligns source prompt composition with the Foundry NymphsCore runner.",
     "v0.1.15 adds module actions for the canonical Sprite Foundry fork flow, including Foundry status/verify and generate-nymphscore from imported presets.",
     "v0.1.16 adds a Sprite-facing Model Fetch action that delegates to the shared Nymphs Image / Z-Image fetcher and cache before first run, and leaves the Nunchaku-compatible tarn59 LoRA selected after complete fetches.",
-    "v0.1.17 rebuilds the prompt preset catalog from the original 92-entry Foundry export roster only and moves staged ControlNet/Depth downloads onto the shared Hugging Face cache."
+    "v0.1.17 rebuilds the prompt preset catalog from the original 92-entry Foundry export roster only and moves staged ControlNet/Depth downloads onto the shared Hugging Face cache.",
+    "v0.1.18 loads the selected Z-Image INT4 r32 model before Sprite generation and falls back from stale mks0813 LoRA selection to the runtime-compatible tarn59 LoRA when available."
   ]
 }

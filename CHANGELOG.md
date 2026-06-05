@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.18 - 2026-06-05
+
+- Load the selected Z-Image Turbo INT4 r32 model through `/api/model/load`
+  before calling `/generate`, fixing first-run failures where the server was
+  online but no model was loaded.
+- Fall back from stale `mks0813_pixel_art` LoRA selection to the downloaded
+  runtime-compatible `tarn59_pixel_art` LoRA when present.
+- Updated direct UI generation to use INT4 r32 and perform the same model-load
+  preflight before generation.
+
 ## 0.1.17 - 2026-06-05
 
 - Rebuilt `foundry_character_presets.json` from the original 92-entry Sprite

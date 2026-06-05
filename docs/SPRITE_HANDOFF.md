@@ -1,531 +1,359 @@
 # Nymphs Sprite Handoff
 
-Last updated: 2026-05-30
+Last updated: 2026-06-05
 
-## North Star
+## Goal
 
-Build `nymphs-sprite` as the NymphsCore module that adapts Sprite Foundry's
-local sprite pipeline into a Nymphs-native workflow.
-
-The target is not to run ComfyUI. The target is:
+Build `nymphs-sprite` as the NymphsCore module version of Sprite Foundry:
 
 ```text
-Nymphs Sprite UI
-  -> Nymphs Image / Z-Image Turbo / Nunchaku
-  -> Z-Image Turbo pixel-art LoRA
-  -> Foundry-style post-process
-  -> transparent albedo sprites, sheets, gates, exports
-  -> later: depth, normal, morphology/control parity
+Sprite Foundry flow
+  -> Nymphs Manager UI
+  -> Nymphs Image / Z-Image generation
+  -> Foundry-style review, gates, maps, and export
 ```
 
-## Repo Map
+Do not make ComfyUI a runtime dependency. The original ComfyUI graphs are a
+parity map only.
+
+## Current Published State
+
+`nymphs-sprite` is published to the dev registry at `0.1.17`.
+
+Raw manifest:
 
 ```text
-nymphnerds/nymphs-sprite
-  NymphsCore module surface, Manager page, sprite LoRA fetch, sprite runner.
-  Current workspace target: v0.1.14, module UI is being tightened against the
-  Nymphs Image rail/stage standard and Sprite Foundry's source-review flow.
-
-nymphnerds/sprite-foundry
-  Fork of mcp-tool-shop-org/sprite-foundry. Full upstream orchestration
-  reference and adaptation lab.
-  Current reference commit in this workspace: fb43975.
-
-nymphnerds/zimage
-  Nymphs Image runtime. Owns Z-Image Turbo, Nunchaku, LoRA loading, Qwen Image
-  Edit, model fetch/delete, and Hugging Face cache path.
-  Current pushed commit: fafa1e3, version 0.1.101.
-
-nymphnerds/NymphsCore
-  Manager shell and module-detail UX.
-  Current pushed commit: e961bc6, Manager 0.9.72.
-
-nymphnerds/nymphs-registry
-  Public/dev registry.
-  Dev registry entry points at nymphs-sprite main and is bumped with each
-  module release.
+https://raw.githubusercontent.com/nymphnerds/nymphs-sprite/main/nymph.json
 ```
 
-## Current Decisions
-
-- `nymphs-sprite` stays its own module and registry entry.
-- Sprite Foundry is the reference system; useful orchestration should be ported
-  or called intentionally, not re-invented casually.
-- ComfyUI workflows are parity/reference material only.
-- First generation path is Z-Image Turbo through Nymphs Image.
-- Pixel art should use a Z-Image Turbo-compatible LoRA, not the original SDXL
-  Pixel Art XL LoRA.
-- Sprite output size is user-selectable, not fixed at 48px.
-- Default sprite target is `96`; allowed range is `24..512`.
-- Nymphs Sprite owns sprite-specific LoRAs/config/output. Nymphs Image owns
-  base model and quantized weight fetching.
-- Nymphs Sprite exposes those shared backend model choices through its own
-  native `Model Fetch` dropdown, but delegates actual backend downloads to the
-  same Nymphs Image / Z-Image fetcher and Hugging Face cache.
-
-## Proven State
-
-Nymphs Image / Z-Image:
-
-- `zimage` is installed and running in the test WSL at `0.1.101`.
-- Runtime status reports:
+Raw manifest hash:
 
 ```text
-models_ready=true
-zimage_ready=true
-weight_profile_selected=zimage_int4_r32
-weight_profiles_downloaded=zimage_int4_r32
+375ec6ff17ad5feb726276946cedd6d174ba713f12713591cafc7de99ee0c1c8
 ```
 
-- The bad duplicate runtime cache path is fixed. Runtime/fetch status now use:
+Latest module commit when this handoff was written:
+
+```text
+4dbce59 Fix Sprite roster presets and shared model cache
+```
+
+Dev registry commit:
+
+```text
+9e86936 Update dev registry for nymphs-sprite 0.1.17
+```
+
+## Repos
+
+```text
+NymphsModules/nymphs-sprite
+  Manager-facing Nymph module, fetch actions, sprite UI, post-process runner.
+
+NymphsModules/sprite-foundry
+  Nymphs fork of upstream Sprite Foundry. Keeps Foundry DB, run/attempt model,
+  gates, review concepts, map/finish/export commands, and adds
+  foundry generate-nymphscore.
+
+NymphsModules/zimage
+  Nymphs Image backend. Owns Z-Image Turbo runtime, Nunchaku, LoRA loading,
+  backend model fetch, and the shared Hugging Face cache.
+```
+
+## Model And Data Boundaries
+
+Do not create new model directories for Sprite.
+
+Shared Hugging Face model cache:
 
 ```text
 $HOME/NymphsData/cache/huggingface
+$HOME/NymphsData/cache/huggingface-home
 ```
 
-not:
+Shared Z-Image generation preset:
 
 ```text
-$HOME/.cache/huggingface/hub
+$HOME/NymphsData/config/zimage/generation-preset.env
 ```
 
-- A fresh model load completed successfully after the fix. The log showed
-  pipeline components and checkpoint shards loading, then:
+Sprite LoRA library:
 
 ```text
-POST /api/model/load HTTP/1.1" 200 OK
+$HOME/LoRA/loras/nymphs-sprite
 ```
 
-- The latest slow-looking load did not show a new duplicate default-cache fetch.
-  It was model/pipeline initialization with coarse UI progress around `8%`.
-
-Manager / model cache UX:
-
-- Manager `0.9.72` renders downloaded weight profiles in the `// MODEL CACHE`
-  detail area as clickable items.
-- Clicking a cached weight asks for confirmation, then calls the module-owned
-  delete action:
-
-```bash
-scripts/zimage_delete_models.sh --profile <profile> --yes
-```
-
-- `zimage_delete_models.sh` validates profile ids against an allow-list and
-  deletes only the selected cached weight/blob.
-- The module guide documents this contract.
-- Right-rail `Delete Data` remains separate and must not delete shared model
-  caches.
-
-Nymphs Sprite module:
-
-- Installs as:
+Sprite module config/output/log roots:
 
 ```text
-$HOME/Nymphs-Sprite
+$HOME/NymphsData/config/nymphs-sprite
+$HOME/NymphsData/outputs/nymphs-sprite
+$HOME/NymphsData/logs/nymphs-sprite
 ```
 
-- Manager UI lives at:
+`Model Fetch -> Complete Sprite Stack` fetches:
 
 ```text
-ui/manager.html
+Z-Image INT4 r32 backend through Nymphs Image's fetcher
+mks0813 pixel-art LoRA
+tarn59 pixel-art LoRA
+ControlNet Union asset into shared HF cache
+Depth Anything V2 Small asset into shared HF cache
 ```
 
-- `ui/manager.html` now follows the Nymphs Image custom UI pattern:
+Complete fetch leaves `tarn59_pixel_art` selected. Keep it that way: it passed
+a one-direction smoke test. `mks0813_pixel_art` is retained as an alternate but
+currently fails Nunchaku LoRA composition with a tensor-shape mismatch.
 
-```text
-left rail  -> runtime, prompt, Z-Image controls, LoRA choice, sprite controls
-right pane -> image preview stage, progress, generated batch strip, compact log
-```
-
-- The sidebar width and collapse point are copied from Nymphs Image:
-
-```css
-grid-template-columns: clamp(260px, 28vw, 300px) minmax(300px, 1fr);
-@media (max-width: 600px)
-```
-
-- The old generic dashboard/card layout is gone. Module-owned shell work uses
-  the Manager WebView2 bridge; Z-Image source generation should call the
-  Z-Image HTTP API directly like Nymphs Image does. The page does not run shell
-  directly and does not add its own bottom chrome.
-- Asset fetching is not in the custom generation UI. It belongs to the module
-  detail action group.
-- LoRA selection is in the custom generation UI because it is part of the
-  Sprite Foundry-style run contract: choose the style/LoRA, then generate raw
-  source directions, then post-process the batch.
-- Prompt selection is a single module-specific preset dropdown, not the full
-  general Nymphs Image Subject/Style/View composer. Presets now come from
-  Sprite Foundry character JSON `subject_prompt` / `negative_prompt` material.
-- The prompt preset dropdown should be treated as a Foundry subject-config
-  selector. It is now backed by:
-
-```text
-profiles/foundry_character_presets.json
-profiles/foundry_export_roster.json
-```
-
-  The catalog is roster-first: it contains the original 92 Foundry production
-  export packs and no extra local character configs. Entries with matching
-  local Foundry `pipeline/chars` prompts preserve negative prompts, seeds,
-  roles, body classes, body locks, reject conditions, pack metadata, and source
-  config paths. Roster-only entries remain visible but disabled for direct
-  generation until their prompt configs are available or reconstructed.
-- `Generate Sources` belongs to the Z-Image section. The intended review loop
-  is:
-
-```text
-choose Foundry-style prompt + LoRA
-  -> generate Z-Image source directions through Z-Image /generate
-  -> preview/pick images in the strip
-  -> run Foundry-style sprite post-process through module action
-```
-
-- The preview strip should match Nymphs Image behavior: browse the current
-  generated batch, choose a local image folder, click one image into the main
-  preview, and select/clear visible thumbnails for review.
-- The strip now has a module-owned `list_outputs` action that reads recent
-  Z-Image outputs through the Z-Image `/api/outputs` endpoint because the
-  module UI is local HTML, not served directly by Z-Image.
-- If checked strip items are managed file paths, `Generate + Process` now
-  post-processes those selected source images instead of generating a fresh
-  set. Browser-picked folders remain preview/select only unless their absolute
-  paths are later bridged by Manager.
-- Custom UI post-process arguments must respect Manager's module-action filter:
-  values are max 256 chars and only shell-safe characters are allowed. Long
-  prompts, LoRA trigger/path values, and selected source-image lists are passed
-  as base64url chunks and decoded by `nymphs_sprite_generate_directions.sh`.
-  Direction lists use `+` instead of comma for the same reason.
-- Do not send source-image generation through Manager module actions. That
-  bridge is single-action and collides with status/output refresh actions,
-  causing `Manager is busy with another module action.` Source generation is
-  Z-Image-owned and should use HTTP `POST /generate` when the WebView permits
-  it. Because the sprite UI is Manager `local_html` rather than Z-Image-served
-  HTML, keep a queued Manager-action fallback for CORS/WebView cases.
-- The Nymphs Image forest background is copied into the module and referenced
-  from installed Manager HTML as a `file://` URI. Do not inline it as a data URI:
-  that made the HTML too large for WebView2 `NavigateToString` and caused
-  "Value does not fall within the expected range."
-
-- Selected LoRA config is stored at:
+Selected LoRA config:
 
 ```text
 $HOME/NymphsData/config/nymphs-sprite/selected_lora.env
 ```
 
-- Fetch now follows the module guide: one native compact `Model Fetch` dropdown
-  owns first-run preparation and repair choices:
+## Preset State
+
+The Manager preset dropdown is roster-pure:
 
 ```text
-Complete Sprite Stack   -> Z-Image INT4 r32 + mks0813 LoRA + tarn59 LoRA + ControlNet Union + Depth Anything
-                         -> leaves tarn59 selected
-Complete Sprite Assets  -> mks0813 LoRA + tarn59 LoRA + ControlNet Union + Depth Anything
-                         -> leaves tarn59 selected
-Individual choices      -> backend weight only, LoRA only, ControlNet only, Depth only
+profiles/foundry_export_roster.json       original 92 production export packs
+profiles/foundry_character_presets.json   same 92 entries, enriched where configs exist
 ```
 
-- The actual model/LoRA files are not committed into git. The module owns the
-  recipes, UI choices, paths, fetch scripts, status, and delete behavior. Shared
-  Hugging Face model assets live under `$HOME/NymphsData/cache/huggingface`;
-  Sprite LoRAs live under `$HOME/LoRA/loras/nymphs-sprite`.
-- Complete fetch leaves `tarn59_pixel_art` selected by default for first-run
-  generation. A one-direction smoke test passed with tarn59 on Z-Image INT4
-  r32. The `mks0813_pixel_art` file is kept as an alternate asset, but currently
-  fails Nunchaku LoRA composition with a rank/shape mismatch.
-
-- Fetch output follows the module guide:
+Current counts:
 
 ```text
-MODEL FETCH STARTED
-MODEL FETCH STATUS ... this_repo_cache=... active_download_files=...
-MODEL FETCH COMPLETE
+92 roster entries total
+51 generation-ready entries with local prompt/source configs
+41 roster-only entries disabled until configs are imported or reconstructed
+0 extra h3d/local/duplicate entries
+0 "Foundry Character" labels
 ```
 
-- The Manager action group intentionally uses the existing `fetch_lora`
-  capability with an `--asset` argument. This keeps the Fetch button enabled in
-  Manager sessions that have refreshed controls but still hold older capability
-  data.
+Do not add non-roster configs to the visible dropdown. If a local config is not
+in the original roster, it belongs in research/debug notes, not the production
+preset surface.
 
-- The default `mks0813/z-image-turbo-pixel-art-lora` file is currently:
+## What Works Now
+
+The current usable module flow is:
 
 ```text
-epoch-1.safetensors
+install/update from dev registry
+  -> Model Fetch / Complete Sprite Stack
+  -> open Nymphs Sprite UI
+  -> select generation-ready roster preset
+  -> select LoRA
+  -> Generate Sources
+  -> preview/pick source images
+  -> Generate + Process
 ```
 
-  The Hugging Face model card still shows the older
-  `z-image-turbo-pixel-art-lora.safetensors` example, but the live repo file
-  list does not contain that filename.
+Implemented pieces:
 
-- Status reports local sprite assets so the Manager can show what is already
-  downloaded:
+- Nymphs Image-style Manager UI.
+- Roster preset dropdown.
+- LoRA selection from downloaded Sprite LoRAs.
+- Fast source generation path through Z-Image `/generate`.
+- Module-action fallback for WebView/CORS cases.
+- Fast `/server_info` probe before direct `/generate`.
+- Module bridge auto-starts Z-Image when offline.
+- Foundry-style Python post-process:
+  - copy raw source images
+  - background/green-screen cleanup
+  - foreground crop
+  - square pad
+  - nearest-neighbor resize
+  - transparent albedo PNG
+  - previews/contact sheet
+  - `sprite_batch.json`
+  - basic mechanical checks
+- Foundry bridge action:
+  - `foundry_generate`
+  - wraps `python3 -m foundry.cli generate-nymphscore`
+  - uses selected imported preset `source_config`
 
-```text
-downloaded_loras=...
-lora_files=...
-downloaded_models=...
-weight_profiles_downloaded=...
-controlnet_ready=...
-depth_models_ready=...
-```
-
-- Sprite LoRA cache deletion is module-owned:
-
-```bash
-scripts/nymphs_sprite_delete_models.sh --profile <lora_profile> --yes
-```
-
-- Generated batches write under:
+Current output roots:
 
 ```text
 $HOME/NymphsData/outputs/nymphs-sprite/<subject-id>/<batch-id>
+NymphsModules/sprite-foundry/bakeoff/<run_id>
 ```
 
-- Current batch artifacts:
+## What Is Not Full Flow Yet
+
+The original Sprite Foundry full flow is not complete in Manager yet.
+
+Missing Manager-visible lifecycle pieces:
+
+- `review-show`
+- raw/pixel accept
+- raw/pixel reject
+- regen loop
+- produce depth/normal/finish artifacts
+- finish board
+- deterministic export
+- export manifest/checksum surfacing
+- Foundry run browser/status board in the Sprite UI
+
+Missing backend parity:
+
+- Real Z-Image ControlNet/morphology conditioning is not proven.
+- Depth Anything is fetched/staged but not wired as a full per-direction map
+  stage in the module.
+- Normal maps are not proven.
+- Godot finish-lab parity is not wired.
+
+## ControlNet Reality
+
+Sprite Foundry used ComfyUI ControlNet/depth/canny paths to lock morphology,
+especially for monster and non-humanoid lanes.
+
+Current Nymphs reality:
 
 ```text
-directions/
-contact_sheet.png
-sprite_batch.json
+Z-Image/Nunchaku generation works.
+Z-Image Turbo LoRA loading works with tarn59.
+Z-Image ControlNet assets can be fetched.
+No working Z-Image ControlNet pipeline path has been proven in the current
+Nymphs Image runtime.
 ```
 
-- Foundry-style Python post-process exists:
-  background cleanup, foreground crop, square pad, nearest-neighbor sprite
-  resize, transparent albedo output, preview/contact sheets, and mechanical
-  checks.
-- Direct UI generation and module-bridge generation should use the same
-  Foundry NymphsCore prompt shape:
+Do not promise ControlNet parity, GLB, game-mesh, or full Foundry export parity
+until those paths are proven.
+
+Likely short-term replacement strategy:
 
 ```text
-<lora trigger>, <subject prompt>, <direction prompt>,
-pixel art sprite, game character sprite, 2D RPG, clean readable silhouette,
-centered full body character, isolated figure, bright green background,
-crisp sprite design, HD-2D inspired, single character only
+generate albedo/source first
+  -> derive depth with Depth Anything
+  -> derive normals from depth
+  -> use post-process / Qwen-edit-style refinement where needed
+  -> revisit ControlNet if Nunchaku or diffusers exposes a usable Z-Image path
 ```
 
-  Negative prompts should append:
+## Full Target Flow
+
+The target Manager flow should become:
 
 ```text
-white background, gray background, grey background, beige background, gradient background
+select original Foundry roster preset
+  -> select backend and LoRA
+  -> generate 8 source directions
+  -> inspect raw/pixel contact sheets
+  -> accept/reject/regen attempts
+  -> produce depth and normal maps
+  -> inspect finish board
+  -> export deterministic Foundry pack
 ```
 
-Sprite Foundry fork:
-
-- `foundry generate-nymphscore` exists.
-- It calls Nymphs Image instead of ComfyUI for generation.
-- It registers per-direction seeds.
-- `foundry_maps.py` follows run `sprite_target` instead of hard-coded `48`.
-- `verify.sh` passes with Python 3 fallback.
-
-## Model And Fetch Boundaries
-
-Nymphs Image owns:
+Target filesystem/export contract:
 
 ```text
-Tongyi-MAI/Z-Image-Turbo
-nunchaku-ai/nunchaku-z-image-turbo
-Qwen/Qwen-Image-Edit-2511
-QuantFunc/Nunchaku-Qwen-Image-EDIT-2511
+bakeoff/<run_id>/
+  raw images
+  pixel sprites
+  contact sheets
+  recipe.json
+  manifest.json
+
+exports/<subject_slug>/<run_id>/
+  albedo/
+  normal/
+  depth/
+  preview/
+  manifest.json
+  checksums
 ```
 
-Nymphs Image fetch choices:
+## Next Build Steps
+
+1. Test `0.1.17` from the dev registry in the managed/test WSL.
+   - Update through Manager only.
+   - Do not manually sync installed files.
+   - Run `Model Fetch -> Complete Sprite Stack`.
+   - Confirm status shows shared HF cache and `selected_lora_candidate=tarn59_pixel_art`.
+   - Generate one enabled preset, preferably `Goblin Scout`.
+
+2. Promote Foundry lifecycle actions into `nymphs-sprite`.
+   - Add scripts/actions for:
+     - `foundry_review_show`
+     - `foundry_accept`
+     - `foundry_reject`
+     - `foundry_regen`
+     - `foundry_produce`
+     - `foundry_export`
+   - Keep the Foundry DB and lifecycle logic inside `sprite-foundry`.
+   - Keep the Sprite UI as the Manager workbench.
+
+3. Add a Foundry run browser to `ui/manager.html`.
+   - Show latest run id, subject, state, gate result, attempt count.
+   - Show raw/pixel/contact-sheet artifacts.
+   - Expose accept/reject/regen/produce/export commands.
+
+4. Wire map production carefully.
+   - Validate `foundry_maps.py` after the `sprite_target` changes.
+   - Confirm depth outputs are generated at the selected sprite size.
+   - Add normal derivation only after depth is stable.
+
+5. Revisit morphology/control.
+   - Audit current Nymphs Image, Nunchaku, and diffusers APIs.
+   - If no Z-Image ControlNet path exists, document the two-pass fallback and
+     keep ControlNet assets staged but not advertised as working.
+
+6. Reconstruct the 41 missing roster configs.
+   - Keep them original-roster only.
+   - Do not pollute the dropdown with local debug configs.
+   - Mark entries generation-ready only when a prompt/source config exists.
+
+## Test Commands
+
+Static checks:
+
+```bash
+python3 -m json.tool /home/nymph/NymphsModules/nymphs-sprite/nymph.json
+python3 -m json.tool /home/nymph/NymphsModules/nymphs-sprite/profiles/foundry_character_presets.json
+bash -n /home/nymph/NymphsModules/nymphs-sprite/scripts/nymphs_sprite_generate_directions.sh
+python3 -m py_compile /home/nymph/NymphsModules/nymphs-sprite/scripts/nymphs_sprite_generate_directions.py
+bash /home/nymph/NymphsModules/sprite-foundry/verify.sh
+```
+
+Preset sanity:
+
+```bash
+python3 - <<'PY'
+import json
+from pathlib import Path
+p = Path('/home/nymph/NymphsModules/nymphs-sprite/profiles/foundry_character_presets.json')
+d = json.loads(p.read_text())
+items = d['presets']
+print('total', len(items))
+print('ready', sum(1 for x in items if x.get('generation_ready')))
+print('foundry_labels', sum('Foundry Character' in x.get('label', '') for x in items))
+print('h3d', sum(x['id'].startswith('h3d_') for x in items))
+PY
+```
+
+Expected:
 
 ```text
-Complete INT4 package
-  Z-Image Turbo base + INT4 Z-Image weights + INT4 Qwen Edit weights
-
-Complete FP4 package
-  Z-Image Turbo base + FP4 Z-Image weights + FP4 Qwen Edit weights
-
-Individual choices
-  available for partial install, testing, and repair
+total 92
+ready 51
+foundry_labels 0
+h3d 0
 ```
 
-These are hardware/runtime choices, not sprite modes.
+## Rules To Preserve
 
-Nymphs Sprite owns:
-
-```text
-Z-Image Turbo pixel-art LoRAs
-sprite-specific generation defaults
-sprite post-process config
-future morphology/depth/control references
-```
-
-LoRA paths:
-
-```text
-$HOME/LoRA/loras
-$HOME/LoRA/loras/nymphs-sprite
-```
-
-## Sprite Output Policy
-
-Keep these rules:
-
-- Generate from Z-Image at a practical source size for quality.
-- Preserve raw generated images.
-- Post-process down to `sprite_target` with nearest-neighbor resizing.
-- Never hard-code `48`.
-- Store selected target size in batch metadata.
-- Use `96` as the first-test default.
-- Keep broad output range available: `24..512`.
-
-Expected per-direction outputs:
-
-```text
-raw source image
-cleaned transparent albedo
-preview/composited image
-future depth map
-future normal map
-```
-
-## Python Post-Process Contract
-
-Keep post-process as ordinary Python so it can run without ComfyUI.
-
-Current responsibilities:
-
-- load generated direction image
-- identify/remove simple background when possible
-- build alpha mask
-- crop to foreground bounds
-- square-pad around the subject
-- resize to `sprite_target` with nearest-neighbor sampling
-- write transparent PNG albedo
-- write preview PNG
-- write contact sheet
-- write `sprite_batch.json`
-- run mechanical checks for file count, dimensions, transparency, non-empty
-  foreground, prompt/seed/LoRA/size/source metadata
-
-Next post-process improvements:
-
-- stronger background cleanup options
-- configurable padding
-- per-direction crop consistency checks
-- palette assist / color-count reporting
-- optional indexed-color export
-- depth/normal artifact registration
-- export-pack writer compatible with Sprite Foundry expectations
-
-## Control, Depth, And Morphology Plan
-
-Do not make ComfyUI a runtime dependency. Use Sprite Foundry's ComfyUI workflow
-as a parity map.
-
-Sprite Foundry uses ComfyUI for:
-
-```text
-generation
-LoRA application
-ControlNet/morphology guidance
-depth preprocessing
-normal/depth map generation path
-history/artifact retrieval
-```
-
-Nymphs replacement order:
-
-1. Z-Image generation.
-   - Use Nymphs Image API.
-   - Use Z-Image Turbo/Nunchaku.
-   - Use selected Z-Image Turbo pixel-art LoRA.
-   - Preserve raw outputs.
-
-2. Sprite post-process.
-   - Cleanup, crop, resize, alpha, gates, contact sheet.
-   - Confirm quality before adding heavier control paths.
-
-3. Depth extraction.
-   - Check what Depth Anything/depth tooling is already available in
-     NymphsCore/Nymphs Image.
-   - Store depth per direction.
-   - Keep optional at first.
-
-4. Normal maps.
-   - Derive from depth unless a better native model path exists.
-   - Validate with a simple lighting preview.
-
-5. Morphology/control.
-   - Audit whether current Z-Image/Nunchaku exposes real ControlNet-like image
-     conditioning.
-   - If yes, expose reference controls.
-   - If no, use a two-pass strategy: generate albedo first, derive/refine maps
-     later with post-process/Qwen-edit style tools.
-
-6. Export parity.
-   - Match Foundry pack layout.
-   - Include albedo, depth, normal, manifest, checksums, subject metadata, run
-     provenance.
-
-## Foundry Parity Checklist
-
-Keep these ideas:
-
-- subject registry
-- deterministic run/attempt records
-- per-direction prompts and seeds
-- raw artifact preservation
-- mechanical gates
-- review sheets/contact sheets
-- accepted/rejected attempt lifecycle
-- depth/normal map derivation
-- deterministic export packs
-
-Replace these assumptions:
-
-- SDXL/Juggernaut checkpoint
-- SDXL Pixel Art XL LoRA
-- ComfyUI prompt/history API
-- ComfyUI ControlNet nodes
-- ComfyUI MiDaS/DepthAnything preprocessors
-
-## Immediate Next Work
-
-1. Install/update `nymphs-sprite` from the dev registry in the test WSL.
-   - Confirm module appears only in dev mode.
-   - Confirm the custom UI opens as a Nymphs Image-style rail/stage screen.
-   - Confirm the sidebar width and mobile collapse match Nymphs Image.
-   - Confirm the Model Fetch dropdown includes Complete Sprite Stack, Sprite-only assets, and individual repair choices.
-   - Confirm LoRA/ControlNet/Depth fetches use the compact progress display.
-   - Confirm downloaded LoRAs show in status/model cache after refresh.
-
-2. Pick and fetch the first Z-Image Turbo pixel-art LoRA.
-   - Store it under the sprite LoRA path.
-   - Confirm selected LoRA config is written.
-   - Confirm Nymphs Image can load/generate with it.
-
-3. Run the first small sprite batch.
-   - Backend: Z-Image Turbo INT4 r32.
-   - Target size: `96`.
-   - Subject: simple creature/gnome test.
-   - Output: one eight-direction batch.
-   - Confirm the right-side preview picks up `sprite_contact_sheet=` and
-     per-direction `output_*=` paths.
-   - Inspect raw outputs, transparent albedo files, and contact sheet.
-
-4. Compare against Sprite Foundry.
-   - Check crop behavior.
-   - Check background removal.
-   - Check alpha gates.
-   - Check direction consistency.
-   - Check sheet layout.
-
-5. Use the Foundry bridge for canonical lifecycle runs.
-   - Keep `nymphs-sprite` as the user-facing module.
-   - Keep `sprite-foundry` as the deeper orchestration/export engine.
-   - `Foundry Run` in the module UI calls `foundry_generate`, which wraps
-     `python3 -m foundry.cli generate-nymphscore` with the selected imported
-     preset's original `pipeline/chars/*.json` config.
-   - Keep the lighter `Generate Sources` / `Generate + Process` path for fast
-     module batch iteration and source-image review.
-
-## Do Not Forget
-
-- Preserve upstream Sprite Foundry attribution and MIT notices.
-- Do not put Sprite Foundry code into `nymphs-sprite` without updating third
-  party notices.
-- Do not make ComfyUI a dependency of Nymphs Sprite.
-- Do not assume model paths. Verify cache path, env, status, and runtime load.
-- Keep destructive cleanup module-owned.
-- Keep the module simple enough to test from a clean WSL.
+- Source work happens in the dev/source checkout.
+- Test WSL is for end-user testing only.
+- Do not manually edit installed module files, markers, cached manifests, or
+  runtime state.
+- Publish module first, verify raw `nymph.json`, then update registry.
+- Never advertise a version that is not pushed and raw-available.
+- Module install/update scripts own installed `nymph.json` and
+  `.nymph-module-version`.
+- Keep fetched models out of git.
+- Keep shared backend models in the shared Nymphs cache.
+- Keep Sprite LoRAs in the shared LoRA library.
+- Do not add ComfyUI as a dependency.
