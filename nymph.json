@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -308,6 +308,7 @@
     "v0.1.18 loads the selected Z-Image INT4 r32 model before Sprite generation and falls back from stale mks0813 LoRA selection to the runtime-compatible tarn59 LoRA when available.",
     "v0.1.19 switches Sprite LoRA fetches to the LoRA module's shared $HOME/LoRA/loras layout, uses the corrected mks0813/z-image-turbo-pixel-lora repo, and adds SkyAsl/Pixel-artist-Z alongside tarn59.",
     "v0.1.20 normalizes fetched Z-Image LoRA key prefixes for Nunchaku, resolves stale legacy selected-LoRA paths to the shared LoRA library before generation, and keeps the Foundry bridge on the same selected LoRA path contract.",
-    "v0.1.21 adds the Sprite UI Z-Image model/rank selector and normalizes shared-LoRA dropdown labels/triggers for mks0813, SkyAsl, and tarn59, including custom-discovered shared library paths."
+    "v0.1.21 adds the Sprite UI Z-Image model/rank selector and normalizes shared-LoRA dropdown labels/triggers for mks0813, SkyAsl, and tarn59, including custom-discovered shared library paths.",
+    "v0.1.22 keeps all three canonical Sprite LoRA candidates visible in the UI and marks missing shared-library files instead of hiding absent candidates from the dropdown."
   ]
 }

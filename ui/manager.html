@@ -945,6 +945,12 @@
       return loraMetadata[canonical]?.trigger || "";
     }
 
+    function loraAvailableIds(values) {
+      const available = list(values.weight_profiles_available).filter((id) => loraMetadata[id]);
+      if (available.length) return available;
+      return Object.keys(loraMetadata);
+    }
+
     function yes(value) {
       return String(value || "").toLowerCase() === "true";
     }
@@ -968,10 +974,11 @@
     function populateLoraChoices(values) {
       const select = $("lora-choice");
       const choices = loraChoices(values.lora_choices);
+      const choiceByCanonical = new Map(choices.map((choice) => [canonicalLoraId(choice.id, choice.path), choice]));
       const selectedId = values.selected_lora_candidate || values.weight_profile_selected || "";
       state.selectedLoraPath = values.selected_lora_path || "";
       select.innerHTML = "";
-      if (!choices.length) {
+      if (!choices.length && !loraAvailableIds(values).length) {
         const option = document.createElement("option");
         option.value = "";
         option.textContent = "No sprite LoRA downloaded";
@@ -980,16 +987,29 @@
         return;
       }
       select.disabled = false;
+      for (const candidateId of loraAvailableIds(values)) {
+        const choice = choiceByCanonical.get(candidateId);
+        const option = document.createElement("option");
+        option.value = choice?.id || candidateId;
+        option.dataset.path = choice?.path || "";
+        option.dataset.canonicalId = candidateId;
+        option.textContent = choice ? loraLabel(choice) : `${loraMetadata[candidateId]?.label || candidateId} / missing`;
+        option.disabled = !choice;
+        select.appendChild(option);
+      }
       for (const choice of choices) {
+        const canonicalId = canonicalLoraId(choice.id, choice.path);
+        if (loraMetadata[canonicalId]) continue;
         const option = document.createElement("option");
         option.value = choice.id;
         option.dataset.path = choice.path;
-        option.dataset.canonicalId = canonicalLoraId(choice.id, choice.path);
+        option.dataset.canonicalId = canonicalId;
         option.textContent = loraLabel(choice);
         select.appendChild(option);
       }
-      const selectedOption = Array.from(select.options).find((option) => option.value === selectedId)
+      const selectedOption = Array.from(select.options).find((option) => !option.disabled && option.value === selectedId)
         || Array.from(select.options).find((option) => option.dataset.path === values.selected_lora_path)
+        || Array.from(select.options).find((option) => !option.disabled)
         || select.options[0];
       const runtimeOption = selectedOption;
       if (runtimeOption) {
@@ -1002,6 +1022,8 @@
       const values = parseKeyValues(text);
       state.statusValues = values;
       const loras = list(values.downloaded_loras);
+      const spriteLoraTotal = loraAvailableIds(values).length;
+      const spriteLoraDownloaded = list(values.weight_profiles_downloaded).filter((id) => loraMetadata[canonicalLoraId(id)]).length || loras.filter((id) => loraMetadata[canonicalLoraId(id)]).length;
       const controlReady = yes(values.controlnet_ready);
       const depthReady = yes(values.depth_models_ready);
       const zReady = yes(values.zimage_models_ready);
@@ -1014,7 +1036,7 @@
       $("model-chip").textContent = $("z-model-choice").value.toUpperCase();
       $("runtime-text").textContent = values.zimage_url ? `Z-Image ${values.zimage_url} / ${zReady ? "models ready" : "fetch models"}` : "Z-Image";
       $("selected-model-text").textContent = values.selected_lora_path ? basename(values.selected_lora_path) : (loras.join(", ") || "none");
-      $("progress-detail").textContent = `Backend ${zReady ? "ready" : "missing"} | LoRA ${loras.length || 0} | Control ${controlReady ? "ready" : "staged"} | Depth ${depthReady ? "ready" : "staged"}`;
+      $("progress-detail").textContent = `Backend ${zReady ? "ready" : "missing"} | LoRA ${spriteLoraDownloaded}/${spriteLoraTotal} | Control ${controlReady ? "ready" : "staged"} | Depth ${depthReady ? "ready" : "staged"}`;
       populateLoraChoices(values);
       if (values.selected_lora_trigger) $("lora-trigger").value = values.selected_lora_trigger;
       if (values.selected_lora_scale) $("lora-scale").value = values.selected_lora_scale;
