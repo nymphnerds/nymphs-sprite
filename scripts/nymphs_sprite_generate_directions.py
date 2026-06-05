@@ -32,6 +32,12 @@ DIRECTIONS = {
 }
 
 ORDERED_DIRECTIONS = list(DIRECTIONS.keys())
+STYLE_SUFFIX = (
+    "pixel art sprite, game character sprite, 2D RPG, clean readable silhouette, "
+    "centered full body character, isolated figure, bright green background, "
+    "crisp sprite design, HD-2D inspired, single character only"
+)
+NEGATIVE_BG = "white background, gray background, grey background, beige background, gradient background"
 
 
 def request_json(method: str, url: str, payload: dict[str, Any] | None = None, timeout: int = 1800) -> dict[str, Any]:
@@ -96,6 +102,11 @@ def response_output_path(response: dict[str, Any]) -> Path | None:
     if not value:
         return None
     return Path(value).expanduser()
+
+
+def foundry_negative_prompt(negative_prompt: str) -> str:
+    negative = negative_prompt.strip()
+    return f"{negative}, {NEGATIVE_BG}" if negative else NEGATIVE_BG
 
 
 def copy_direction_image(source: Path, target_dir: Path, index: int, direction: str, label_suffix: str = "") -> Path | None:
@@ -545,7 +556,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--steps", type=int, default=9)
     parser.add_argument("--guidance-scale", type=float, default=0.0)
     parser.add_argument("--nunchaku-rank", type=int, default=32)
-    parser.add_argument("--nunchaku-precision", default="auto", choices=["auto", "int4", "fp4"])
+    parser.add_argument("--nunchaku-precision", default="int4", choices=["auto", "int4", "fp4"])
     parser.add_argument("--profile", default="")
     parser.add_argument("--directions", default=",".join(DIRECTIONS.keys()))
     parser.add_argument("--source-images", default="")
@@ -635,13 +646,7 @@ def main() -> int:
             lora_trigger,
             args.subject_prompt,
             DIRECTIONS[direction],
-            "pixel art sprite",
-            "game character sprite",
-            "2D RPG",
-            "clean readable silhouette",
-            "centered full body character",
-            "isolated figure",
-            "crisp sprite design",
+            STYLE_SUFFIX,
         ]
         prompt = ", ".join(part for part in prompt_parts if part)
         payload = {
@@ -656,7 +661,7 @@ def main() -> int:
             "guidance_scale": args.guidance_scale,
             "seed": args.seed + (index - 1) * args.seed_step,
             "prompt": prompt,
-            "negative_prompt": args.negative_prompt,
+            "negative_prompt": foundry_negative_prompt(args.negative_prompt),
             "lora_path": lora_path,
             "lora_scale": args.lora_scale,
             "batch_id": batch_id,

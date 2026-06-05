@@ -33,6 +33,20 @@ weight_profiles_available=none
 weight_profiles_downloaded=none
 weight_profiles_missing=none
 weight_profile_ready=false
+zimage_installed=false
+zimage_models_ready=false
+zimage_weight_profile_selected=none
+zimage_weight_profile_ready=false
+zimage_downloaded_models=none
+zimage_downloaded_weights=none
+zimage_missing_weights=none
+zimage_hf_cache_dir="${HOME}/NymphsData/cache/huggingface"
+zimage_preset_file="${HOME}/NymphsData/config/zimage/generation-preset.env"
+zimage_status_detail=unknown
+zimage_fetch_entrypoint=unavailable
+foundry_available=false
+foundry_root="${NYMPHS_SPRITE_FOUNDRY_ROOT}"
+foundry_db_present=false
 
 if [[ -f "${NYMPHS_SPRITE_MARKER_FILE}" ]]; then
   installed=true
@@ -214,11 +228,38 @@ if [[ ${#downloaded_model_items[@]} -gt 0 ]]; then
 fi
 
 if [[ "${weight_profile_ready}" == "true" ]]; then
-  models_ready=true
   assets_ready=true
 fi
 if [[ -z "${selected_lora_candidate}" || "${selected_lora_candidate}" == "custom" ]]; then
   selected_lora_candidate="${weight_profile_selected}"
+fi
+
+if zimage_status_script="$(nymphs_sprite_zimage_script zimage_status.sh 2>/dev/null)"; then
+  zimage_fetch_entrypoint="$(nymphs_sprite_zimage_script zimage_fetch_models.sh 2>/dev/null || printf 'unavailable')"
+  zimage_status_output="$("${zimage_status_script}" 2>/dev/null || true)"
+  while IFS='=' read -r key value; do
+    case "${key}" in
+      installed) zimage_installed="${value}" ;;
+      models_ready) zimage_models_ready="${value}" ;;
+      downloaded_models) zimage_downloaded_models="${value}" ;;
+      downloaded_weights) zimage_downloaded_weights="${value}" ;;
+      missing_weights) zimage_missing_weights="${value}" ;;
+      weight_profile_selected) zimage_weight_profile_selected="${value}" ;;
+      weight_profile_ready) zimage_weight_profile_ready="${value}" ;;
+      hf_cache_dir) zimage_hf_cache_dir="${value}" ;;
+      detail) zimage_status_detail="${value}" ;;
+    esac
+  done <<< "${zimage_status_output}"
+fi
+
+if [[ "${assets_ready}" == "true" && "${zimage_models_ready}" == "true" ]]; then
+  models_ready=true
+fi
+
+if foundry_root_resolved="$(nymphs_sprite_foundry_root 2>/dev/null)"; then
+  foundry_available=true
+  foundry_root="${foundry_root_resolved}"
+  [[ -f "${foundry_root}/foundry.db" ]] && foundry_db_present=true
 fi
 
 if [[ "${installed}" == "true" && "${runtime_present}" == "false" ]]; then
@@ -229,7 +270,15 @@ elif [[ "${installed}" == "true" ]]; then
   if [[ "${models_ready}" == "true" ]]; then
     state=installed
     health=ok
-    detail="${NYMPHS_SPRITE_MODULE_NAME} is installed. Sprite LoRA cache is ready; start Nymphs Image/Z-Image and generate through the module UI."
+    detail="${NYMPHS_SPRITE_MODULE_NAME} is installed. Shared Z-Image models and Sprite LoRA assets are ready."
+  elif [[ "${zimage_models_ready}" != "true" && "${assets_ready}" != "true" ]]; then
+    state=model_download_needed
+    health=model-download-needed
+    detail="Shared Z-Image model files and Sprite assets need downloading. Use Model Fetch for Z-Image, then Asset Fetch for the sprite package."
+  elif [[ "${zimage_models_ready}" != "true" ]]; then
+    state=model_download_needed
+    health=model-download-needed
+    detail="Shared Z-Image model files need downloading. Use Model Fetch; it writes to the same cache used by Nymphs Image."
   else
     state=model_download_needed
     health=model-download-needed
@@ -283,12 +332,27 @@ weight_profiles_available=${weight_profiles_available}
 weight_profiles_downloaded=${weight_profiles_downloaded}
 weight_profiles_missing=${weight_profiles_missing}
 weight_profile_ready=${weight_profile_ready}
+zimage_installed=${zimage_installed}
+zimage_models_ready=${zimage_models_ready}
+zimage_weight_profile_selected=${zimage_weight_profile_selected}
+zimage_weight_profile_ready=${zimage_weight_profile_ready}
+zimage_downloaded_models=${zimage_downloaded_models}
+zimage_downloaded_weights=${zimage_downloaded_weights}
+zimage_missing_weights=${zimage_missing_weights}
+zimage_hf_cache_dir=${zimage_hf_cache_dir}
+zimage_preset_file=${zimage_preset_file}
+zimage_fetch_entrypoint=${zimage_fetch_entrypoint}
+zimage_status_detail=${zimage_status_detail}
 zimage_url=${NYMPHS_SPRITE_ZIMAGE_URL}
 target_model=Tongyi-MAI/Z-Image-Turbo
 target_lora_family=zimage
 target_controlnet=alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union
 target_depth_model=depth-anything/Depth-Anything-V2-Small-hf
+foundry_available=${foundry_available}
+foundry_root=${foundry_root}
+foundry_db_present=${foundry_db_present}
 generate_entrypoint=${NYMPHS_SPRITE_INSTALL_DIR}/scripts/nymphs_sprite_generate_directions.sh
+foundry_generate_entrypoint=${NYMPHS_SPRITE_INSTALL_DIR}/scripts/nymphs_sprite_foundry_generate.sh
 last_log=${NYMPHS_SPRITE_LOG_FILE}
 marker=${NYMPHS_SPRITE_MARKER_FILE}
 detail=${detail}

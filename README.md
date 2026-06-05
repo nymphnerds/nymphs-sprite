@@ -13,7 +13,8 @@ runtime.
 - `comfyui_workflows/`: API-format ComfyUI workflow templates extracted from
   the upstream Sprite Foundry pipeline for parity notes only.
 - `profiles/`: Nymphs-native request templates for Z-Image Turbo sprite
-  generation and a small candidate LoRA catalog.
+  generation, Sprite Foundry character presets, and a small candidate LoRA
+  catalog.
 - `models/` profiles: catalogs for Z-Image ControlNet Union and Depth Anything
   dependencies used by guided morphology and depth-map derivation.
 - `ui/manager.html`: the NymphsCore Manager UI for the sprite flow.
@@ -95,16 +96,41 @@ Default LoRA library root:
 $HOME/LoRA/loras
 ```
 
+## Model Fetch
+
+The Manager detail page exposes one native `Model Fetch` dropdown, matching the
+other Nymphs modules. The default `Complete Sprite Stack` choice fetches all
+first-run Sprite requirements:
+
+```text
+shared Z-Image INT4 r32 backend
+tarn59 pixel-art LoRA
+mks0813 pixel-art LoRA
+Z-Image ControlNet Union
+Depth Anything V2 Small
+```
+
+Shared backend model files delegate to Nymphs Image / Z-Image and use the same
+cache and generation preset:
+
+```text
+$HOME/NymphsData/cache/huggingface
+$HOME/NymphsData/config/zimage/generation-preset.env
+```
+
+Sprite-owned assets are still stored under the Sprite module paths below, so
+either Nymphs Image or Nymphs Sprite can prepare the shared backend without
+creating duplicate model caches.
+
 ## Pixel Art LoRA
 
 The module includes a starter catalog in
 `profiles/zimage_turbo_lora_candidates.json`.
 
-The Manager detail page exposes module-owned downloads through one native
-`Asset Fetch` dropdown. The complete package fetches both starter sprite LoRAs,
-plus the staged ControlNet Union and Depth Anything assets; individual choices
-remain available for repair/testing. Pick an asset package from the dropdown and
-press Fetch. The fetcher stores the selected LoRA preset at:
+The same `Model Fetch` dropdown also includes Sprite-only choices for repair or
+testing. The complete asset package fetches both starter sprite LoRAs, plus the
+staged ControlNet Union and Depth Anything assets without touching shared
+Z-Image backend weights. The fetcher stores the selected LoRA preset at:
 
 ```text
 $HOME/NymphsData/config/nymphs-sprite/selected_lora.env
@@ -116,19 +142,24 @@ $HOME/NymphsData/config/nymphs-sprite/selected_lora.env
 Current default candidate:
 
 ```text
-repo:     mks0813/z-image-turbo-pixel-art-lora
-file:     epoch-1.safetensors
-trigger:  pxlstl
+repo:     tarn59/pixel_art_style_lora_z_image_turbo
+file:     pixel_art_style_z_image_turbo.safetensors
+trigger:  Pixel art style.
 base:     Tongyi-MAI/Z-Image-Turbo
 ```
 
 Alternative candidate:
 
 ```text
-repo:     tarn59/pixel_art_style_lora_z_image_turbo
-trigger:  Pixel art style.
+repo:     mks0813/z-image-turbo-pixel-art-lora
+file:     epoch-1.safetensors
+trigger:  pxlstl
 base:     Tongyi-MAI/Z-Image-Turbo
 ```
+
+The mks0813 file is retained as an alternate asset, but the current Nunchaku
+LoRA runtime rejects it with a tensor-shape mismatch during composition. The
+tarn59 LoRA has passed a one-direction Sprite generation smoke test.
 
 After install, the fetch script can place a selected LoRA under:
 
@@ -188,6 +219,66 @@ and defaults to `96` for Z-Image's more detailed pixel style. Useful test sizes:
 192  chunky preview/game token scale
 256  large portrait-token sprite
 ```
+
+## Sprite Foundry Presets
+
+The module keeps a generated catalog of the available Sprite Foundry character
+configs at:
+
+```text
+profiles/foundry_character_presets.json
+profiles/foundry_export_roster.json
+```
+
+The catalog is derived from the local `sprite-foundry/pipeline/chars` configs
+and preserves full subject prompts, negative prompts, seeds, roles, body
+classes, body locks, reject conditions, pack metadata, and source config paths.
+The custom Manager UI uses this catalog for the prompt preset dropdown instead
+of a small hand-written sample.
+
+The original public Foundry roster describes 92 production export packs. This
+module currently has direct generation presets for the Foundry character configs
+available in the local fork. `foundry_export_roster.json` carries the 92-pack
+lane/subject target; export-roster-only entries remain a parity target until
+their prompt configs are available or reconstructed.
+
+## Foundry Bridge
+
+The custom UI has two generation lanes:
+
+```text
+Generate Sources / Generate + Process
+  Fast module batch path under $HOME/NymphsData/outputs/nymphs-sprite.
+
+Foundry Run
+  Canonical Sprite Foundry fork path using foundry generate-nymphscore.
+```
+
+`Foundry Run` uses the selected imported preset's `source_config` path and calls
+the local `sprite-foundry` fork. The default checkout is:
+
+```text
+$HOME/NymphsModules/sprite-foundry
+```
+
+Override it with:
+
+```bash
+export NYMPHS_SPRITE_FOUNDRY_ROOT=/path/to/sprite-foundry
+```
+
+Useful module actions:
+
+```bash
+bash $HOME/Nymphs-Sprite/scripts/nymphs_sprite_foundry_status.sh
+bash $HOME/Nymphs-Sprite/scripts/nymphs_sprite_foundry_generate.sh \
+  --source-config pipeline/chars/goblin_scout.json \
+  --sprite-size 96
+```
+
+This path preserves Foundry's registry, gates, review queue, bakeoff artifacts,
+and next-step commands. It still requires Nymphs Image / Z-Image to be running
+at the configured `zimage_url`, plus a downloaded Z-Image Turbo pixel-art LoRA.
 
 ## ControlNet And Depth
 

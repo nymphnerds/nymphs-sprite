@@ -1,5 +1,49 @@
 # Changelog
 
+## 0.1.16 - 2026-06-05
+
+- Added a Sprite-facing fetch bridge to the shared Nymphs Image / Z-Image model
+  fetcher and Hugging Face cache.
+- Collapsed Manager fetch UI to one compact `Model Fetch` dropdown, matching
+  the other modules' native fetch pattern.
+- Made the default `Complete Sprite Stack` fetch all first-run Sprite needs:
+  shared Z-Image INT4 r32 backend, both starter LoRAs, staged ControlNet Union,
+  and Depth Anything.
+- Extended status and the custom UI to distinguish shared Z-Image backend model
+  readiness from Sprite-owned asset readiness.
+- Changed the module runner's default generation precision to `int4` so it
+  matches the default fetched/loaded Z-Image profile instead of sending `auto`.
+- Switched the default selected LoRA to `tarn59_pixel_art`; a one-direction
+  smoke test succeeded with it, while the mks0813 file currently trips a
+  Nunchaku LoRA tensor-shape mismatch.
+
+## 0.1.15 - 2026-06-05
+
+- Added a Foundry bridge path so the module can call the canonical
+  `sprite-foundry` fork flow through `python3 -m foundry.cli generate-nymphscore`.
+- Added `foundry_status` and `foundry_generate` module actions, with early
+  checks for the local Foundry checkout, selected LoRA path, and Z-Image server.
+- Added a `Foundry Run` button to the custom UI that uses the selected imported
+  Foundry preset's original `pipeline/chars/*.json` config.
+- Extended module status with Foundry availability, root, DB presence, and the
+  Foundry generation entrypoint.
+
+## 0.1.14 - 2026-06-05
+
+- Replaced the tiny hand-written prompt preset sample with a generated Sprite
+  Foundry character preset catalog from the local `sprite-foundry`
+  `pipeline/chars` configs.
+- Preserved full Foundry subject prompts, negative prompts, seeds, roles, body
+  classes, body locks, reject conditions, pack metadata, and source config
+  paths in `profiles/foundry_character_presets.json`.
+- Added `profiles/foundry_export_roster.json` from the Foundry export roster so
+  the module carries the 92-pack lane/subject target even where prompt configs
+  are not yet available.
+- Updated the custom UI dropdown to use the generated Foundry preset catalog.
+- Aligned direct Z-Image source generation and module-bridge source generation
+  with the Foundry NymphsCore runner's style suffix and background-negative
+  prompt clause.
+
 ## 0.1.13 - 2026-05-30
 
 - Rewired `Generate Sources` to call the Z-Image `/generate` API directly,

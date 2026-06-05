@@ -1,0 +1,941 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-03-27T23:38:34.653979+00:00",
+  "total_packs": 92,
+  "by_lane": {
+    "beast": 16,
+    "townsfolk": 16,
+    "goblin": 8,
+    "hero": 8,
+    "pirate": 8,
+    "villain": 8,
+    "zombie": 8,
+    "crew": 7,
+    "creature": 6,
+    "hostile": 3,
+    "authority": 2,
+    "civilian": 2
+  },
+  "roster": [
+    {
+      "subject_slug": "beast_bell_warden",
+      "display_name": "Beast Bell Warden",
+      "lane": "beast",
+      "body_family": "bipedal",
+      "run_id": "beast_bell_warden_p3_20260327_212632",
+      "export_path": "exports/beast_bell_warden/beast_bell_warden_p3_20260327_212632",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "beast_bone_weaver",
+      "display_name": "Beast Bone Weaver",
+      "lane": "beast",
+      "body_family": "arthropod",
+      "run_id": "beast_bone_weaver_p5a_20260327_232151",
+      "export_path": "exports/beast_bone_weaver/beast_bone_weaver_p5a_20260327_232151",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "beast_clock_golem",
+      "display_name": "Beast Clock Golem",
+      "lane": "beast",
+      "body_family": "wide_squat",
+      "run_id": "beast_clock_golem_p3_20260327_211436",
+      "export_path": "exports/beast_clock_golem/beast_clock_golem_p3_20260327_211436",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "beast_grinning_idol",
+      "display_name": "Beast Grinning Idol",
+      "lane": "beast",
+      "body_family": "wide_squat",
+      "run_id": "beast_grinning_idol_p5a_20260327_223156",
+      "export_path": "exports/beast_grinning_idol/beast_grinning_idol_p5a_20260327_223156",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "beast_hive_keeper",
+      "display_name": "Beast Hive Keeper",
+      "lane": "beast",
+      "body_family": "wide_squat",
+      "run_id": "beast_hive_keeper_p5a_20260327_232022",
+      "export_path": "exports/beast_hive_keeper/beast_hive_keeper_p5a_20260327_232022",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "beast_hollow_knight",
+      "display_name": "Beast Hollow Knight",
+      "lane": "beast",
+      "body_family": "bipedal",
+      "run_id": "beast_hollow_knight_p3_20260327_210348",
+      "export_path": "exports/beast_hollow_knight/beast_hollow_knight_p3_20260327_210348",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "beast_ink_shade",
+      "display_name": "Beast Ink Shade",
+      "lane": "beast",
+      "body_family": "tall_thin",
+      "run_id": "beast_ink_shade_p3_20260327_212456",
+      "export_path": "exports/beast_ink_shade/beast_ink_shade_p3_20260327_212456",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "beast_lantern_angler",
+      "display_name": "Beast Lantern Angler",
+      "lane": "beast",
+      "body_family": "tall_thin",
+      "run_id": "beast_lantern_angler_p5a_20260327_220815",
+      "export_path": "exports/beast_lantern_angler/beast_lantern_angler_p5a_20260327_220815",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "beast_mirror_stalker",
+      "display_name": "Beast Mirror Stalker",
+      "lane": "beast",
+      "body_family": "tall_thin",
+      "run_id": "beast_mirror_stalker_p3_20260327_210616",
+      "export_path": "exports/beast_mirror_stalker/beast_mirror_stalker_p3_20260327_210616",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "beast_mud_revenant",
+      "display_name": "Beast Mud Revenant",
+      "lane": "beast",
+      "body_family": "amorphous",
+      "run_id": "beast_mud_revenant_p5a_20260327_223323",
+      "export_path": "exports/beast_mud_revenant/beast_mud_revenant_p5a_20260327_223323",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "beast_rat_king",
+      "display_name": "Beast Rat King",
+      "lane": "beast",
+      "body_family": "amorphous",
+      "run_id": "beast_rat_king_p5a_20260327_220242",
+      "export_path": "exports/beast_rat_king/beast_rat_king_p5a_20260327_220242",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "beast_root_puppet",
+      "display_name": "Beast Root Puppet",
+      "lane": "beast",
+      "body_family": "tall_thin",
+      "run_id": "beast_root_puppet_p5a_20260327_221324",
+      "export_path": "exports/beast_root_puppet/beast_root_puppet_p5a_20260327_221324",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "beast_spore_mother",
+      "display_name": "Beast Spore Mother",
+      "lane": "beast",
+      "body_family": "amorphous",
+      "run_id": "beast_spore_mother_p5a_20260327_221155",
+      "export_path": "exports/beast_spore_mother/beast_spore_mother_p5a_20260327_221155",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "beast_teeth_collector",
+      "display_name": "Beast Teeth Collector",
+      "lane": "beast",
+      "body_family": "bipedal",
+      "run_id": "beast_teeth_collector_p3_20260327_213101",
+      "export_path": "exports/beast_teeth_collector/beast_teeth_collector_p3_20260327_213101",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "beast_throat_singer",
+      "display_name": "Beast Throat Singer",
+      "lane": "beast",
+      "body_family": "tall_thin",
+      "run_id": "beast_throat_singer_p3_20260327_212144",
+      "export_path": "exports/beast_throat_singer/beast_throat_singer_p3_20260327_212144",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "beast_wyvern",
+      "display_name": "Beast Wyvern",
+      "lane": "beast",
+      "body_family": "winged",
+      "run_id": "beast_wyvern_p5a_20260327_231740",
+      "export_path": "exports/beast_wyvern/beast_wyvern_p5a_20260327_231740",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "cargo_beast",
+      "display_name": "Cargo Beast",
+      "lane": "creature",
+      "body_family": "bipedal",
+      "run_id": "cargo_beast_p5a_20260326_060955",
+      "export_path": "exports/cargo_beast/cargo_beast_p5a_20260326_060955",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "compact_patrol",
+      "display_name": "Compact Patrol",
+      "lane": "authority",
+      "body_family": "bipedal",
+      "run_id": "compact_patrol_p3_20260326_071546",
+      "export_path": "exports/compact_patrol/compact_patrol_p3_20260326_071546",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "drift_lurker",
+      "display_name": "Drift Lurker",
+      "lane": "creature",
+      "body_family": "bipedal",
+      "run_id": "drift_lurker_p5a_20260326_154405",
+      "export_path": "exports/drift_lurker/drift_lurker_p5a_20260326_154405",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "drift_maw",
+      "display_name": "Drift Maw",
+      "lane": "creature",
+      "body_family": "bipedal",
+      "run_id": "drift_maw_p3_20260326_053532",
+      "export_path": "exports/drift_maw/drift_maw_p3_20260326_053532",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "goblin_archer",
+      "display_name": "Goblin Archer",
+      "lane": "goblin",
+      "body_family": "bipedal",
+      "run_id": "goblin_archer_p3_20260326_185513",
+      "export_path": "exports/goblin_archer/goblin_archer_p3_20260326_185513",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "goblin_bomber",
+      "display_name": "Goblin Bomber",
+      "lane": "goblin",
+      "body_family": "bipedal",
+      "run_id": "goblin_bomber_p3_20260326_190427",
+      "export_path": "exports/goblin_bomber/goblin_bomber_p3_20260326_190427",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "goblin_brute",
+      "display_name": "Goblin Brute",
+      "lane": "goblin",
+      "body_family": "bipedal",
+      "run_id": "goblin_brute_p3_20260326_185632",
+      "export_path": "exports/goblin_brute/goblin_brute_p3_20260326_185632",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "goblin_grunt",
+      "display_name": "Goblin Grunt",
+      "lane": "goblin",
+      "body_family": "bipedal",
+      "run_id": "goblin_grunt_p3_20260326_185327",
+      "export_path": "exports/goblin_grunt/goblin_grunt_p3_20260326_185327",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "goblin_scout",
+      "display_name": "Goblin Scout",
+      "lane": "goblin",
+      "body_family": "bipedal",
+      "run_id": "goblin_scout_p3_20260326_190316",
+      "export_path": "exports/goblin_scout/goblin_scout_p3_20260326_190316",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "goblin_shaman",
+      "display_name": "Goblin Shaman",
+      "lane": "goblin",
+      "body_family": "bipedal",
+      "run_id": "goblin_shaman_p3_20260326_190204",
+      "export_path": "exports/goblin_shaman/goblin_shaman_p3_20260326_190204",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "goblin_warchief",
+      "display_name": "Goblin Warchief",
+      "lane": "goblin",
+      "body_family": "bipedal",
+      "run_id": "goblin_warchief_p3_20260326_190928",
+      "export_path": "exports/goblin_warchief/goblin_warchief_p3_20260326_190928",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "goblin_wolf_rider",
+      "display_name": "Goblin Wolf Rider",
+      "lane": "goblin",
+      "body_family": "bipedal",
+      "run_id": "goblin_wolf_rider_p3_20260326_191042",
+      "export_path": "exports/goblin_wolf_rider/goblin_wolf_rider_p3_20260326_191042",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "hero_barbarian",
+      "display_name": "Hero Barbarian",
+      "lane": "hero",
+      "body_family": "bipedal",
+      "run_id": "hero_barbarian_p3_20260326_200411",
+      "export_path": "exports/hero_barbarian/hero_barbarian_p3_20260326_200411",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "hero_cleric",
+      "display_name": "Hero Cleric",
+      "lane": "hero",
+      "body_family": "bipedal",
+      "run_id": "hero_cleric_p3_20260326_201031",
+      "export_path": "exports/hero_cleric/hero_cleric_p3_20260326_201031",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "hero_fighter",
+      "display_name": "Hero Fighter",
+      "lane": "hero",
+      "body_family": "bipedal",
+      "run_id": "hero_fighter_p3_20260326_194912",
+      "export_path": "exports/hero_fighter/hero_fighter_p3_20260326_194912",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "hero_mage",
+      "display_name": "Hero Mage",
+      "lane": "hero",
+      "body_family": "bipedal",
+      "run_id": "hero_mage_p3_20260326_195552",
+      "export_path": "exports/hero_mage/hero_mage_p3_20260326_195552",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "hero_monk",
+      "display_name": "Hero Monk",
+      "lane": "hero",
+      "body_family": "bipedal",
+      "run_id": "hero_monk_p3_20260326_201514",
+      "export_path": "exports/hero_monk/hero_monk_p3_20260326_201514",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "hero_paladin",
+      "display_name": "Hero Paladin",
+      "lane": "hero",
+      "body_family": "bipedal",
+      "run_id": "hero_paladin_p3_20260326_201253",
+      "export_path": "exports/hero_paladin/hero_paladin_p3_20260326_201253",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "hero_ranger",
+      "display_name": "Hero Ranger",
+      "lane": "hero",
+      "body_family": "bipedal",
+      "run_id": "hero_ranger_p3_20260326_195330",
+      "export_path": "exports/hero_ranger/hero_ranger_p3_20260326_195330",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "hero_rogue",
+      "display_name": "Hero Rogue",
+      "lane": "hero",
+      "body_family": "bipedal",
+      "run_id": "hero_rogue_p3_20260326_195933",
+      "export_path": "exports/hero_rogue/hero_rogue_p3_20260326_195933",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "hull_diver",
+      "display_name": "Hull Diver",
+      "lane": "crew",
+      "body_family": "bipedal",
+      "run_id": "hull_diver_p3_20260326_152916",
+      "export_path": "exports/hull_diver/hull_diver_p3_20260326_152916",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "ilen_marr",
+      "display_name": "Ilen Marr",
+      "lane": "crew",
+      "body_family": "bipedal",
+      "run_id": "ilen_marr_p3_20260326_044636",
+      "export_path": "exports/ilen_marr/ilen_marr_p3_20260326_044636",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "interdiction_agent",
+      "display_name": "Interdiction Agent",
+      "lane": "hostile",
+      "body_family": "bipedal",
+      "run_id": "interdiction_agent_p3_20260326_153314",
+      "export_path": "exports/interdiction_agent/interdiction_agent_p3_20260326_153314",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "kael_morrow",
+      "display_name": "Kael Morrow",
+      "lane": "crew",
+      "body_family": "bipedal",
+      "run_id": "kael_1c_20260326_033800",
+      "export_path": "exports/kael_morrow/kael_1c_20260326_033800",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "keth_healer_drone",
+      "display_name": "Keth Healer Drone",
+      "lane": "creature",
+      "body_family": "bipedal",
+      "run_id": "keth_healer_drone_p5a_20260326_072410",
+      "export_path": "exports/keth_healer_drone/keth_healer_drone_p5a_20260326_072410",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "nera_quill",
+      "display_name": "Nera Quill",
+      "lane": "civilian",
+      "body_family": "bipedal",
+      "run_id": "nera_quill_p3_20260326_071227",
+      "export_path": "exports/nera_quill/nera_quill_p3_20260326_071227",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "orryn_broker",
+      "display_name": "Orryn Broker",
+      "lane": "civilian",
+      "body_family": "bipedal",
+      "run_id": "orryn_broker_p3_20260326_072045",
+      "export_path": "exports/orryn_broker/orryn_broker_p3_20260326_072045",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "pirate_captain",
+      "display_name": "Pirate Captain",
+      "lane": "pirate",
+      "body_family": "bipedal",
+      "run_id": "pirate_captain_p3_20260327_024113",
+      "export_path": "exports/pirate_captain/pirate_captain_p3_20260327_024113",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "pirate_cutthroat",
+      "display_name": "Pirate Cutthroat",
+      "lane": "pirate",
+      "body_family": "bipedal",
+      "run_id": "pirate_cutthroat_p3_20260327_024427",
+      "export_path": "exports/pirate_cutthroat/pirate_cutthroat_p3_20260327_024427",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "pirate_drowned",
+      "display_name": "Pirate Drowned",
+      "lane": "pirate",
+      "body_family": "bipedal",
+      "run_id": "pirate_drowned_p3_20260327_025408",
+      "export_path": "exports/pirate_drowned/pirate_drowned_p3_20260327_025408",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "pirate_governor",
+      "display_name": "Pirate Governor",
+      "lane": "pirate",
+      "body_family": "bipedal",
+      "run_id": "pirate_governor_p3_20260327_024818",
+      "export_path": "exports/pirate_governor/pirate_governor_p3_20260327_024818",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "pirate_navy_sailor",
+      "display_name": "Pirate Navy Sailor",
+      "lane": "pirate",
+      "body_family": "bipedal",
+      "run_id": "pirate_navy_sailor_p3_20260327_024658",
+      "export_path": "exports/pirate_navy_sailor/pirate_navy_sailor_p3_20260327_024658",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "pirate_pistoleer",
+      "display_name": "Pirate Pistoleer",
+      "lane": "pirate",
+      "body_family": "bipedal",
+      "run_id": "pirate_pistoleer_p3_20260327_024543",
+      "export_path": "exports/pirate_pistoleer/pirate_pistoleer_p3_20260327_024543",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "pirate_quartermaster",
+      "display_name": "Pirate Quartermaster",
+      "lane": "pirate",
+      "body_family": "bipedal",
+      "run_id": "pirate_quartermaster_p3_20260327_024305",
+      "export_path": "exports/pirate_quartermaster/pirate_quartermaster_p3_20260327_024305",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "pirate_sea_priest",
+      "display_name": "Pirate Sea Priest",
+      "lane": "pirate",
+      "body_family": "bipedal",
+      "run_id": "pirate_sea_priest_p3_20260327_031321",
+      "export_path": "exports/pirate_sea_priest/pirate_sea_priest_p3_20260327_031321",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "reach_pirate",
+      "display_name": "Reach Pirate",
+      "lane": "hostile",
+      "body_family": "bipedal",
+      "run_id": "reach_pirate_p3_20260326_071816",
+      "export_path": "exports/reach_pirate/reach_pirate_p3_20260326_071816",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "scav_raider",
+      "display_name": "Scav Raider",
+      "lane": "hostile",
+      "body_family": "bipedal",
+      "run_id": "scav_raider_p3_20260326_053427",
+      "export_path": "exports/scav_raider/scav_raider_p3_20260326_053427",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "sera_vale",
+      "display_name": "Sera Vale",
+      "lane": "crew",
+      "body_family": "bipedal",
+      "run_id": "stack_a_v2_20260326_030834",
+      "export_path": "exports/sera_vale/stack_a_v2_20260326_030834",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "skitter_drone",
+      "display_name": "Skitter Drone",
+      "lane": "creature",
+      "body_family": "bipedal",
+      "run_id": "skitter_drone_p5a_20260326_060825",
+      "export_path": "exports/skitter_drone/skitter_drone_p5a_20260326_060825",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "thal",
+      "display_name": "Thal",
+      "lane": "crew",
+      "body_family": "bipedal",
+      "run_id": "thal_p3_20260326_044905",
+      "export_path": "exports/thal/thal_p3_20260326_044905",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "thal_hazard",
+      "display_name": "Thal Hazard",
+      "lane": "crew",
+      "body_family": "bipedal",
+      "run_id": "thal_hazard_p3_20260326_151723",
+      "export_path": "exports/thal_hazard/thal_hazard_p3_20260326_151723",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_barmaid",
+      "display_name": "Townsfolk Barmaid",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_barmaid_p3_20260327_201329",
+      "export_path": "exports/townsfolk_barmaid/townsfolk_barmaid_p3_20260327_201329",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_beggar",
+      "display_name": "Townsfolk Beggar",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_beggar_p3_20260327_201602",
+      "export_path": "exports/townsfolk_beggar/townsfolk_beggar_p3_20260327_201602",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_blacksmith",
+      "display_name": "Townsfolk Blacksmith",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_blacksmith_p3_20260327_200629",
+      "export_path": "exports/townsfolk_blacksmith/townsfolk_blacksmith_p3_20260327_200629",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_child",
+      "display_name": "Townsfolk Child",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_child_p3_20260327_202530",
+      "export_path": "exports/townsfolk_child/townsfolk_child_p3_20260327_202530",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_elder",
+      "display_name": "Townsfolk Elder",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_elder_p3_20260327_202648",
+      "export_path": "exports/townsfolk_elder/townsfolk_elder_p3_20260327_202648",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_farmer",
+      "display_name": "Townsfolk Farmer",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_farmer_p3_20260327_201218",
+      "export_path": "exports/townsfolk_farmer/townsfolk_farmer_p3_20260327_201218",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_fisherman",
+      "display_name": "Townsfolk Fisherman",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_fisherman_p3_20260327_201957",
+      "export_path": "exports/townsfolk_fisherman/townsfolk_fisherman_p3_20260327_201957",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_guard",
+      "display_name": "Townsfolk Guard",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_guard_p3_20260327_201050",
+      "export_path": "exports/townsfolk_guard/townsfolk_guard_p3_20260327_201050",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_herbalist",
+      "display_name": "Townsfolk Herbalist",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_herbalist_p3_20260327_201720",
+      "export_path": "exports/townsfolk_herbalist/townsfolk_herbalist_p3_20260327_201720",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_innkeeper",
+      "display_name": "Townsfolk Innkeeper",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_innkeeper_p3_20260327_200752",
+      "export_path": "exports/townsfolk_innkeeper/townsfolk_innkeeper_p3_20260327_200752",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_lamplighter",
+      "display_name": "Townsfolk Lamplighter",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_lamplighter_p3_20260327_202418",
+      "export_path": "exports/townsfolk_lamplighter/townsfolk_lamplighter_p3_20260327_202418",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_merchant",
+      "display_name": "Townsfolk Merchant",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_merchant_p3_20260327_200916",
+      "export_path": "exports/townsfolk_merchant/townsfolk_merchant_p3_20260327_200916",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_minstrel",
+      "display_name": "Townsfolk Minstrel",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_minstrel_p3_20260327_202124",
+      "export_path": "exports/townsfolk_minstrel/townsfolk_minstrel_p3_20260327_202124",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_noble",
+      "display_name": "Townsfolk Noble",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_noble_p3_20260327_201452",
+      "export_path": "exports/townsfolk_noble/townsfolk_noble_p3_20260327_201452",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_scribe",
+      "display_name": "Townsfolk Scribe",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_scribe_p3_20260327_202251",
+      "export_path": "exports/townsfolk_scribe/townsfolk_scribe_p3_20260327_202251",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "townsfolk_stable_hand",
+      "display_name": "Townsfolk Stable Hand",
+      "lane": "townsfolk",
+      "body_family": "bipedal",
+      "run_id": "townsfolk_stable_hand_p3_20260327_201841",
+      "export_path": "exports/townsfolk_stable_hand/townsfolk_stable_hand_p3_20260327_201841",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "varek",
+      "display_name": "Varek",
+      "lane": "crew",
+      "body_family": "bipedal",
+      "run_id": "varek_p3_20260326_045646",
+      "export_path": "exports/varek/varek_p3_20260326_045646",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "veshan_envoy",
+      "display_name": "Veshan Envoy",
+      "lane": "authority",
+      "body_family": "bipedal",
+      "run_id": "veshan_envoy_p3_20260326_152433",
+      "export_path": "exports/veshan_envoy/veshan_envoy_p3_20260326_152433",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "villain_assassin",
+      "display_name": "Villain Assassin",
+      "lane": "villain",
+      "body_family": "bipedal",
+      "run_id": "villain_assassin_p3_20260326_205507",
+      "export_path": "exports/villain_assassin/villain_assassin_p3_20260326_205507",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "villain_blackguard",
+      "display_name": "Villain Blackguard",
+      "lane": "villain",
+      "body_family": "bipedal",
+      "run_id": "villain_blackguard_p3_20260326_204649",
+      "export_path": "exports/villain_blackguard/villain_blackguard_p3_20260326_204649",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "villain_cult_priest",
+      "display_name": "Villain Cult Priest",
+      "lane": "villain",
+      "body_family": "bipedal",
+      "run_id": "villain_cult_priest_p3_20260326_205712",
+      "export_path": "exports/villain_cult_priest/villain_cult_priest_p3_20260326_205712",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "villain_dark_monk",
+      "display_name": "Villain Dark Monk",
+      "lane": "villain",
+      "body_family": "bipedal",
+      "run_id": "villain_dark_monk_p3_20260326_211446",
+      "export_path": "exports/villain_dark_monk/villain_dark_monk_p3_20260326_211446",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "villain_dread_ranger",
+      "display_name": "Villain Dread Ranger",
+      "lane": "villain",
+      "body_family": "bipedal",
+      "run_id": "villain_dread_ranger_p3_20260326_204918",
+      "export_path": "exports/villain_dread_ranger/villain_dread_ranger_p3_20260326_204918",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "villain_necromancer",
+      "display_name": "Villain Necromancer",
+      "lane": "villain",
+      "body_family": "bipedal",
+      "run_id": "villain_necromancer_p3_20260326_205132",
+      "export_path": "exports/villain_necromancer/villain_necromancer_p3_20260326_205132",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "villain_reaver",
+      "display_name": "Villain Reaver",
+      "lane": "villain",
+      "body_family": "bipedal",
+      "run_id": "villain_reaver_p3_20260326_205916",
+      "export_path": "exports/villain_reaver/villain_reaver_p3_20260326_205916",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "villain_warlord",
+      "display_name": "Villain Warlord",
+      "lane": "villain",
+      "body_family": "bipedal",
+      "run_id": "villain_warlord_p3_20260326_211156",
+      "export_path": "exports/villain_warlord/villain_warlord_p3_20260326_211156",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "void_raptor",
+      "display_name": "Void Raptor",
+      "lane": "creature",
+      "body_family": "bipedal",
+      "run_id": "void_raptor_p5a_20260326_063319",
+      "export_path": "exports/void_raptor/void_raptor_p5a_20260326_063319",
+      "preview_present": true,
+      "file_count": 25
+    },
+    {
+      "subject_slug": "zombie_bloater",
+      "display_name": "Zombie Bloater",
+      "lane": "zombie",
+      "body_family": "bipedal",
+      "run_id": "zombie_bloater_p3_20260326_174606",
+      "export_path": "exports/zombie_bloater/zombie_bloater_p3_20260326_174606",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "zombie_elite",
+      "display_name": "Zombie Elite",
+      "lane": "zombie",
+      "body_family": "bipedal",
+      "run_id": "zombie_elite_p3_20260326_175314",
+      "export_path": "exports/zombie_elite/zombie_elite_p3_20260326_175314",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "zombie_hazmat",
+      "display_name": "Zombie Hazmat",
+      "lane": "zombie",
+      "body_family": "bipedal",
+      "run_id": "zombie_hazmat_p3_20260326_174501",
+      "export_path": "exports/zombie_hazmat/zombie_hazmat_p3_20260326_174501",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "zombie_riot",
+      "display_name": "Zombie Riot",
+      "lane": "zombie",
+      "body_family": "bipedal",
+      "run_id": "zombie_riot_p3_20260326_173654",
+      "export_path": "exports/zombie_riot/zombie_riot_p3_20260326_173654",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "zombie_runner",
+      "display_name": "Zombie Runner",
+      "lane": "zombie",
+      "body_family": "bipedal",
+      "run_id": "zombie_runner_p3_20260326_173541",
+      "export_path": "exports/zombie_runner/zombie_runner_p3_20260326_173541",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "zombie_shambler",
+      "display_name": "Zombie Shambler",
+      "lane": "zombie",
+      "body_family": "bipedal",
+      "run_id": "zombie_shambler_p3_20260326_173434",
+      "export_path": "exports/zombie_shambler/zombie_shambler_p3_20260326_173434",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "zombie_skeletal",
+      "display_name": "Zombie Skeletal",
+      "lane": "zombie",
+      "body_family": "bipedal",
+      "run_id": "zombie_skeletal_p3_20260326_174710",
+      "export_path": "exports/zombie_skeletal/zombie_skeletal_p3_20260326_174710",
+      "preview_present": true,
+      "file_count": 26
+    },
+    {
+      "subject_slug": "zombie_worker",
+      "display_name": "Zombie Worker",
+      "lane": "zombie",
+      "body_family": "bipedal",
+      "run_id": "zombie_worker_p3_20260326_175208",
+      "export_path": "exports/zombie_worker/zombie_worker_p3_20260326_175208",
+      "preview_present": true,
+      "file_count": 26
+    }
+  ]
+}

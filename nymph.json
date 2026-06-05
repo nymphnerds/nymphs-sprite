@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.13",
+  "version": "0.1.16",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -32,6 +32,8 @@
     "models_root": "$HOME/NymphsData/models/nymphs-sprite",
     "controlnet_root": "$HOME/NymphsData/models/nymphs-sprite/controlnet",
     "depth_models_root": "$HOME/NymphsData/models/nymphs-sprite/depth",
+    "shared_zimage_huggingface_cache": "$HOME/NymphsData/cache/huggingface",
+    "shared_zimage_config_root": "$HOME/NymphsData/config/zimage",
     "profiles_root": "$HOME/Nymphs-Sprite/profiles",
     "lora_root": "$HOME/LoRA/loras"
   },
@@ -42,6 +44,7 @@
     "open_ui": "scripts/nymphs_sprite_open_ui.sh",
     "open_zimage": "scripts/nymphs_sprite_open_zimage.sh",
     "start_zimage": "scripts/nymphs_sprite_start_zimage.sh",
+    "fetch_models": "scripts/nymphs_sprite_fetch_models.sh",
     "open": "scripts/nymphs_sprite_open.sh",
     "open_lora": "scripts/nymphs_sprite_open_lora.sh",
     "open_outputs": "scripts/nymphs_sprite_open_outputs.sh",
@@ -55,6 +58,8 @@
     "check_runtime": "scripts/nymphs_sprite_check_runtime.sh",
     "generate_sources": "scripts/nymphs_sprite_generate_sources.sh",
     "generate_directions": "scripts/nymphs_sprite_generate_directions.sh",
+    "foundry_status": "scripts/nymphs_sprite_foundry_status.sh",
+    "foundry_generate": "scripts/nymphs_sprite_foundry_generate.sh",
     "list_outputs": "scripts/nymphs_sprite_list_zimage_outputs.sh",
     "logs": "scripts/nymphs_sprite_logs.sh",
     "uninstall": "scripts/nymphs_sprite_uninstall.sh"
@@ -65,10 +70,13 @@
     "open_ui",
     "open_zimage",
     "start_zimage",
+    "fetch_models",
     "open_lora",
     "open_outputs",
     "generate_sources",
     "generate_directions",
+    "foundry_status",
+    "foundry_generate",
     "list_outputs",
     "fetch_assets",
     "fetch_lora",
@@ -91,14 +99,22 @@
     },
     "manager_action_groups": [
       {
-        "id": "asset_fetch",
-        "title": "Asset Fetch",
+        "id": "model_fetch",
+        "title": "Model Fetch",
         "layout": "compact",
-        "entrypoint": "fetch_lora",
+        "entrypoint": "fetch_assets",
         "result": "show_logs",
         "visibility": "installed",
-        "description": "Download module-owned sprite assets. Complete fetches both Z-Image Turbo pixel LoRAs plus staged ControlNet Union and Depth Anything assets. Base Z-Image/Nunchaku/Qwen weights stay owned by Nymphs Image.",
+        "description": "Download everything Sprite needs from one dropdown. The complete stack fetches the shared Z-Image INT4 r32 backend through Nymphs Image's cache plus Sprite's LoRAs, staged ControlNet Union, and Depth Anything assets. Backend model choices and Sprite-only asset choices remain available for repair/testing.",
         "links": [
+          {
+            "label": "Z-Image Turbo",
+            "url": "https://huggingface.co/Tongyi-MAI/Z-Image-Turbo"
+          },
+          {
+            "label": "Z-Image weights",
+            "url": "https://huggingface.co/nunchaku-ai/nunchaku-z-image-turbo"
+          },
           {
             "label": "mks0813 pixel art LoRA",
             "url": "https://huggingface.co/mks0813/z-image-turbo-pixel-art-lora"
@@ -108,11 +124,7 @@
             "url": "https://huggingface.co/tarn59/pixel_art_style_lora_z_image_turbo"
           },
           {
-            "label": "Z-Image Turbo",
-            "url": "https://huggingface.co/Tongyi-MAI/Z-Image-Turbo"
-          },
-          {
-            "label": "Z-Image Turbo ControlNet Union",
+            "label": "ControlNet Union",
             "url": "https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union"
           },
           {
@@ -126,32 +138,57 @@
             "type": "select",
             "label": "Download",
             "arg": "--asset",
-            "default": "complete_sprite",
+            "default": "complete_sprite_stack",
             "options": [
               {
-                "label": "Complete Sprite Package",
+                "label": "Complete Sprite Stack",
+                "value": "complete_sprite_stack",
+                "description": "Fetch all first-run Sprite needs: shared Z-Image INT4 r32 backend, both LoRAs, ControlNet Union, and Depth Anything"
+              },
+              {
+                "label": "Complete Sprite Assets",
                 "value": "complete_sprite",
-                "description": "Both LoRAs, staged ControlNet Union, and Depth Anything; LoRA choice can be switched later"
+                "description": "Fetch both LoRAs, staged ControlNet Union, and Depth Anything without touching shared Z-Image backend weights"
+              },
+              {
+                "label": "Sprite backend - Z-Image INT4 r32",
+                "value": "sprite_starter",
+                "description": "Fetch only the shared Z-Image backend model/weight needed for the default Sprite run"
+              },
+              {
+                "label": "Z-Image Turbo INT4 r128",
+                "value": "zimage_int4_r128",
+                "description": "Fetch only the balanced RTX 20/30/40 shared backend weight"
+              },
+              {
+                "label": "Z-Image Turbo INT4 r256",
+                "value": "zimage_int4_r256",
+                "description": "Fetch only the highest-rank INT4 shared backend weight"
+              },
+              {
+                "label": "Z-Image Turbo FP4 r32",
+                "value": "zimage_fp4_r32",
+                "description": "Fetch only the fast RTX 50 / Blackwell-oriented shared backend weight"
               },
               {
                 "label": "Z-Image Turbo Pixel Art LoRA",
                 "value": "mks0813_pixel_art",
-                "description": "Recommended first sprite LoRA; trigger pxlstl"
+                "description": "Fetch only the mks0813 LoRA; retained as an alternate because current Nunchaku LoRA composition rejects it"
               },
               {
-                "label": "Pixel Art Style LoRA for Z-Image Turbo",
+                "label": "Pixel Art Style LoRA",
                 "value": "tarn59_pixel_art",
-                "description": "Alternative pixel-art style LoRA; trigger Pixel art style."
+                "description": "Fetch only the recommended first sprite LoRA for the current Nunchaku runtime"
               },
               {
                 "label": "Z-Image ControlNet Union",
                 "value": "controlnet_union",
-                "description": "Staged guidance asset for future morphology/depth/canny control"
+                "description": "Fetch only the staged guidance asset for future morphology/depth/canny control"
               },
               {
                 "label": "Depth Anything V2 Small",
                 "value": "depth_anything_small",
-                "description": "Depth extraction asset for sprite depth-map work"
+                "description": "Fetch only the depth extraction asset for sprite depth-map work"
               }
             ]
           },
@@ -165,7 +202,7 @@
           }
         ],
         "submit": {
-          "label": "Fetch"
+          "label": "Fetch Models"
         }
       }
     ],
@@ -193,6 +230,12 @@
         "label": "Open Outputs",
         "entrypoint": "open_outputs",
         "result": "open_directory"
+      },
+      {
+        "id": "foundry_status",
+        "label": "Foundry Status",
+        "entrypoint": "foundry_status",
+        "result": "show_logs"
       },
       {
         "id": "logs",
@@ -248,6 +291,9 @@
     "v0.1.10 replaces the starter prompt presets with Sprite Foundry-derived subjects, inlines the Nymphs Image forest background during install, moves source generation into the Z-Image stage, and lets the strip picker load recent Z-Image outputs.",
     "v0.1.11 keeps the forest background as an installed file URI instead of a huge data URI so WebView2 can load the module UI.",
     "v0.1.12 base64url-chunks long prompt, LoRA trigger/path, and selected source-image arguments so Manager's safe module-action argument filter does not reject generation.",
-    "v0.1.13 rewires source generation to call Z-Image /generate directly like Nymphs Image, leaving Manager module actions for status, folders, and Foundry-style post-processing."
+    "v0.1.13 rewires source generation to call Z-Image /generate directly like Nymphs Image, leaving Manager module actions for status, folders, and Foundry-style post-processing.",
+    "v0.1.14 replaces the small hand-written prompt sample with a generated Sprite Foundry character preset catalog and aligns source prompt composition with the Foundry NymphsCore runner.",
+    "v0.1.15 adds module actions for the canonical Sprite Foundry fork flow, including Foundry status/verify and generate-nymphscore from imported presets.",
+    "v0.1.16 adds a Sprite-facing Model Fetch action that delegates to the shared Nymphs Image / Z-Image fetcher and cache before first run, and leaves the Nunchaku-compatible tarn59 LoRA selected after complete fetches."
   ]
 }

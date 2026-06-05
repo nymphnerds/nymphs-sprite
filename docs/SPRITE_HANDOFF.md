@@ -23,7 +23,7 @@ Nymphs Sprite UI
 ```text
 nymphnerds/nymphs-sprite
   NymphsCore module surface, Manager page, sprite LoRA fetch, sprite runner.
-  Current workspace target: v0.1.13, module UI is being tightened against the
+  Current workspace target: v0.1.14, module UI is being tightened against the
   Nymphs Image rail/stage standard and Sprite Foundry's source-review flow.
 
 nymphnerds/sprite-foundry
@@ -59,6 +59,9 @@ nymphnerds/nymphs-registry
 - Default sprite target is `96`; allowed range is `24..512`.
 - Nymphs Sprite owns sprite-specific LoRAs/config/output. Nymphs Image owns
   base model and quantized weight fetching.
+- Nymphs Sprite exposes those shared backend model choices through its own
+  native `Model Fetch` dropdown, but delegates actual backend downloads to the
+  same Nymphs Image / Z-Image fetcher and Hugging Face cache.
 
 ## Proven State
 
@@ -153,6 +156,20 @@ grid-template-columns: clamp(260px, 28vw, 300px) minmax(300px, 1fr);
 - Prompt selection is a single module-specific preset dropdown, not the full
   general Nymphs Image Subject/Style/View composer. Presets now come from
   Sprite Foundry character JSON `subject_prompt` / `negative_prompt` material.
+- The prompt preset dropdown should be treated as a Foundry subject-config
+  selector. It is now backed by:
+
+```text
+profiles/foundry_character_presets.json
+profiles/foundry_export_roster.json
+```
+
+  The catalog preserves available local Foundry `pipeline/chars` prompts,
+  negative prompts, seeds, roles, body classes, body locks, reject conditions,
+  pack metadata, and source config paths. The public Foundry roster has 92
+  export packs; `foundry_export_roster.json` carries that lane/subject target.
+  The local fork currently provides prompt configs for the selectable generation
+  presets, while roster-only entries remain parity targets.
 - `Generate Sources` belongs to the Z-Image section. The intended review loop
   is:
 
@@ -195,20 +212,24 @@ choose Foundry-style prompt + LoRA
 $HOME/NymphsData/config/nymphs-sprite/selected_lora.env
 ```
 
-- LoRA fetch now follows the module guide:
-- LoRA, ControlNet, and Depth are exposed through one module-owned
-  `Asset Fetch` dropdown:
+- Fetch now follows the module guide: one native compact `Model Fetch` dropdown
+  owns first-run preparation and repair choices:
 
 ```text
-Complete Sprite Package -> mks0813 LoRA + tarn59 LoRA + ControlNet Union + Depth Anything
-Individual choices      -> LoRA only, ControlNet only, Depth only
+Complete Sprite Stack   -> Z-Image INT4 r32 + mks0813 LoRA + tarn59 LoRA + ControlNet Union + Depth Anything
+                         -> leaves tarn59 selected
+Complete Sprite Assets  -> mks0813 LoRA + tarn59 LoRA + ControlNet Union + Depth Anything
+                         -> leaves tarn59 selected
+Individual choices      -> backend weight only, LoRA only, ControlNet only, Depth only
 ```
 
 - The actual model/LoRA files are not committed into git. The module owns the
   recipes, UI choices, paths, fetch scripts, status, and delete behavior; fetched
   assets live under the declared module/cache roots.
-- Complete fetch leaves `mks0813_pixel_art` selected by default for first-run
-  generation. A later UI pass should expose switching between downloaded LoRAs.
+- Complete fetch leaves `tarn59_pixel_art` selected by default for first-run
+  generation. A one-direction smoke test passed with tarn59 on Z-Image INT4
+  r32. The `mks0813_pixel_art` file is kept as an alternate asset, but currently
+  fails Nunchaku LoRA composition with a rank/shape mismatch.
 
 - Fetch output follows the module guide:
 
@@ -269,6 +290,21 @@ sprite_batch.json
   background cleanup, foreground crop, square pad, nearest-neighbor sprite
   resize, transparent albedo output, preview/contact sheets, and mechanical
   checks.
+- Direct UI generation and module-bridge generation should use the same
+  Foundry NymphsCore prompt shape:
+
+```text
+<lora trigger>, <subject prompt>, <direction prompt>,
+pixel art sprite, game character sprite, 2D RPG, clean readable silhouette,
+centered full body character, isolated figure, bright green background,
+crisp sprite design, HD-2D inspired, single character only
+```
+
+  Negative prompts should append:
+
+```text
+white background, gray background, grey background, beige background, gradient background
+```
 
 Sprite Foundry fork:
 
@@ -449,7 +485,7 @@ Replace these assumptions:
    - Confirm module appears only in dev mode.
    - Confirm the custom UI opens as a Nymphs Image-style rail/stage screen.
    - Confirm the sidebar width and mobile collapse match Nymphs Image.
-   - Confirm the Asset Fetch dropdown includes one complete package and individual assets.
+   - Confirm the Model Fetch dropdown includes Complete Sprite Stack, Sprite-only assets, and individual repair choices.
    - Confirm LoRA/ControlNet/Depth fetches use the compact progress display.
    - Confirm downloaded LoRAs show in status/model cache after refresh.
 
@@ -474,11 +510,14 @@ Replace these assumptions:
    - Check direction consistency.
    - Check sheet layout.
 
-5. Decide integration split after the first real batch.
+5. Use the Foundry bridge for canonical lifecycle runs.
    - Keep `nymphs-sprite` as the user-facing module.
-   - Keep `sprite-foundry` as deeper orchestration/export reference.
-   - Either call Foundry from the module or port exact pieces once the module
-     path is proven.
+   - Keep `sprite-foundry` as the deeper orchestration/export engine.
+   - `Foundry Run` in the module UI calls `foundry_generate`, which wraps
+     `python3 -m foundry.cli generate-nymphscore` with the selected imported
+     preset's original `pipeline/chars/*.json` config.
+   - Keep the lighter `Generate Sources` / `Generate + Process` path for fast
+     module batch iteration and source-image review.
 
 ## Do Not Forget
 
