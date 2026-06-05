@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.27 - 2026-06-05
+
+- Removed the Sprite `generate_sources` module action from the advertised
+  manifest surface so Manager cannot route source image generation through the
+  old script bridge.
+- Kept the UI `Generate Sources` button, but it now only uses the direct
+  Nymphs Image-style Z-Image `/generate` call.
+- Matched the working Nymphs Image fast smoke-test defaults: `auto_r32`,
+  512x512, 8 steps, seed 0, LoRA strength 1, and one `front` source selected
+  by default.
+
 ## 0.1.20 - 2026-06-05
 
 - Normalize fetched Z-Image LoRA keys into the runtime copy stored under the

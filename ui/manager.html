@@ -730,10 +730,10 @@
               <option value="int4_r256">Z-Image Nunchaku r256</option>
             </select>
           </div>
-          <div class="field"><label for="width">Width</label><input id="width" type="number" min="256" max="2048" step="64" value="1024"></div>
-          <div class="field"><label for="height">Height</label><input id="height" type="number" min="256" max="2048" step="64" value="1024"></div>
-          <div class="field"><label for="steps">Steps</label><input id="steps" type="number" min="1" max="80" value="9"></div>
-          <div class="field"><label for="seed">Seed</label><input id="seed" type="number" value="123456789"></div>
+          <div class="field"><label for="width">Width</label><input id="width" type="number" min="256" max="2048" step="64" value="512"></div>
+          <div class="field"><label for="height">Height</label><input id="height" type="number" min="256" max="2048" step="64" value="512"></div>
+          <div class="field"><label for="steps">Steps</label><input id="steps" type="number" min="1" max="80" value="8"></div>
+          <div class="field"><label for="seed">Seed</label><input id="seed" type="number" value="0"></div>
           <div class="field wide"><label for="lora-choice">LoRA</label><select id="lora-choice"></select></div>
           <div class="field"><label for="lora-trigger">Trigger</label><input id="lora-trigger" maxlength="80" value="pxlstl"></div>
           <div class="field"><label for="lora-scale">Scale</label><input id="lora-scale" type="number" min="0" max="2" step="0.05" value="1"></div>
@@ -751,13 +751,13 @@
         </div>
         <div class="check-grid" id="directions">
           <label class="check"><input type="checkbox" value="front" checked>Front</label>
-          <label class="check"><input type="checkbox" value="front_left" checked>Front left</label>
-          <label class="check"><input type="checkbox" value="left" checked>Left</label>
-          <label class="check"><input type="checkbox" value="back_left" checked>Back left</label>
-          <label class="check"><input type="checkbox" value="back" checked>Back</label>
-          <label class="check"><input type="checkbox" value="back_right" checked>Back right</label>
-          <label class="check"><input type="checkbox" value="right" checked>Right</label>
-          <label class="check"><input type="checkbox" value="front_right" checked>Front right</label>
+          <label class="check"><input type="checkbox" value="front_left">Front left</label>
+          <label class="check"><input type="checkbox" value="left">Left</label>
+          <label class="check"><input type="checkbox" value="back_left">Back left</label>
+          <label class="check"><input type="checkbox" value="back">Back</label>
+          <label class="check"><input type="checkbox" value="back_right">Back right</label>
+          <label class="check"><input type="checkbox" value="right">Right</label>
+          <label class="check"><input type="checkbox" value="front_right">Front right</label>
         </div>
         <div class="command-row">
           <button id="generate-process" type="button">Generate + Process</button>
@@ -1608,9 +1608,9 @@
           model_id: zSelection.model_id,
           nunchaku_rank: zSelection.nunchaku_rank,
           nunchaku_precision: zSelection.nunchaku_precision,
-          width: parseInt(value("width") || "1024", 10),
-          height: parseInt(value("height") || "1024", 10),
-          steps: parseInt(value("steps") || "9", 10),
+          width: parseInt(value("width") || "512", 10),
+          height: parseInt(value("height") || "512", 10),
+          steps: parseInt(value("steps") || "8", 10),
           guidance_scale: 0,
           seed,
           prompt: spritePrompt(direction),
@@ -1642,14 +1642,6 @@
       }
       setProgress("Done", `${generatedPaths.length} source image${generatedPaths.length === 1 ? "" : "s"} ready.`, 100);
       return generatedPaths;
-    }
-
-    async function generateSourcesViaModuleBridge(directions) {
-      setProgress("Z-Image", "Generating through module bridge.", 10);
-      const before = new Set(state.outputs.map(outputKey));
-      const text = await moduleAction("generate_sources", buildModuleArgs(directions), { busy: false });
-      parseOutputPaths(text);
-      return state.outputs.map(outputKey).filter((key) => key && !before.has(key) && !/^https?:/i.test(key));
     }
 
     function populatePromptPresets() {
@@ -1743,26 +1735,16 @@
       renderGallery();
       $("result-image").style.display = "none";
       $("empty").hidden = false;
-      const sourcesOnly = action === "generate_sources";
+      const sourcesOnly = action === "sources_only";
       const processingSelected = selectedSources.length > 0;
       setProgress("Generate", sourcesOnly ? "Generating source directions." : (processingSelected ? "Processing selected source images." : "Generating and processing batch."), 10);
       setBusy(true, "Generate");
       (async () => {
         let sources = selectedSources;
         if (!sourcesOnly && !sources.length) {
-          try {
-            sources = await generateZImageSources(directions);
-          } catch (error) {
-            append(`Direct Z-Image generation unavailable: ${error.message || error}`);
-            sources = await generateSourcesViaModuleBridge(directions);
-          }
+          sources = await generateZImageSources(directions);
         } else if (sourcesOnly) {
-          try {
-            await generateZImageSources(directions);
-          } catch (error) {
-            append(`Direct Z-Image generation unavailable: ${error.message || error}`);
-            await generateSourcesViaModuleBridge(directions);
-          }
+          await generateZImageSources(directions);
           return;
         }
         const text = await moduleAction("generate_directions", buildModuleArgs(directions, sources), { busy: false });
@@ -1810,7 +1792,7 @@
     $("prompt-preset").addEventListener("change", () => applyPromptPreset($("prompt-preset").value));
     $("subject-prompt").addEventListener("input", markPromptCustom);
     $("negative-prompt").addEventListener("input", markPromptCustom);
-    $("generate-sources").addEventListener("click", () => runGeneration("generate_sources"));
+    $("generate-sources").addEventListener("click", () => runGeneration("sources_only"));
     $("generate-process").addEventListener("click", () => runGeneration("generate_directions"));
     $("foundry-generate").addEventListener("click", runFoundryGeneration);
 
