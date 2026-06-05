@@ -56,9 +56,9 @@ if [[ "${confirmed}" != "true" && "${dry_run}" != "true" ]]; then
   exit 1
 fi
 
-PROFILE_FILE="${NYMPHS_SPRITE_PROFILES_DIR}/zimage_turbo_lora_candidates.json"
+PROFILE_FILE="$(cd "${SCRIPT_DIR}/.." && pwd)/profiles/zimage_turbo_lora_candidates.json"
 if [[ ! -f "${PROFILE_FILE}" ]]; then
-  PROFILE_FILE="$(cd "${SCRIPT_DIR}/.." && pwd)/profiles/zimage_turbo_lora_candidates.json"
+  PROFILE_FILE="${NYMPHS_SPRITE_PROFILES_DIR}/zimage_turbo_lora_candidates.json"
 fi
 
 python3 - "${PROFILE_FILE}" "${NYMPHS_SPRITE_LORA_DIR}" "${NYMPHS_SPRITE_LORA_PRESET_FILE}" "${profile}" "${dry_run}" <<'PY'

@@ -77,9 +77,9 @@ if [[ -f "${NYMPHS_SPRITE_LORA_PRESET_FILE}" ]]; then
   selected_lora_scale="$(sed -n 's/^NYMPHS_SPRITE_SELECTED_LORA_SCALE=//p' "${NYMPHS_SPRITE_LORA_PRESET_FILE}" | tail -n 1)"
 fi
 
-PROFILE_FILE="${NYMPHS_SPRITE_PROFILES_DIR}/zimage_turbo_lora_candidates.json"
+PROFILE_FILE="$(cd "${SCRIPT_DIR}/.." && pwd)/profiles/zimage_turbo_lora_candidates.json"
 if [[ ! -f "${PROFILE_FILE}" ]]; then
-  PROFILE_FILE="$(cd "${SCRIPT_DIR}/.." && pwd)/profiles/zimage_turbo_lora_candidates.json"
+  PROFILE_FILE="${NYMPHS_SPRITE_PROFILES_DIR}/zimage_turbo_lora_candidates.json"
 fi
 
 if [[ -d "${NYMPHS_SPRITE_CONTROLNET_DIR}/alibaba-pai--Z-Image-Turbo-Fun-Controlnet-Union" ]] &&

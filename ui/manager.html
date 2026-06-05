@@ -720,6 +720,16 @@
       <section class="section">
         <div class="section-title"><span>Z-Image</span><span id="model-chip">r32</span></div>
         <div class="grid">
+          <div class="field wide">
+            <label for="z-model-choice">Model</label>
+            <select id="z-model-choice">
+              <option value="auto_r32">Auto r32</option>
+              <option value="auto_r128">Auto r128</option>
+              <option value="int4_r256">INT4 r256</option>
+              <option value="fp4_r32">FP4 r32</option>
+              <option value="fp4_r128">FP4 r128</option>
+            </select>
+          </div>
           <div class="field"><label for="width">Width</label><input id="width" type="number" min="256" max="2048" step="64" value="1024"></div>
           <div class="field"><label for="height">Height</label><input id="height" type="number" min="256" max="2048" step="64" value="1024"></div>
           <div class="field"><label for="steps">Steps</label><input id="steps" type="number" min="1" max="80" value="9"></div>
@@ -845,6 +855,7 @@
       manualFolderName: "",
       viewerSource: "outputs",
       selectedLoraPath: "",
+      zModelTouched: false,
       statusValues: {},
     };
 
@@ -909,6 +920,31 @@
       }).filter((item) => item.id && item.path);
     }
 
+    const loraMetadata = {
+      mks0813_pixel_art: { label: "Z-Image Turbo Pixel LoRA", trigger: "pxlstl" },
+      skyasl_pixel_artist: { label: "Pixel-artist-Z Character LoRA", trigger: "a pixel art character" },
+      tarn59_pixel_art: { label: "Pixel Art Style LoRA", trigger: "Pixel art style." }
+    };
+
+    function canonicalLoraId(id, path = "") {
+      const text = `${id || ""} ${path || ""}`.toLowerCase();
+      if (text.includes("mks0813")) return "mks0813_pixel_art";
+      if (text.includes("skyasl") || text.includes("pixel_artist")) return "skyasl_pixel_artist";
+      if (text.includes("tarn59") || text.includes("pixel_art_style")) return "tarn59_pixel_art";
+      return id || "";
+    }
+
+    function loraLabel(choice) {
+      const canonical = canonicalLoraId(choice.id, choice.path);
+      if (loraMetadata[canonical]) return loraMetadata[canonical].label;
+      return String(choice.id || choice.name || "LoRA").replace(/^custom_/, "").replace(/_/g, " ");
+    }
+
+    function loraTriggerFor(id, path = "") {
+      const canonical = canonicalLoraId(id, path);
+      return loraMetadata[canonical]?.trigger || "";
+    }
+
     function yes(value) {
       return String(value || "").toLowerCase() === "true";
     }
@@ -948,7 +984,8 @@
         const option = document.createElement("option");
         option.value = choice.id;
         option.dataset.path = choice.path;
-        option.textContent = `${choice.id.replace(/_/g, " ")} / ${choice.name}`;
+        option.dataset.canonicalId = canonicalLoraId(choice.id, choice.path);
+        option.textContent = loraLabel(choice);
         select.appendChild(option);
       }
       const selectedOption = Array.from(select.options).find((option) => option.value === selectedId)
@@ -969,20 +1006,21 @@
       const depthReady = yes(values.depth_models_ready);
       const zReady = yes(values.zimage_models_ready);
       const zProfile = values.zimage_weight_profile_selected || values.weight_profile_selected || "int4_r32";
+      if (!state.zModelTouched) $("z-model-choice").value = zModelChoiceFromStatus(values);
 
       $("status-pill").textContent = statusLabel();
       $("status-pill").className = statusClass();
       $("runtime-chip").textContent = values.health === "ok" ? "ready" : "check";
-      $("model-chip").textContent = zProfile;
+      $("model-chip").textContent = $("z-model-choice").value.toUpperCase();
       $("runtime-text").textContent = values.zimage_url ? `Z-Image ${values.zimage_url} / ${zReady ? "models ready" : "fetch models"}` : "Z-Image";
       $("selected-model-text").textContent = values.selected_lora_path ? basename(values.selected_lora_path) : (loras.join(", ") || "none");
       $("progress-detail").textContent = `Backend ${zReady ? "ready" : "missing"} | LoRA ${loras.length || 0} | Control ${controlReady ? "ready" : "staged"} | Depth ${depthReady ? "ready" : "staged"}`;
       populateLoraChoices(values);
       if (values.selected_lora_trigger) $("lora-trigger").value = values.selected_lora_trigger;
       if (values.selected_lora_scale) $("lora-scale").value = values.selected_lora_scale;
-      if ($("lora-choice").value === "mks0813_pixel_art") $("lora-trigger").value = "pxlstl";
-      if ($("lora-choice").value === "skyasl_pixel_artist") $("lora-trigger").value = "a pixel art character";
-      if ($("lora-choice").value === "tarn59_pixel_art") $("lora-trigger").value = "Pixel art style.";
+      const selectedOption = $("lora-choice").selectedOptions[0];
+      const trigger = loraTriggerFor($("lora-choice").value, selectedOption?.dataset.path || "");
+      if (trigger) $("lora-trigger").value = trigger;
       setProgress("Idle", $("progress-detail").textContent, 0);
     }
 
@@ -1341,12 +1379,23 @@
       return String(path || "").startsWith("/") ? `${base}${path}` : String(path || "");
     }
 
-    function zImageSelection() {
-      const values = state.statusValues || {};
+    function zModelChoiceFromStatus(values) {
       const profile = String(values.zimage_weight_profile_selected || "").replace(/^zimage_/, "");
       const match = profile.match(/^(auto|int4|fp4)_r(32|128|256)$/);
       const rank = parseInt(values.zimage_nunchaku_rank || (match ? match[2] : "32"), 10);
-      const precision = String(values.zimage_nunchaku_precision || (match ? match[1] : "auto")).toLowerCase();
+      let precision = String(values.zimage_nunchaku_precision || (match ? match[1] : "auto")).toLowerCase();
+      if (!["auto", "int4", "fp4"].includes(precision)) precision = "auto";
+      if (rank === 256) return "int4_r256";
+      if (rank === 128) return `${precision === "fp4" ? "fp4" : "auto"}_r128`;
+      if (precision === "fp4") return "fp4_r32";
+      return "auto_r32";
+    }
+
+    function zImageSelection() {
+      const choice = $("z-model-choice")?.value || zModelChoiceFromStatus(state.statusValues || {});
+      const [rawPrecision, rawRank] = choice.split("_r");
+      const rank = parseInt(rawRank || "32", 10);
+      const precision = String(rawPrecision || "auto").toLowerCase();
       return {
         model_id: "Tongyi-MAI/Z-Image-Turbo",
         nunchaku_rank: [32, 128, 256].includes(rank) ? rank : 32,
@@ -1522,10 +1571,16 @@
     $("lora-choice").addEventListener("change", () => {
       const option = $("lora-choice").selectedOptions[0];
       state.selectedLoraPath = option?.dataset.path || "";
+      const trigger = loraTriggerFor($("lora-choice").value, state.selectedLoraPath);
+      if (trigger) $("lora-trigger").value = trigger;
       if (!$("lora-choice").value) return;
       moduleAction("select_lora", { candidate: $("lora-choice").value }, { quiet: false })
         .then(refreshStatus)
         .catch(() => {});
+    });
+    $("z-model-choice").addEventListener("change", () => {
+      state.zModelTouched = true;
+      $("model-chip").textContent = $("z-model-choice").value.toUpperCase();
     });
     function runGeneration(action) {
       if (state.busy) return;

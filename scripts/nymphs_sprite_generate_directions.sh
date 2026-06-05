@@ -116,9 +116,9 @@ if [[ -f "${NYMPHS_SPRITE_LORA_PRESET_FILE}" ]]; then
   selected_lora_path="$(sed -n 's/^NYMPHS_SPRITE_SELECTED_LORA_PATH=//p' "${NYMPHS_SPRITE_LORA_PRESET_FILE}" | tail -n 1)"
   selected_lora_trigger="$(sed -n 's/^NYMPHS_SPRITE_SELECTED_LORA_TRIGGER=//p' "${NYMPHS_SPRITE_LORA_PRESET_FILE}" | tail -n 1)"
   selected_lora_scale="$(sed -n 's/^NYMPHS_SPRITE_SELECTED_LORA_SCALE=//p' "${NYMPHS_SPRITE_LORA_PRESET_FILE}" | tail -n 1)"
-  profile_file="${NYMPHS_SPRITE_PROFILES_DIR}/zimage_turbo_lora_candidates.json"
+  profile_file="$(cd "${SCRIPT_DIR}/.." && pwd)/profiles/zimage_turbo_lora_candidates.json"
   if [[ ! -f "${profile_file}" ]]; then
-    profile_file="$(cd "${SCRIPT_DIR}/.." && pwd)/profiles/zimage_turbo_lora_candidates.json"
+    profile_file="${NYMPHS_SPRITE_PROFILES_DIR}/zimage_turbo_lora_candidates.json"
   fi
   resolved_lora_path="$("${python_bin}" - "${profile_file}" "${NYMPHS_SPRITE_LORA_DIR}" "${selected_lora_candidate}" "${selected_lora_path}" <<'PY'
 from __future__ import annotations
