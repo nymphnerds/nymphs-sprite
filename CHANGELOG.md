@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.30 - 2026-06-05
+
+- Restored the Nymphs Image forest stage look in Sprite by simplifying the
+  viewer background to use the installed `ui/nymphs_preview_forest.png`
+  directly.
+- Removed the darker inherited overlay/fallback stack that made the stage read
+  as a plain black panel in Manager.
+
 ## 0.1.29 - 2026-06-05
 
 - Flush source-generation progress lines immediately from the Sprite bridge so

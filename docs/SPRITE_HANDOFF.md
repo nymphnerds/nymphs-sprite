@@ -25,7 +25,7 @@ later dedicated conversion module.
 Current source version target:
 
 ```text
-nymphs-sprite 0.1.29
+nymphs-sprite 0.1.30
 ```
 
 Latest pushed/tested state from 2026-06-05:
@@ -49,8 +49,12 @@ Remaining roughness found during test:
   `output_front=<local path>` and final JSON `"url"` as separate outputs.
 - `0.1.29` fixes those two UI bridge issues by flushing progress lines and
   merging JSON preview URLs onto the matching local output path.
+- `0.1.30` restores the Nymphs Image forest stage look. The forest PNG was
+  already present and identical to Nymphs Image's asset, but Sprite's viewer CSS
+  used a darker overlay/fallback stack that made the stage read as plain black.
+  The CSS now uses the installed local `ui/nymphs_preview_forest.png` directly.
 
-Current source tree may have uncommitted changes while preparing `0.1.29`.
+Current source tree may have uncommitted changes while preparing `0.1.30`.
 Do not update the registry until:
 
 1. The source diff is reviewed.
