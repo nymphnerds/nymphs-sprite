@@ -25,10 +25,33 @@ later dedicated conversion module.
 Current source version target:
 
 ```text
-nymphs-sprite 0.1.20
+nymphs-sprite 0.1.29
 ```
 
-Current source tree has uncommitted changes. Do not update the registry until:
+Latest pushed/tested state from 2026-06-05:
+
+- `0.1.28` was pushed and added to the dev registry.
+- User updated/tested from the test WSL through Manager.
+- `Generate Sources` produced a source image successfully using the shared
+  Nymphs Image/Z-Image runtime and `mks0813_pixel_art`.
+- The generated goblin scout source looked correct: Z-Image Turbo/Nunchaku,
+  512x512, 8 steps, `mks0813_pixel_art.safetensors`, green-screen source.
+- The runtime architecture is now correct: Sprite does not own/copy/vendor
+  Z-Image, and it uses the same Nymphs Image runtime, venv, shared HF cache,
+  and shared `$HOME/LoRA/loras` library.
+
+Remaining roughness found during test:
+
+- The Manager-action bridge looked frozen at `10%` while Z-Image was working.
+  Cause: Python progress prints were buffered, unlike Nymphs Image which polls
+  `/active_task` live from its own served UI.
+- The strip showed a duplicate/blank second tile because Sprite parsed both
+  `output_front=<local path>` and final JSON `"url"` as separate outputs.
+- `0.1.29` fixes those two UI bridge issues by flushing progress lines and
+  merging JSON preview URLs onto the matching local output path.
+
+Current source tree may have uncommitted changes while preparing `0.1.29`.
+Do not update the registry until:
 
 1. The source diff is reviewed.
 2. The module repo is committed and pushed.
@@ -69,30 +92,21 @@ Do not manually copy source files into the test/runtime WSL.
 
 ## Current Diff Summary
 
-At this checkpoint, `nymphs-sprite` source has modified:
+At the older `0.1.20` checkpoint, `nymphs-sprite` source had modified many
+files. As of the `0.1.29` cleanup pass, the intended active diff is much
+smaller:
 
 ```text
 CHANGELOG.md
-README.md
-docs/FOUNDRY_SOURCE_AUDIT_AND_TEST_FLOW.md
 docs/SPRITE_HANDOFF.md
 nymph.json
-profiles/zimage_turbo_lora_candidates.json
-scripts/_nymphs_sprite_common.sh
-scripts/nymphs_sprite_delete_models.sh
-scripts/nymphs_sprite_fetch_assets.sh
-scripts/nymphs_sprite_fetch_lora.sh
-scripts/nymphs_sprite_foundry_generate.sh
 scripts/nymphs_sprite_generate_directions.py
-scripts/nymphs_sprite_generate_directions.sh
-scripts/nymphs_sprite_select_lora.sh
-scripts/nymphs_sprite_status.sh
 ui/manager.html
 ```
 
 No untracked `__pycache__` artifacts were left after static checks.
 
-High-level changes in that diff:
+High-level state now:
 
 - Adds/normalizes three Z-Image Turbo pixel-art LoRAs.
 - Moves Sprite LoRAs to the shared LoRA module layout.
@@ -105,6 +119,15 @@ High-level changes in that diff:
 - Removes the fallback that silently avoided `mks0813_pixel_art`.
 - Keeps ControlNet/Depth as staged assets only, not as a claimed working
   generation path.
+- Restores source generation through the Manager action transport, because
+  Sprite's `local_html` WebView cannot reliably use Nymphs Image's direct
+  relative browser `fetch()` model.
+- Keeps the actual generation method copied from Nymphs Image at the API
+  contract level: `/api/model/load` then `/generate`, same model/rank/LoRA
+  payload fields, same shared runtime.
+- `0.1.29` improves the Manager-action version of that flow by flushing
+  progress and merging preview URLs, but it is still not as elegant as the
+  native Nymphs Image UI.
 
 ## Shared Model And Data Contract
 
@@ -281,10 +304,14 @@ selected model/rank/precision
   -> generate using same model/rank/precision
 ```
 
-Sprite now follows that pattern in both routes:
+Sprite should follow that pattern through the module bridge:
 
-- direct browser/Z-Image route in `ui/manager.html`
 - module bridge route in `scripts/nymphs_sprite_generate_directions.py`
+
+Important: `ui/manager.html` is `local_html`, not the Z-Image-served Nymphs
+Image page. It must not browser-fetch `http://127.0.0.1:8090/generate`
+directly. That caused WebView `Failed to fetch`. Keep browser calls on the
+Manager module-action transport, and let the script call the shared Z-Image API.
 
 Sprite status now forwards these values from `zimage_status.sh`:
 
@@ -355,9 +382,9 @@ Implemented pieces:
 - Nymphs Image-style Manager visual language.
 - Original Foundry roster preset dropdown.
 - Three shared LoRA choices.
-- Fast source generation path through Z-Image `/generate`.
+- Fast source generation path through Sprite `generate_sources`, which calls
+  shared Z-Image `/api/model/load` and `/generate` from the script side.
 - Model-load-first behavior copied from Nymphs Image.
-- Module-action fallback for bridge cases.
 - Module bridge auto-starts Z-Image when offline.
 - Foundry-style Python post-process:
   - copy raw source images
@@ -524,6 +551,11 @@ explicitly requested. The user likes it, but we paused this to keep the current
 fix scoped. Future polish should copy the tested Nymphs Image pattern rather
 than inventing a new browser.
 
+After the final 2026-06-05 test, the source image displayed successfully, but
+the strip briefly showed duplicate/blank entries. `0.1.29` changes the parser
+to merge final Z-Image JSON preview URLs onto the existing local path entry.
+Retest this specifically.
+
 ## Validation Done This Session
 
 Static checks passed:
@@ -564,7 +596,11 @@ No Z-Image/API server process was left running at the end of the session.
 
 ## Next Session Plan
 
-1. Re-read this handoff and the module rules:
+1. Do not restart the architecture. The source-image step worked. Keep Sprite
+   using shared Nymphs Image/Z-Image runtime and copy Nymphs Image behavior
+   where practical instead of creating another backend.
+
+2. Re-read this handoff and the module rules:
 
 ```text
 /home/nymph/NymphsCore/docs/SUPERHIVE_RELEASE_CHECKLIST.md
@@ -572,7 +608,7 @@ No Z-Image/API server process was left running at the end of the session.
 /home/nymph/NymphsCore/docs/NYMPHS_MODULE_MAKING_GUIDE.md
 ```
 
-2. Review the source diff.
+3. Review the source diff.
 
 ```bash
 git -C /home/nymph/NymphsModules/nymphs-sprite status --short --branch
@@ -580,7 +616,7 @@ git -C /home/nymph/NymphsModules/nymphs-sprite diff --stat
 git -C /home/nymph/NymphsModules/nymphs-sprite diff -- scripts/nymphs_sprite_fetch_lora.sh ui/manager.html scripts/nymphs_sprite_generate_directions.py scripts/nymphs_sprite_status.sh
 ```
 
-3. Confirm Z-Image source/runtime alignment.
+4. Confirm Z-Image source/runtime alignment.
 
 - Check whether installed `/home/nymph/Z-Image` is behind `NymphsModules/zimage`.
 - If behind, update it through module update flow.
@@ -588,7 +624,7 @@ git -C /home/nymph/NymphsModules/nymphs-sprite diff -- scripts/nymphs_sprite_fet
 - Confirm `model_manager.py` uses exact local HF cache path resolution for
   Nunchaku rank weights.
 
-4. Run static checks again.
+5. Run static checks again.
 
 ```bash
 python3 -m json.tool /home/nymph/NymphsModules/nymphs-sprite/nymph.json

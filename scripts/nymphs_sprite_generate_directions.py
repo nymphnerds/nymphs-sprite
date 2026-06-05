@@ -101,7 +101,8 @@ def ensure_zimage_model_loaded(zimage_url: str, args: argparse.Namespace) -> Non
     if not response.get("loaded") and response.get("restart") == "scheduled":
         print(
             "zimage_model_restart="
-            f"{payload['model_id']} precision={payload['nunchaku_precision']} rank={payload['nunchaku_rank']}"
+            f"{payload['model_id']} precision={payload['nunchaku_precision']} rank={payload['nunchaku_rank']}",
+            flush=True,
         )
         for _attempt in range(45):
             time.sleep(1.0)
@@ -114,7 +115,8 @@ def ensure_zimage_model_loaded(zimage_url: str, args: argparse.Namespace) -> Non
     if response.get("loaded"):
         print(
             "zimage_model_loaded="
-            f"{payload['model_id']} precision={payload['nunchaku_precision']} rank={payload['nunchaku_rank']}"
+            f"{payload['model_id']} precision={payload['nunchaku_precision']} rank={payload['nunchaku_rank']}",
+            flush=True,
         )
         return
     raise SystemExit(f"ERROR: Z-Image did not load the selected model: {response}")
@@ -647,8 +649,8 @@ def main() -> int:
         missing = [str(path) for path in source_images if not path.is_file()]
         if missing:
             raise SystemExit(f"ERROR: selected source image(s) not found: {', '.join(missing)}")
-        print(f"batch_id={batch_id}")
-        print(f"source_images={len(source_images)}")
+        print(f"batch_id={batch_id}", flush=True)
+        print(f"source_images={len(source_images)}", flush=True)
         generated = []
         for index, source in enumerate(source_images, start=1):
             direction = source_direction_name(source, index)
@@ -661,7 +663,7 @@ def main() -> int:
                     "response": {"output_path": str(source), "url": "", "metadata_path": ""},
                 }
             )
-            print(f"output_{direction}={source}")
+            print(f"output_{direction}={source}", flush=True)
         artifacts = write_sprite_artifacts(
             outputs_root=Path(args.outputs_root),
             subject_id=args.subject_id,
@@ -671,11 +673,11 @@ def main() -> int:
             args=args,
             generated=generated,
         )
-        print(f"sprite_batch_dir={artifacts['batch_dir']}")
-        print(f"sprite_manifest={artifacts['manifest_path']}")
+        print(f"sprite_batch_dir={artifacts['batch_dir']}", flush=True)
+        print(f"sprite_manifest={artifacts['manifest_path']}", flush=True)
         if artifacts["contact_sheet"]:
-            print(f"sprite_contact_sheet={artifacts['contact_sheet']}")
-        print(json.dumps({"status": "ok", "batch_id": batch_id, "outputs": [], "artifacts": artifacts}, indent=2))
+            print(f"sprite_contact_sheet={artifacts['contact_sheet']}", flush=True)
+        print(json.dumps({"status": "ok", "batch_id": batch_id, "outputs": [], "artifacts": artifacts}, indent=2), flush=True)
         return 0
 
     lora_path = args.lora_path.strip() or str(profile.get("lora_path") or "").strip()
@@ -690,8 +692,8 @@ def main() -> int:
     if invalid:
         raise SystemExit(f"ERROR: unknown direction(s): {', '.join(invalid)}")
 
-    print(f"batch_id={batch_id}")
-    print(f"lora_path={lora_path}")
+    print(f"batch_id={batch_id}", flush=True)
+    print(f"lora_path={lora_path}", flush=True)
     ensure_zimage_model_loaded(zimage_url, args)
 
     outputs = []
@@ -726,7 +728,7 @@ def main() -> int:
             "item_index": index,
             "item_total": len(direction_names),
         }
-        print(f"generate={direction} seed={payload['seed']}")
+        print(f"generate={direction} seed={payload['seed']}", flush=True)
         response = request_json("POST", f"{zimage_url.rstrip('/')}/generate", payload=payload)
         outputs.append(response)
         generated.append(
@@ -738,7 +740,7 @@ def main() -> int:
                 "response": response,
             }
         )
-        print(f"output_{direction}={response.get('output_path')}")
+        print(f"output_{direction}={response.get('output_path')}", flush=True)
         time.sleep(0.2)
 
     artifacts = write_sprite_artifacts(
@@ -750,12 +752,12 @@ def main() -> int:
         args=args,
         generated=generated,
     )
-    print(f"sprite_batch_dir={artifacts['batch_dir']}")
-    print(f"sprite_manifest={artifacts['manifest_path']}")
+    print(f"sprite_batch_dir={artifacts['batch_dir']}", flush=True)
+    print(f"sprite_manifest={artifacts['manifest_path']}", flush=True)
     if artifacts["contact_sheet"]:
-        print(f"sprite_contact_sheet={artifacts['contact_sheet']}")
+        print(f"sprite_contact_sheet={artifacts['contact_sheet']}", flush=True)
 
-    print(json.dumps({"status": "ok", "batch_id": batch_id, "outputs": outputs, "artifacts": artifacts}, indent=2))
+    print(json.dumps({"status": "ok", "batch_id": batch_id, "outputs": outputs, "artifacts": artifacts}, indent=2), flush=True)
     return 0
 
 

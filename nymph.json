@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -320,6 +320,7 @@
     "v0.1.25 restarts and reloads the shared Z-Image backend once when a stale Nunchaku transformer rank causes a qkv_proj_down LoRA shape mismatch during source generation.",
     "v0.1.26 aligns Sprite's Z-Image model choices, selected LoRA path precedence, LoRA strength default, and generate payload with the working Nymphs Image UI contract: auto_r32, auto_r128, int4_r256, no Sprite-owned rank-mismatch restart.",
     "v0.1.27 removes Sprite's source-generation module bridge action from the manifest and custom UI path. The Manager Generate Sources button now only uses the direct Nymphs Image-style Z-Image /generate flow, with Fast 512 defaults and one front source selected by default for smoke testing.",
-    "v0.1.28 restores generate_sources as the local_html Manager transport while keeping the shared Nymphs Image/Z-Image runtime, venv, model cache, and LoRA library. Sprite no longer browser-fetches the Z-Image API directly from its local_html UI."
+    "v0.1.28 restores generate_sources as the local_html Manager transport while keeping the shared Nymphs Image/Z-Image runtime, venv, model cache, and LoRA library. Sprite no longer browser-fetches the Z-Image API directly from its local_html UI.",
+    "v0.1.29 flushes Sprite bridge progress immediately and merges Z-Image JSON preview URLs back onto their local output paths so source generation feels less frozen and the strip does not show duplicate blank tiles."
   ]
 }

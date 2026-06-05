@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.29 - 2026-06-05
+
+- Flush source-generation progress lines immediately from the Sprite bridge so
+  Manager can show `batch_id`, `zimage_model_loaded`, and `generate=<direction>`
+  while Z-Image/Nunchaku is working.
+- Merge final Z-Image JSON preview URLs onto the existing local output path
+  entries instead of adding a second duplicate strip tile.
+- Keep the architecture unchanged: shared Nymphs Image/Z-Image runtime, shared
+  venv/cache/LoRA library, no vendored backend.
+
 ## 0.1.28 - 2026-06-05
 
 - Restored `generate_sources` as the Manager action transport for Sprite's

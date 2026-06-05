@@ -1053,15 +1053,23 @@
       return encodeURI(`file://${path}`);
     }
 
-    function addOutput(path, label) {
+    function addOutput(path, label, previewUrl = "") {
       if (!path || path === "None") return;
       if (!/\.(png|jpg|jpeg|webp)$/i.test(path)) return;
-      if (state.outputs.some((item) => item.path === path)) return;
+      const url = previewUrl || pathToFileUrl(path);
+      const existing = state.outputs.find((item) => item.path === path || (previewUrl && item.url === previewUrl));
+      if (existing) {
+        existing.url = url || existing.url;
+        existing.label = label || existing.label;
+        renderGallery();
+        if (state.visibleOutputs[0]) showOutput(0);
+        return;
+      }
       state.outputs.unshift({
         path,
         relative_path: path,
         label: label || basename(path),
-        url: pathToFileUrl(path),
+        url,
         managed: true,
         created: Date.now() / 1000,
         folder: "Current batch"
@@ -1077,19 +1085,20 @@
         const match = line.match(/^(sprite_contact_sheet|output_[A-Za-z0-9_]+)=([^\r\n]+)$/);
         if (match) addOutput(match[2].trim(), match[1].replace(/^output_/, ""));
       }
-      const urlMatches = String(text || "").match(/"url"\s*:\s*"([^"]+)"/g) || [];
-      for (const item of urlMatches) {
-        const match = item.match(/"url"\s*:\s*"([^"]+)"/);
-        if (!match) continue;
-        const rawUrl = match[1].replace(/\\\//g, "/");
-        const base = state.statusValues.zimage_url || "http://127.0.0.1:8090";
+      const base = state.statusValues.zimage_url || "http://127.0.0.1:8090";
+      const jsonPaths = [...String(text || "").matchAll(/"output_path"\s*:\s*"([^"]+)"/g)]
+        .map((match) => match[1].replace(/\\\//g, "/"));
+      const jsonUrls = [...String(text || "").matchAll(/"url"\s*:\s*"([^"]+)"/g)]
+        .map((match) => {
+          const rawUrl = match[1].replace(/\\\//g, "/");
+          return rawUrl.startsWith("/") ? `${base}${rawUrl}` : rawUrl;
+        });
+      for (const [index, path] of jsonPaths.entries()) {
+        addOutput(path, "zimage", jsonUrls[index] || "");
+      }
+      for (const rawUrl of jsonUrls.slice(jsonPaths.length)) {
         const url = rawUrl.startsWith("/") ? `${base}${rawUrl}` : rawUrl;
         addOutput(url, "zimage");
-      }
-      const jsonPaths = String(text || "").match(/"output_path"\s*:\s*"([^"]+)"/g) || [];
-      for (const item of jsonPaths) {
-        const match = item.match(/"output_path"\s*:\s*"([^"]+)"/);
-        if (match) addOutput(match[1].replace(/\\\//g, "/"), "output");
       }
     }
 
