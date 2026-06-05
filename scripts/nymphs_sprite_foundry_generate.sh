@@ -278,7 +278,9 @@ if selected_path and selected_path.is_file():
 PY
 )"
   [[ -n "${resolved_path}" ]] && selected_path="${resolved_path}"
-  [[ -z "${lora_path}" && -n "${selected_path}" ]] && lora_path="${selected_path}"
+  if [[ -n "${selected_path}" && ( -z "${lora_path}" || "${lora_path}" == *"/LoRA/loras/nymphs-sprite/"* ) ]]; then
+    lora_path="${selected_path}"
+  fi
   [[ -z "${lora_trigger}" && -n "${selected_trigger}" ]] && lora_trigger="${selected_trigger}"
   [[ -z "${lora_scale}" && -n "${selected_scale}" ]] && lora_scale="${selected_scale}"
 fi
