@@ -286,7 +286,7 @@ PY
 fi
 
 [[ -n "${lora_trigger}" ]] || lora_trigger="pxlstl"
-[[ -n "${lora_scale}" ]] || lora_scale="0.85"
+[[ -n "${lora_scale}" ]] || lora_scale="1"
 
 if [[ -n "${lora_path}" && ! -f "${lora_path}" ]]; then
   echo "ERROR: selected LoRA path does not exist: ${lora_path}" >&2

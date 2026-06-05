@@ -59,7 +59,7 @@ Usage:
   nymphs_sprite_select_lora.sh --candidate mks0813_pixel_art
   nymphs_sprite_select_lora.sh --candidate skyasl_pixel_artist
   nymphs_sprite_select_lora.sh --candidate tarn59_pixel_art
-  nymphs_sprite_select_lora.sh --path /path/to/lora.safetensors [--trigger TOKEN] [--lora-scale 0.85]
+  nymphs_sprite_select_lora.sh --path /path/to/lora.safetensors [--trigger TOKEN] [--lora-scale 1]
 
 Selects an already-downloaded sprite LoRA for the next Nymphs Sprite run.
 This does not fetch model files.
@@ -163,7 +163,7 @@ if not trigger:
     lower_path = str(path).lower()
     trigger = "pxlstl" if "mks0813" in lower_path else ("a pixel art character" if "skyasl" in lower_path else "Pixel art style.")
 if not scale:
-    scale = "0.85"
+    scale = "1"
 
 preset_file.parent.mkdir(parents=True, exist_ok=True)
 preset_file.write_text(

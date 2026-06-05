@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.25",
+  "version": "0.1.26",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -317,6 +317,7 @@
     "v0.1.22 keeps all three canonical Sprite LoRA candidates visible in the UI and marks missing shared-library files instead of hiding absent candidates from the dropdown.",
     "v0.1.23 makes the generation bridges prefer the resolved shared LoRA library path over stale legacy UI arguments so old nymphs-sprite LoRA paths cannot override the selected shared LoRA.",
     "v0.1.24 makes the Sprite generation UI rank-only with r32, r128, and r256, restores the Nymphs Image-style strip browser/forest preview, and keeps hardware-specific INT4/FP4 choices in the Manager model fetch page.",
-    "v0.1.25 restarts and reloads the shared Z-Image backend once when a stale Nunchaku transformer rank causes a qkv_proj_down LoRA shape mismatch during source generation."
+    "v0.1.25 restarts and reloads the shared Z-Image backend once when a stale Nunchaku transformer rank causes a qkv_proj_down LoRA shape mismatch during source generation.",
+    "v0.1.26 aligns Sprite's Z-Image model choices, selected LoRA path precedence, LoRA strength default, and generate payload with the working Nymphs Image UI contract: auto_r32, auto_r128, int4_r256, no Sprite-owned rank-mismatch restart."
   ]
 }

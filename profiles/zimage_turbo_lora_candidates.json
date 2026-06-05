@@ -9,7 +9,7 @@
       "base_model": "Tongyi-MAI/Z-Image-Turbo",
       "trigger": "pxlstl",
       "prompt_suffix": ", pxlstl",
-      "recommended_lora_scale": 0.85,
+      "recommended_lora_scale": 1,
       "license_note": "Follows the license of Tongyi-MAI/Z-Image-Turbo.",
       "source_url": "https://huggingface.co/mks0813/z-image-turbo-pixel-lora"
     },
@@ -21,7 +21,7 @@
       "base_model": "Tongyi-MAI/Z-Image-Turbo",
       "trigger": "a pixel art character",
       "prompt_suffix": ", a pixel art character",
-      "recommended_lora_scale": 0.85,
+      "recommended_lora_scale": 1,
       "license_note": "Apache-2.0 model card license.",
       "source_url": "https://huggingface.co/SkyAsl/Pixel-artist-Z"
     },
@@ -33,7 +33,7 @@
       "base_model": "Tongyi-MAI/Z-Image-Turbo",
       "trigger": "Pixel art style.",
       "prompt_suffix": ", Pixel art style.",
-      "recommended_lora_scale": 0.85,
+      "recommended_lora_scale": 1,
       "license_note": "Apache-2.0 model card license.",
       "source_url": "https://huggingface.co/tarn59/pixel_art_style_lora_z_image_turbo"
     }

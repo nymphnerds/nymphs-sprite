@@ -130,7 +130,7 @@ Usage:
   nymphs_sprite_fetch_lora.sh --candidate mks0813_pixel_art
   nymphs_sprite_fetch_lora.sh --candidate skyasl_pixel_artist
   nymphs_sprite_fetch_lora.sh --candidate tarn59_pixel_art
-  nymphs_sprite_fetch_lora.sh --repo owner/repo [--filename file.safetensors] [--trigger TOKEN] [--lora-scale 0.85]
+  nymphs_sprite_fetch_lora.sh --repo owner/repo [--filename file.safetensors] [--trigger TOKEN] [--lora-scale 1]
 
 Downloads a selected Z-Image Turbo-compatible sprite/pixel-art LoRA into:
   $HOME/LoRA/loras
@@ -421,7 +421,7 @@ def write_selection(dest: Path, normalization: dict) -> None:
     if not trigger:
         trigger = "pxlstl" if "mks0813" in repo_id.lower() else ("a pixel art character" if "skyasl" in repo_id.lower() else "Pixel art style.")
     if not lora_scale:
-        lora_scale = "0.85"
+        lora_scale = "1"
 
     metadata = {
         "schema": "nymphs_lora.v1",

@@ -87,6 +87,15 @@ append_decoded_arg "lora-path" "lora-path"
 append_decoded_arg "lora-trigger" "lora-trigger"
 append_decoded_arg "source-images" "source-images"
 
+arg_present() {
+  local needle="$1"
+  local arg=""
+  for arg in "${pass_args[@]}"; do
+    [[ "${arg}" == "${needle}" || "${arg}" == "${needle}="* ]] && return 0
+  done
+  return 1
+}
+
 zimage_probe() {
   "${python_bin}" - "${NYMPHS_SPRITE_ZIMAGE_URL%/}/server_info" <<'PY' >/dev/null 2>&1
 from __future__ import annotations
@@ -154,23 +163,24 @@ except Exception:
     data = {"candidates": {}}
 
 item = (data.get("candidates") or {}).get(candidate)
+if selected_path and selected_path.is_file():
+    print(selected_path)
+    raise SystemExit(0)
 if item:
     for path in candidate_paths(item):
         if path.is_file():
             print(path)
             raise SystemExit(0)
-if selected_path and selected_path.is_file():
-    print(selected_path)
 PY
 )"
   [[ -n "${resolved_lora_path}" ]] && selected_lora_path="${resolved_lora_path}"
-  if [[ -n "${selected_lora_path}" ]]; then
+  if [[ -n "${selected_lora_path}" ]] && ! arg_present "--lora-path"; then
     extra_args+=(--lora-path "${selected_lora_path}")
   fi
-  if [[ -n "${selected_lora_trigger}" ]]; then
+  if [[ -n "${selected_lora_trigger}" ]] && ! arg_present "--lora-trigger"; then
     extra_args+=(--lora-trigger "${selected_lora_trigger}")
   fi
-  if [[ -n "${selected_lora_scale}" ]]; then
+  if [[ -n "${selected_lora_scale}" ]] && ! arg_present "--lora-scale"; then
     extra_args+=(--lora-scale "${selected_lora_scale}")
   fi
 fi

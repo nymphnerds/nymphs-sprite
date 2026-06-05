@@ -720,14 +720,14 @@
       </section>
 
       <section class="section">
-        <div class="section-title"><span>Z-Image</span><span id="model-chip">r32</span></div>
+        <div class="section-title"><span>Z-Image</span><span id="model-chip">auto r32</span></div>
         <div class="grid">
           <div class="field wide">
             <label for="z-model-choice">Model</label>
             <select id="z-model-choice">
-              <option value="r32">r32</option>
-              <option value="r128">r128</option>
-              <option value="r256">r256</option>
+              <option value="auto_r32">Z-Image Nunchaku r32</option>
+              <option value="auto_r128">Z-Image Nunchaku r128</option>
+              <option value="int4_r256">Z-Image Nunchaku r256</option>
             </select>
           </div>
           <div class="field"><label for="width">Width</label><input id="width" type="number" min="256" max="2048" step="64" value="1024"></div>
@@ -736,7 +736,7 @@
           <div class="field"><label for="seed">Seed</label><input id="seed" type="number" value="123456789"></div>
           <div class="field wide"><label for="lora-choice">LoRA</label><select id="lora-choice"></select></div>
           <div class="field"><label for="lora-trigger">Trigger</label><input id="lora-trigger" maxlength="80" value="pxlstl"></div>
-          <div class="field"><label for="lora-scale">Scale</label><input id="lora-scale" type="number" min="0" max="2" step="0.05" value="0.85"></div>
+          <div class="field"><label for="lora-scale">Scale</label><input id="lora-scale" type="number" min="0" max="2" step="0.05" value="1"></div>
         </div>
         <div class="command-row">
           <button id="generate-sources" class="primary" type="button">Generate Sources</button>
@@ -1035,7 +1035,7 @@
       $("status-pill").textContent = statusLabel();
       $("status-pill").className = statusClass();
       $("runtime-chip").textContent = values.health === "ok" ? "ready" : "check";
-      $("model-chip").textContent = $("z-model-choice").value.toUpperCase();
+      $("model-chip").textContent = zModelChipText();
       $("runtime-text").textContent = values.zimage_url ? `Z-Image ${values.zimage_url} / ${zReady ? "models ready" : "fetch models"}` : "Z-Image";
       $("selected-model-text").textContent = values.selected_lora_path ? basename(values.selected_lora_path) : (loras.join(", ") || "none");
       $("progress-detail").textContent = `Backend ${zReady ? "ready" : "missing"} | LoRA ${spriteLoraDownloaded}/${spriteLoraTotal} | Control ${controlReady ? "ready" : "staged"} | Depth ${depthReady ? "ready" : "staged"}`;
@@ -1518,23 +1518,25 @@
       const profile = String(values.zimage_weight_profile_selected || "").replace(/^zimage_/, "");
       const match = profile.match(/^(auto|int4|fp4)_r(32|128|256)$/);
       const rank = parseInt(values.zimage_nunchaku_rank || (match ? match[2] : "32"), 10);
-      if (rank === 256) return "r256";
-      if (rank === 128) return "r128";
-      return "r32";
+      if (rank === 256) return "int4_r256";
+      if (rank === 128) return "auto_r128";
+      return "auto_r32";
+    }
+
+    function zModelChipText() {
+      const [precision, rawRank] = String($("z-model-choice")?.value || "auto_r32").split("_r");
+      return `${precision || "auto"} r${rawRank || "32"}`;
     }
 
     function zImageSelection() {
       const choice = $("z-model-choice")?.value || zModelChoiceFromStatus(state.statusValues || {});
-      const rank = parseInt(String(choice).replace(/^r/, "") || "32", 10);
-      const profile = String(state.statusValues.zimage_weight_profile_selected || "").replace(/^zimage_/, "");
-      const match = profile.match(/^(auto|int4|fp4)_r(32|128|256)$/);
-      let precision = String(state.statusValues.zimage_nunchaku_precision || (match ? match[1] : "int4")).toLowerCase();
-      if (!["int4", "fp4"].includes(precision)) precision = "int4";
-      if (rank === 256 && precision === "fp4") precision = "int4";
+      const [precision, rawRank] = String(choice || "auto_r32").split("_r");
+      const rank = parseInt(rawRank || "32", 10);
       return {
         model_id: "Tongyi-MAI/Z-Image-Turbo",
         nunchaku_rank: [32, 128, 256].includes(rank) ? rank : 32,
-        nunchaku_precision: precision
+        nunchaku_precision: precision || "auto",
+        label: $("z-model-choice")?.selectedOptions?.[0]?.textContent || "Z-Image"
       };
     }
 
@@ -1614,7 +1616,7 @@
           prompt: spritePrompt(direction),
           negative_prompt: foundryNegativePrompt(),
           lora_path: state.selectedLoraPath,
-          lora_scale: parseFloat(value("lora-scale") || "0.85"),
+          lora_scale: parseFloat(value("lora-scale") || "1"),
           batch_id: batchId,
           batch_label: `Nymphs Sprite: ${value("subject-id")}`,
           batch_type: "sprite_source",
@@ -1721,7 +1723,7 @@
     });
     $("z-model-choice").addEventListener("change", () => {
       state.zModelTouched = true;
-      $("model-chip").textContent = $("z-model-choice").value.toUpperCase();
+      $("model-chip").textContent = zModelChipText();
     });
     function runGeneration(action) {
       if (state.busy) return;

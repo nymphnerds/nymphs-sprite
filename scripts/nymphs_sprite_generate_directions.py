@@ -13,7 +13,6 @@ import json
 import os
 import re
 import shutil
-import subprocess
 import time
 import urllib.error
 import urllib.request
@@ -83,47 +82,6 @@ def request_json(method: str, url: str, payload: dict[str, Any] | None = None, t
         raise SystemExit(str(exc)) from exc
 
 
-def rank_shape_mismatch(body: str) -> bool:
-    text = body.lower()
-    return (
-        "trying to set a tensor of shape" in text
-        and "qkv_proj_down" in text
-        and "3840, 128" in text
-    )
-
-
-def zimage_restart_script() -> Path:
-    candidates = []
-    for raw in [
-        os.environ.get("NYMPHS_SPRITE_ZIMAGE_ROOT"),
-        os.environ.get("ZIMAGE_INSTALL_ROOT"),
-        str(Path.home() / "Z-Image"),
-    ]:
-        if raw:
-            candidates.append(Path(raw).expanduser() / "scripts" / "zimage_restart.sh")
-    for path in candidates:
-        if path.is_file():
-            return path
-    raise SystemExit("ERROR: Z-Image restart script was not found under $HOME/Z-Image/scripts.")
-
-
-def restart_zimage_for_rank_recovery(zimage_url: str, args: argparse.Namespace) -> None:
-    script = zimage_restart_script()
-    print(
-        "zimage_rank_mismatch_recovery="
-        f"restart precision={args.nunchaku_precision} rank={args.nunchaku_rank}"
-    )
-    subprocess.run([str(script)], check=True, timeout=180)
-    for _attempt in range(90):
-        time.sleep(1.0)
-        try:
-            request_json("GET", f"{zimage_url.rstrip('/')}/health", timeout=5)
-            return
-        except SystemExit:
-            continue
-    raise SystemExit("ERROR: Z-Image did not come back after rank-mismatch restart.")
-
-
 def latest_lora_path(zimage_url: str) -> str | None:
     data = request_json("GET", f"{zimage_url.rstrip('/')}/api/loras", timeout=20)
     runs = data.get("runs") or []
@@ -160,24 +118,6 @@ def ensure_zimage_model_loaded(zimage_url: str, args: argparse.Namespace) -> Non
         )
         return
     raise SystemExit(f"ERROR: Z-Image did not load the selected model: {response}")
-
-
-def generate_with_rank_recovery(
-    zimage_url: str,
-    payload: dict[str, Any],
-    args: argparse.Namespace,
-    recovered: bool = False,
-) -> dict[str, Any]:
-    url = f"{zimage_url.rstrip('/')}/generate"
-    try:
-        return request_json_raw("POST", url, payload=payload)
-    except RequestJsonError as exc:
-        if exc.status in {400, 500} and rank_shape_mismatch(exc.body) and not recovered:
-            print("zimage_rank_mismatch_retry=stale transformer detected; restarting shared Z-Image backend")
-            restart_zimage_for_rank_recovery(zimage_url, args)
-            ensure_zimage_model_loaded(zimage_url, args)
-            return generate_with_rank_recovery(zimage_url, payload, args, recovered=True)
-        raise SystemExit(str(exc)) from exc
 
 
 def load_profile(path: Path) -> dict[str, Any]:
@@ -662,7 +602,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--negative-prompt", default="")
     parser.add_argument("--lora-path", default="")
     parser.add_argument("--lora-trigger", default="pxlstl")
-    parser.add_argument("--lora-scale", type=float, default=0.85)
+    parser.add_argument("--lora-scale", type=float, default=1.0)
     parser.add_argument("--seed", type=int, default=123456789)
     parser.add_argument("--seed-step", type=int, default=1)
     parser.add_argument("--width", type=int, default=1024)
@@ -670,7 +610,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--steps", type=int, default=9)
     parser.add_argument("--guidance-scale", type=float, default=0.0)
     parser.add_argument("--nunchaku-rank", type=int, default=32)
-    parser.add_argument("--nunchaku-precision", default="int4", choices=["auto", "int4", "fp4"])
+    parser.add_argument("--nunchaku-precision", default="auto", choices=["auto", "int4", "fp4"])
     parser.add_argument("--profile", default="")
     parser.add_argument("--directions", default=",".join(DIRECTIONS.keys()))
     parser.add_argument("--source-images", default="")
@@ -787,7 +727,7 @@ def main() -> int:
             "item_total": len(direction_names),
         }
         print(f"generate={direction} seed={payload['seed']}")
-        response = generate_with_rank_recovery(zimage_url, payload, args)
+        response = request_json("POST", f"{zimage_url.rstrip('/')}/generate", payload=payload)
         outputs.append(response)
         generated.append(
             {
