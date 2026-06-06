@@ -1,6 +1,6 @@
 # Nymphs Sprite Handoff
 
-Last updated: 2026-06-05
+Last updated: 2026-06-06
 
 ## Goal
 
@@ -25,51 +25,44 @@ later dedicated conversion module.
 Current source version target:
 
 ```text
-nymphs-sprite 0.1.33
+nymphs-sprite 0.1.36
 ```
 
-Latest pushed/tested state from 2026-06-05:
+Latest pushed source state from 2026-06-06:
 
-- `0.1.28` was pushed and added to the dev registry.
-- User updated/tested from the test WSL through Manager.
-- `Generate Sources` produced a source image successfully using the shared
-  Nymphs Image/Z-Image runtime and `mks0813_pixel_art`.
-- The generated goblin scout source looked correct: Z-Image Turbo/Nunchaku,
-  512x512, 8 steps, `mks0813_pixel_art.safetensors`, green-screen source.
-- The runtime architecture is now correct: Sprite does not own/copy/vendor
-  Z-Image, and it uses the same Nymphs Image runtime, venv, shared HF cache,
-  and shared `$HOME/LoRA/loras` library.
+- Nunchaku fork ControlNet fix pushed:
+  `b092d6904f6ace0cc6fa65f3ac0beb1cf257ac40`.
+- Nymphs Image/Z-Image `0.1.105` pushed and registry-updated; raw manifest was
+  verified before registry update.
+- Nymphs Sprite `0.1.35` pushed with the current user-facing UI baseline:
+  standard `local_url` UI, same-origin output browser, hidden Foundry-facing
+  controls, and Nymphs Image-style output strip management.
+- `0.1.36` is a docs/handoff refresh so the next session starts from the actual
+  pushed state instead of the older `0.1.33` transition notes.
 
-Remaining roughness found during test:
+Current tested dev sanity state:
 
-- The Manager-action bridge looked frozen at `10%` while Z-Image was working.
-  Cause: Python progress prints were buffered, unlike Nymphs Image which polls
-  `/active_task` live from its own served UI.
-- The strip showed a duplicate/blank second tile because Sprite parsed both
-  `output_front=<local path>` and final JSON `"url"` as separate outputs.
-- `0.1.29` fixes those two UI bridge issues by flushing progress lines and
-  merging JSON preview URLs onto the matching local output path.
-- `0.1.30` restores the Nymphs Image forest stage look. The forest PNG was
-  already present and identical to Nymphs Image's asset, but Sprite's viewer CSS
-  used a darker overlay/fallback stack that made the stage read as plain black.
-  The CSS now uses the installed local `ui/nymphs_preview_forest.png` directly.
-- `0.1.31` makes the forest robust for `local_html` by embedding it as a data
-  URI during install/update. It also fixes the Recent strip to proxy the same
-  Nymphs Image `/api/outputs?limit=80` source and fall back to scanning shared
-  Z-Image output folders if the API returns empty or is unavailable.
-- `0.1.33` removes the `local_html` UI path for Sprite and aligns it with the
-  standard generation-module contract: `local_url`, `/nymph`, `/health`,
-  `/server_info`, and `/ui/nymphs_preview_forest.png` served from the module.
-  The 0.1.31 data-URI forest embed is removed because it made the WebView HTML
-  oversized and diverged from the Nymphs Image UI standard.
+- `Generate Sources` and ControlNet-guided direction generation have both run
+  successfully in dev WSL through shared Nymphs Image/Z-Image/Nunchaku.
+- The generated Sprite ControlNet smoke output was written under the shared
+  Z-Image output root and then surfaced in the Sprite strip.
+- The Sprite UI now follows the standard generation-module contract:
+  `local_url`, `/nymph`, `/health`, `/server_info`, `/api/outputs`, `/outputs`,
+  and normal `/ui` assets.
+- The forest background is served as `/ui/nymphs_preview_forest.png`, matching
+  the Nymphs Image pattern. Do not return to embedded `local_html` data URIs.
+- The visible `Foundry Run` button and visible `Foundry Status` Manager action
+  are removed. The underlying Foundry scripts remain available as developer
+  reference/parity tools, not as the normal user workflow.
 
-Current source tree may have uncommitted changes while preparing `0.1.33`.
-Do not update the registry until:
+Registry note:
 
-1. The source diff is reviewed.
-2. The module repo is committed and pushed.
-3. The raw GitHub `nymph.json` is verified.
-4. Only then update the dev registry.
+- `nymphs-sprite` is still not listed in
+  `/home/nymph/NymphsModules/nymphs-registry/nymphs.json`.
+- Do not bump the registry for Sprite unless it is added to the catalog or an
+  existing catalog entry must advertise a new remote manifest.
+- For any future registry change: push Sprite first, verify raw GitHub
+  `nymph.json`, then update/push registry.
 
 Raw manifest to verify after push:
 
@@ -103,21 +96,21 @@ Do not manually copy source files into the test/runtime WSL.
   backend work.
 ```
 
-## Current Diff Summary
+## Current Source Summary
 
-At the older `0.1.20` checkpoint, `nymphs-sprite` source had modified many
-files. As of the `0.1.29` cleanup pass, the intended active diff is much
-smaller:
+The Sprite repo is expected to be clean after `0.1.36` is pushed. The current
+module baseline is:
 
 ```text
 CHANGELOG.md
 docs/SPRITE_HANDOFF.md
 nymph.json
 scripts/nymphs_sprite_generate_directions.py
+scripts/nymphs_sprite_ui_server.py
 ui/manager.html
 ```
 
-No untracked `__pycache__` artifacts were left after static checks.
+No untracked `__pycache__` artifacts should be left after static checks.
 
 High-level state now:
 
@@ -130,17 +123,21 @@ High-level state now:
 - Makes Sprite UI/module generation call "load selected Z-Image model first"
   using the same pattern as Nymphs Image.
 - Removes the fallback that silently avoided `mks0813_pixel_art`.
-- Keeps ControlNet/Depth as staged assets only, not as a claimed working
-  generation path.
+- Uses selected source images as Z-Image/Nunchaku `controlnet_edit` guidance
+  for `Generate + Process`.
+- Keeps Depth Anything staged/fetchable, but depth/normal map production is not
+  wired as a finished output stage yet.
 - Keeps source generation on module-owned scripts that call the shared Z-Image
   API, while the Sprite UI itself is served through the standard local
   `http://127.0.0.1:8098/nymph` route.
 - Keeps the actual generation method copied from Nymphs Image at the API
   contract level: `/api/model/load` then `/generate`, same model/rank/LoRA
   payload fields, same shared runtime.
-- `0.1.29` improves the Manager-action version of that flow by flushing
-  progress and merging preview URLs, but it is still not as elegant as the
-  native Nymphs Image UI.
+- Serves Sprite's output browser directly from its local UI server with
+  `/api/outputs` and `/outputs/<source>/...` URLs.
+- Copies the Nymphs Image strip management model: select, select all, clear
+  selection, move selected, delete selected, and delete top-level managed
+  folders.
 
 ## Shared Model And Data Contract
 
@@ -353,27 +350,24 @@ downloaded_loras=mks0813_pixel_art,skyasl_pixel_artist,tarn59_pixel_art
 
 ## Runtime Caveat
 
-During diagnosis, the dev installed Z-Image venv was inspected and briefly
-repaired enough for direct tests. The durable fix should be through source and
-module update, not manual venv edits.
+Do not manually patch the installed/runtime WSL. Source fixes must move through
+the normal module publish/update path.
 
-Known source/runtime drift:
+Current backend state:
 
-- `NymphsModules/zimage/model_manager.py` resolves the selected Nunchaku rank
-  file to the exact local HF cache path before `from_pretrained`.
-- `/home/nymph/Z-Image/model_manager.py` may be older and may still pass the
-  repo/file string directly.
+- Nunchaku fork has the Z-Image ControlNet RoPE packing fix pushed at
+  `b092d6904f6ace0cc6fa65f3ac0beb1cf257ac40`.
+- Nymphs Image/Z-Image source pins that Nunchaku commit in
+  `scripts/_zimage_common.sh`.
+- Z-Image `0.1.105` was pushed and its registry entry was updated after raw
+  manifest verification.
+- Sprite `Generate + Process` now sends selected source images to
+  Z-Image `controlnet_edit` using `source-mode=controlnet` and a default
+  `controlnet-scale=0.55`.
 
-Next session should update installed Nymphs Image through the module update
-flow before judging Sprite in managed/test runtime.
-
-Also note:
-
-- Local `/home/nymph/nunchaku` has newer Z-Image LoRA converter code.
-- Building/reinstalling the Nunchaku fork from source is slow and was not
-  completed in this session.
-- Do not promise ControlNet or new Nunchaku fork behavior until it is built,
-  installed through the proper script, and tested.
+The dev sanity test proved the code path in dev WSL. The real acceptance test
+still needs the user to update/install through Manager in the managed/test WSL
+and generate from the published artifacts.
 
 ## Current Working Flow
 
@@ -389,6 +383,7 @@ install/update Nymphs Image
   -> Generate Sources
   -> preview/pick source images
   -> Generate + Process
+  -> review/move/delete outputs from the strip
 ```
 
 Implemented pieces:
@@ -410,16 +405,32 @@ Implemented pieces:
   - previews/contact sheet
   - `sprite_batch.json`
   - basic mechanical checks
-- Foundry bridge action:
-  - `foundry_generate`
-  - wraps `python3 -m foundry.cli generate-nymphscore`
-  - uses selected imported preset `source_config`
+- ControlNet-guided direction generation:
+  - selected strip images feed `Generate + Process`
+  - Sprite sends those paths to Z-Image `controlnet_edit`
+  - output metadata records `generation_mode`, `control_source_path`, and
+    `controlnet_conditioning_scale`
+- Output strip management:
+  - Recent/date/folder browsing from Sprite's local `/api/outputs`
+  - same-origin image URLs from `/outputs/<source>/...`
+  - select current, select all, clear selection
+  - move selected
+  - delete selected images and matching metadata
+  - delete top-level managed output folders
+
+Developer-only Foundry bridge note:
+
+- The repo still contains `foundry_generate` and `foundry_status` entrypoints.
+- They are not shown in the main Sprite UI/Manager action row.
+- Treat them as audit/parity tools only, not as the user workflow.
 
 Current output roots:
 
 ```text
 $HOME/NymphsData/outputs/nymphs-sprite/<subject-id>/<batch-id>
-/home/nymph/NymphsModules/sprite-foundry/bakeoff/<run_id>
+$HOME/NymphsData/outputs/zimage
+$HOME/Z-Image/outputs
+$HOME/NymphsModules/zimage/outputs
 ```
 
 ## Preset State
@@ -503,11 +514,13 @@ Missing Manager-visible lifecycle pieces:
 - finish board
 - deterministic export
 - export manifest/checksum surfacing
-- Foundry run browser/status board in Sprite UI
+- Foundry review/status board, if the developer parity path becomes useful
+  again. Do not put Foundry Run back in the main user flow.
 
 Missing backend parity:
 
-- Real Z-Image ControlNet/morphology conditioning is not proven.
+- Z-Image/Nunchaku `controlnet_edit` works as a first guided path, but it is
+  not yet full Sprite Foundry morphology parity.
 - Depth Anything is fetched/staged but not wired as a full per-direction map
   production stage.
 - Normal maps are not proven.
@@ -524,63 +537,65 @@ Current Nymphs reality:
 ```text
 Z-Image/Nunchaku txt2img works.
 Z-Image Turbo LoRA loading works with normalized transformer-local LoRA keys.
-Z-Image ControlNet assets can be fetched.
-No working Z-Image ControlNet pipeline path has been proven in the current
-Nymphs Image runtime.
+Z-Image/Nunchaku controlnet_edit works in dev sanity tests after the Nunchaku
+RoPE packing fix.
+Sprite Generate + Process can use selected source images as ControlNet guides.
 ```
 
-Do not promise ControlNet parity until a real Nymphs Image backend path works.
+Do not call this full Sprite Foundry ControlNet parity yet. It is a working
+guided generation path, not a completed morphology/depth/canny parity system.
 
-Likely short-term fallback:
+Likely next backend work:
 
 ```text
-generate albedo/source first
+generate source candidates
+  -> guide directions with controlnet_edit
+  -> compare consistency across all 8 directions
   -> derive depth with Depth Anything
   -> derive normals from depth
-  -> use post-process / Qwen-edit-style refinement where useful
-  -> revisit ControlNet when Nunchaku or diffusers exposes a usable Z-Image path
+  -> decide whether additional canny/depth conditioning is needed
 ```
 
 ## Image Strip / Browser
 
-Nymphs Image has a stronger strip browser than Sprite:
+Sprite's strip is now intentionally close to Nymphs Image:
 
 - recent/date/folder views
 - selected output object tracking
 - visible-output selection helpers
 - move selected to folder
 - delete selected/folder
-- refresh output gallery
-- use selected as source
-
-Sprite currently has a simpler strip:
-
-- recent output load via module `list_outputs`
 - manual folder picker
 - select current/all/clear
 - selected images feed `Generate + Process`
 
-Do not port the full Nymphs Image strip browser in the current cleanup unless
-explicitly requested. The user likes it, but we paused this to keep the current
-fix scoped. Future polish should copy the tested Nymphs Image pattern rather
-than inventing a new browser.
+The intentionally missing Nymphs Image actions are only the Image-specific
+"use selected as source/parts source" helpers. In Sprite, selection already
+feeds `Generate + Process`, so do not add extra source buttons unless the user
+asks for a clearer explicit action.
 
-After the final 2026-06-05 test, the source image displayed successfully, but
-the strip briefly showed duplicate/blank entries. `0.1.29` changes the parser
-to merge final Z-Image JSON preview URLs onto the existing local path entry.
-Retest this specifically.
-
-The Recent strip should mirror Nymphs Image. Its data source is now:
+The Recent strip data source is now served by Sprite's own local UI server:
 
 ```text
-primary:  shared Z-Image API /api/outputs?limit=80
-fallback: $HOME/NymphsData/outputs/zimage
-fallback: $HOME/Z-Image/outputs
-fallback: $HOME/NymphsModules/zimage/outputs
+GET  http://127.0.0.1:8098/api/outputs?limit=80
+GET  http://127.0.0.1:8098/outputs/<source>/<relative-path>
+POST http://127.0.0.1:8098/api/outputs/delete
+POST http://127.0.0.1:8098/api/outputs/move
+POST http://127.0.0.1:8098/api/outputs/folder/delete
 ```
 
-Do not invent a separate Sprite-only recent browser. Keep copying Nymphs Image's
-output object shape and strip behavior.
+Sources currently scanned:
+
+```text
+sprite:        $HOME/NymphsData/outputs/nymphs-sprite
+zimage:        $HOME/NymphsData/outputs/zimage
+zimage-legacy: $HOME/Z-Image/outputs
+zimage-dev:    $HOME/NymphsModules/zimage/outputs
+module:        <module-root>/outputs
+```
+
+Do not return to `file://` URLs or Manager `list_outputs` for the main UI
+gallery. Keep copying Nymphs Image's output object shape and strip behavior.
 
 ## Validation Done This Session
 
@@ -588,14 +603,13 @@ Static checks passed:
 
 ```bash
 python3 -m json.tool /home/nymph/NymphsModules/nymphs-sprite/nymph.json
-python3 -m json.tool /home/nymph/NymphsModules/nymphs-sprite/profiles/zimage_turbo_lora_candidates.json
-bash -n /home/nymph/NymphsModules/nymphs-sprite/scripts/nymphs_sprite_fetch_lora.sh
+bash -n /home/nymph/NymphsModules/nymphs-sprite/scripts/_nymphs_sprite_common.sh
+bash -n /home/nymph/NymphsModules/nymphs-sprite/scripts/nymphs_sprite_list_zimage_outputs.sh
+bash -n /home/nymph/NymphsModules/nymphs-sprite/scripts/nymphs_sprite_open_ui.sh
 bash -n /home/nymph/NymphsModules/nymphs-sprite/scripts/nymphs_sprite_status.sh
-bash -n /home/nymph/NymphsModules/nymphs-sprite/scripts/nymphs_sprite_generate_directions.sh
-bash -n /home/nymph/NymphsModules/nymphs-sprite/scripts/nymphs_sprite_foundry_generate.sh
-bash -n /home/nymph/NymphsModules/nymphs-sprite/scripts/nymphs_sprite_fetch_assets.sh
-bash -n /home/nymph/NymphsModules/nymphs-sprite/scripts/nymphs_sprite_select_lora.sh
+python3 -m py_compile /home/nymph/NymphsModules/nymphs-sprite/scripts/nymphs_sprite_ui_server.py
 python3 -m py_compile /home/nymph/NymphsModules/nymphs-sprite/scripts/nymphs_sprite_generate_directions.py
+node inline-script parse check for ui/manager.html
 ```
 
 Status check with source install root showed:
@@ -618,7 +632,30 @@ normalized mks LoRA applies successfully
 unmatched_prefix_count=0
 ```
 
-No Z-Image/API server process was left running at the end of the session.
+ControlNet/dev sanity:
+
+```text
+Nunchaku fork backup branch: backup/pre-zimage-controlnet
+Nunchaku RoPE fix pushed: b092d6904f6ace0cc6fa65f3ac0beb1cf257ac40
+Z-Image controlnet_edit smoke output succeeded in dev WSL.
+Sprite Generate + Process with selected source image succeeded in dev WSL.
+```
+
+Sprite local UI server route checks:
+
+```text
+GET /health -> 200 JSON
+GET /server_info -> 200 JSON
+GET /nymph -> 200 HTML
+GET /ui/nymphs_preview_forest.png -> 200 image/png
+GET /api/outputs?limit=5 -> 200 JSON records
+GET /outputs/<source>/<image>.png -> 200 image/png
+POST /api/outputs/delete -> 200; removed image + metadata in temp root
+POST /api/outputs/move -> 200; moved image + metadata in temp root
+POST /api/outputs/folder/delete -> 200; removed temp managed folder
+```
+
+No Sprite UI server process was left running at the end of the route tests.
 
 ## Next Session Plan
 
@@ -634,60 +671,50 @@ No Z-Image/API server process was left running at the end of the session.
 /home/nymph/NymphsCore/docs/NYMPHS_MODULE_MAKING_GUIDE.md
 ```
 
-3. Review the source diff.
+3. Confirm the source repo is clean and raw manifest is public.
 
 ```bash
 git -C /home/nymph/NymphsModules/nymphs-sprite status --short --branch
-git -C /home/nymph/NymphsModules/nymphs-sprite diff --stat
-git -C /home/nymph/NymphsModules/nymphs-sprite diff -- scripts/nymphs_sprite_fetch_lora.sh ui/manager.html scripts/nymphs_sprite_generate_directions.py scripts/nymphs_sprite_status.sh
+curl -L -s https://raw.githubusercontent.com/nymphnerds/nymphs-sprite/main/nymph.json | python3 -m json.tool
 ```
 
-4. Confirm Z-Image source/runtime alignment.
+4. Test through Manager/module flow only.
 
-- Check whether installed `/home/nymph/Z-Image` is behind `NymphsModules/zimage`.
-- If behind, update it through module update flow.
-- Do not manually patch installed runtime files.
-- Confirm `model_manager.py` uses exact local HF cache path resolution for
-  Nunchaku rank weights.
+- Install/update from Manager, not manual copy.
+- Confirm installed Sprite version marker reports the pushed version.
+- Open Sprite UI from Manager.
+- Confirm no `Foundry Run` button in the left workflow.
+- Confirm no visible `Foundry Status` action in the Manager action row.
+- Confirm Recent thumbnails render actual images.
+- Select output(s), then test Delete selected.
+- Move selected output(s) to a folder.
+- Delete that top-level managed folder.
+- Generate Sources.
+- Select a source image.
+- Generate + Process for at least one direction.
+- Then test all 8 directions.
 
-5. Run static checks again.
+5. If Manager testing passes, continue product cleanup.
 
-```bash
-python3 -m json.tool /home/nymph/NymphsModules/nymphs-sprite/nymph.json
-python3 -m json.tool /home/nymph/NymphsModules/nymphs-sprite/profiles/foundry_character_presets.json
-python3 -m json.tool /home/nymph/NymphsModules/nymphs-sprite/profiles/zimage_turbo_lora_candidates.json
-bash -n /home/nymph/NymphsModules/nymphs-sprite/scripts/*.sh
-python3 -m py_compile /home/nymph/NymphsModules/nymphs-sprite/scripts/nymphs_sprite_generate_directions.py
-```
+- Rename the cryptic left-panel labels into clearer user steps.
+- Consider moving dev-only Foundry entrypoints out of visible capabilities if
+  Manager exposes capabilities directly elsewhere.
+- Improve source-selection clarity: make it obvious selected strip images are
+  guides for `Generate + Process`.
+- Add output labels/filters that distinguish source images from processed
+  sprite batches.
 
-5. Test through Manager/module flow only.
-
-- Install/update from module manager.
-- Run `Model Fetch -> Complete Sprite Stack`.
-- Confirm all three LoRAs appear in dropdown.
-- Confirm selected LoRA is `mks0813_pixel_art`.
-- Confirm selected path is in `$HOME/LoRA/loras/mks0813_pixel_art/`.
-- Confirm Z-Image selected model loads before generation.
-- Generate one enabled preset, preferably `Goblin Scout`.
-- Try one backup LoRA if mks output is stylistically poor, but do not remove mks.
-
-6. If generation works, commit and push `nymphs-sprite`.
-
-- Verify raw `nymph.json` at GitHub.
-- Only then update dev registry.
-- Do not touch public/production registry.
-
-7. After the working baseline is pushed, choose the next feature:
+6. After Manager baseline is stable, choose the next feature:
 
 ```text
 A. Full Foundry review/accept/reject/regenerate lifecycle
-B. Nymphs Image strip browser/picker port
-C. ControlNet/Nunchaku backend research spike
-D. Depth/normal map production from accepted sprite sources
+B. Depth/normal map production from accepted sprite sources
+C. ControlNet consistency/morphology refinement across all 8 directions
+D. Deterministic Foundry-style export pack once review/accept exists
 ```
 
-Recommended next feature: A, then B. ControlNet should remain research until a
-working backend path is proven.
+Recommended next feature: make the current 8-direction ControlNet flow feel
+usable and understandable before adding more Foundry lifecycle concepts.
 
 ## Test Commands
 

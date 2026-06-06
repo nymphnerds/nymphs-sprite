@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.36 - 2026-06-06
+
+- Refresh the Sprite handoff to match the pushed `0.1.35` UI/output-strip
+  baseline, current Nunchaku/Z-Image ControlNet state, and next Manager test
+  path.
+- Clarify that Foundry-facing scripts are developer/audit tools and are not
+  part of the normal user workflow.
+
 ## 0.1.35 - 2026-06-06
 
 - Remove the legacy Foundry Run button, dead Foundry UI path, and visible
