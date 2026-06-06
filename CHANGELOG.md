@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.35 - 2026-06-06
+
+- Remove the legacy Foundry Run button, dead Foundry UI path, and visible
+  Foundry Status Manager action from the main Sprite workflow.
+- Add Nymphs Image-style output strip management: Move Selected, Delete Folder,
+  and Delete selected images.
+- Add Sprite local UI POST endpoints for `/api/outputs/delete`,
+  `/api/outputs/move`, and `/api/outputs/folder/delete`, constrained to the
+  managed output roots served by the Sprite UI.
+
 ## 0.1.34 - 2026-06-06
 
 - Mirror the Nymphs Image output-browser contract in Sprite's `local_url` UI:

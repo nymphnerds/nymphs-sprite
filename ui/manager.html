@@ -740,7 +740,6 @@
         </div>
         <div class="command-row">
           <button id="generate-process" type="button">Generate + Process</button>
-          <button id="foundry-generate" type="button">Foundry Run</button>
         </div>
       </section>
     </aside>
@@ -778,6 +777,8 @@
               <summary aria-label="Folder actions" title="Folder actions">...</summary>
               <div class="folder-menu-panel">
                 <button id="choose-folder" type="button">Choose Folder</button>
+                <button id="move-selected" type="button">Move Selected</button>
+                <button class="danger" id="delete-folder" type="button">Delete Folder</button>
                 <button id="open-outputs" type="button">Open Outputs</button>
                 <button id="open-logs" type="button">Logs</button>
               </div>
@@ -786,6 +787,7 @@
             <button id="select-visible" type="button">Select</button>
             <button id="select-all-visible" type="button">Select All</button>
             <button id="clear-selection" type="button">Clear</button>
+            <button class="danger" id="delete-selected" type="button">Delete</button>
           </div>
         </div>
         <input id="folder-picker" type="file" accept="image/*" webkitdirectory multiple hidden>
@@ -1267,8 +1269,9 @@
         label: item.item_label || item.name || basename(rawPath || url) || `image-${index + 1}`,
         url,
         managed: true,
+        source: item.source || "",
         created: item.created || item.mtime || 0,
-        folder: item.folder || item.batch_id || "",
+        folder: item.folder || "",
       };
     }
 
@@ -1312,13 +1315,29 @@
       $("selection-count").textContent = `${count} selected`;
     }
 
+    function visibleSelectedOutputs() {
+      return (state.visibleOutputs || []).filter((item) => state.selectedOutputPaths.has(outputKey(item)));
+    }
+
+    function currentManagedFolder() {
+      if (state.viewerSource === "manual" || !state.outputView.startsWith("folder:")) return "";
+      const folder = state.outputView.slice(7);
+      if (!folder || folder.includes("/") || folder.includes("\\")) return "";
+      return state.visibleOutputs.some((item) => item.managed !== false && outputFolder(item) === folder) ? folder : "";
+    }
+
     function updateStripControls() {
       const visible = state.visibleOutputs || [];
+      const selected = visibleSelectedOutputs();
+      const managedSelected = selected.filter((item) => item.managed !== false);
       $("strip-prev").disabled = visible.length < 2 || state.busy;
       $("strip-next").disabled = visible.length < 2 || state.busy;
       $("select-visible").disabled = state.selectedIndex < 0 || state.busy;
       $("select-all-visible").disabled = visible.length === 0 || state.busy;
       $("clear-selection").disabled = state.selectedOutputPaths.size === 0 || state.busy;
+      $("move-selected").disabled = managedSelected.length === 0 || state.busy;
+      $("delete-selected").disabled = managedSelected.length === 0 || state.busy;
+      $("delete-folder").disabled = !currentManagedFolder() || state.busy;
       updateSelectionCount();
     }
 
@@ -1345,6 +1364,90 @@
     function clearOutputSelection() {
       for (const item of state.visibleOutputs || []) state.selectedOutputPaths.delete(outputKey(item));
       renderGallery();
+    }
+
+    function managedOutputRef(item) {
+      return {
+        source: item.source || "",
+        relative_path: item.relative_path || item.path || "",
+        path: item.path || "",
+      };
+    }
+
+    function applyOutputResponse(body, preferredView = "") {
+      state.outputs = (body.outputs || []).map(normalizeManagedOutput);
+      state.viewerSource = "outputs";
+      if (preferredView) state.outputView = preferredView;
+      state.manualFolderName = "";
+      renderGallery();
+      if (state.visibleOutputs[0]) showOutput(0);
+      else {
+        state.selectedIndex = -1;
+        $("result-image").removeAttribute("src");
+        $("result-image").style.display = "none";
+        $("empty").hidden = false;
+        $("output-label").textContent = "No output";
+      }
+    }
+
+    async function moveSelectedOutputs() {
+      const managed = visibleSelectedOutputs().filter((item) => item.managed !== false);
+      if (!managed.length) return;
+      const folder = window.prompt("Move selected images to folder", "");
+      if (folder === null) return;
+      $("folder-menu").open = false;
+      const response = await fetch("/api/outputs/move", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folder, items: managed.map(managedOutputRef) }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        append(`ERROR: ${body.detail || "Could not move selected outputs."}`);
+        return;
+      }
+      for (const item of managed) state.selectedOutputPaths.delete(outputKey(item));
+      applyOutputResponse(body, body.folder ? `folder:${body.folder}` : "recent");
+    }
+
+    async function deleteCurrentFolder() {
+      const folder = currentManagedFolder();
+      if (!folder) return;
+      const count = state.visibleOutputs.filter((item) => item.managed !== false && outputFolder(item) === folder).length;
+      const noun = count === 1 ? "image" : "images";
+      if (!window.confirm(`Delete folder "${folder}" and ${count} ${noun} inside it?`)) return;
+      $("folder-menu").open = false;
+      const response = await fetch("/api/outputs/folder/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folder }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        append(`ERROR: ${body.detail || "Could not delete folder."}`);
+        return;
+      }
+      for (const item of state.visibleOutputs) state.selectedOutputPaths.delete(outputKey(item));
+      applyOutputResponse(body, "recent");
+    }
+
+    async function deleteSelectedOutputs() {
+      const managed = visibleSelectedOutputs().filter((item) => item.managed !== false);
+      if (!managed.length) return;
+      const noun = managed.length === 1 ? "image" : "images";
+      if (!window.confirm(`Delete ${managed.length} selected ${noun} and matching metadata from Nymphs outputs?`)) return;
+      const response = await fetch("/api/outputs/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: managed.map(managedOutputRef) }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        append(`ERROR: ${body.detail || "Could not delete selected outputs."}`);
+        return;
+      }
+      for (const item of managed) state.selectedOutputPaths.delete(outputKey(item));
+      applyOutputResponse(body);
     }
 
     function clearLocalObjectUrls() {
@@ -1490,26 +1593,6 @@
       return compactArgs(args);
     }
 
-    function buildFoundryArgs() {
-      const presetId = $("prompt-preset").value;
-      const preset = promptPresets[presetId] || {};
-      const args = {
-        "preset-id": presetId,
-        "subject-id": preset.subjectId || value("subject-id"),
-        seed: value("seed"),
-        steps: value("steps"),
-        width: value("width"),
-        height: value("height"),
-        "sprite-size": value("sprite-size"),
-        "palette-colors": value("palette-colors"),
-        "lora-scale": value("lora-scale")
-      };
-      addEncodedArg(args, "source-config", preset.sourceConfig || "");
-      addEncodedArg(args, "lora-path", state.selectedLoraPath);
-      addEncodedArg(args, "lora-trigger", value("lora-trigger"));
-      return compactArgs(args);
-    }
-
     function spritePrompt(direction) {
       return [
         value("lora-trigger"),
@@ -1526,12 +1609,6 @@
         "HD-2D inspired",
         "single character only"
       ].filter(Boolean).join(", ");
-    }
-
-    function foundryNegativePrompt() {
-      const bg = "white background, gray background, grey background, beige background, gradient background";
-      const negative = value("negative-prompt");
-      return negative ? `${negative}, ${bg}` : bg;
     }
 
     function zModelChoiceFromStatus(values) {
@@ -1631,6 +1708,9 @@
     $("select-visible").addEventListener("click", selectVisibleOutput);
     $("select-all-visible").addEventListener("click", selectAllVisibleOutputs);
     $("clear-selection").addEventListener("click", clearOutputSelection);
+    $("move-selected").addEventListener("click", moveSelectedOutputs);
+    $("delete-folder").addEventListener("click", deleteCurrentFolder);
+    $("delete-selected").addEventListener("click", deleteSelectedOutputs);
     $("lora-choice").addEventListener("change", () => {
       const option = $("lora-choice").selectedOptions[0];
       state.selectedLoraPath = option?.dataset.path || "";
@@ -1686,43 +1766,11 @@
       }).finally(() => setBusy(false));
     }
 
-    function runFoundryGeneration() {
-      if (state.busy) return;
-      const preset = promptPresets[$("prompt-preset").value] || {};
-      if (!preset.sourceConfig) {
-        append("ERROR: Foundry Run needs an imported Foundry preset. Choose a preset before editing prompt text.");
-        return;
-      }
-      state.outputs = [];
-      state.selectedIndex = -1;
-      state.viewerSource = "batch";
-      state.selectedOutputPaths.clear();
-      renderGallery();
-      $("result-image").style.display = "none";
-      $("empty").hidden = false;
-      setProgress("Foundry", "Starting canonical Foundry run.", 10);
-      setBusy(true, "Foundry");
-      moduleAction("foundry_generate", buildFoundryArgs(), { busy: false })
-        .then((text) => {
-          parseOutputPaths(text);
-          setProgress("Done", state.outputs.length ? "Foundry batch ready." : "Foundry run complete.", 100);
-          refreshStatus();
-        })
-        .catch((error) => {
-          append(`ERROR: ${error.message || error}`);
-          setProgress("Error", error.message || "Foundry run failed.", 0);
-          $("status-pill").textContent = "error";
-          $("status-pill").className = "status-pill warn";
-        })
-        .finally(() => setBusy(false));
-    }
-
     $("prompt-preset").addEventListener("change", () => applyPromptPreset($("prompt-preset").value));
     $("subject-prompt").addEventListener("input", markPromptCustom);
     $("negative-prompt").addEventListener("input", markPromptCustom);
     $("generate-sources").addEventListener("click", () => runGeneration("sources_only"));
     $("generate-process").addEventListener("click", () => runGeneration("generate_directions"));
-    $("foundry-generate").addEventListener("click", runFoundryGeneration);
 
     populatePromptPresets();
     applyPromptPreset("goblin_scout");

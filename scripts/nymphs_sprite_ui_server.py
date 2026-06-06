@@ -5,6 +5,8 @@ import argparse
 import json
 import mimetypes
 import os
+import re
+import shutil
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
@@ -90,7 +92,65 @@ class SpriteUiHandler(BaseHTTPRequestHandler):
 
         self.send_error(404, "Not found")
 
+    def do_POST(self) -> None:
+        parsed = urlparse(self.path)
+        path = unquote(parsed.path)
+
+        if path == "/api/outputs/delete":
+            self._delete_outputs()
+            return
+
+        if path == "/api/outputs/move":
+            self._move_outputs()
+            return
+
+        if path == "/api/outputs/folder/delete":
+            self._delete_output_folder()
+            return
+
+        self.send_error(404, "Not found")
+
     def _send_outputs(self, limit: int) -> None:
+        self._send_json({"outputs": self._output_records(limit)})
+
+    def _metadata_for(self, path: Path) -> dict:
+        metadata_path = path.with_suffix(".json")
+        if not metadata_path.is_file():
+            return {}
+        try:
+            data = json.loads(metadata_path.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+        return data if isinstance(data, dict) else {}
+
+    def _json_payload(self) -> dict:
+        try:
+            length = int(self.headers.get("Content-Length") or "0")
+        except ValueError:
+            length = 0
+        if length <= 0:
+            return {}
+        try:
+            data = json.loads(self.rfile.read(length).decode("utf-8"))
+        except Exception:
+            return {}
+        return data if isinstance(data, dict) else {}
+
+    def _send_json(self, payload: dict, status: int = 200) -> None:
+        body = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        try:
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+
+    def _send_json_error(self, status: int, detail: str) -> None:
+        self._send_json({"detail": detail}, status=status)
+
+    def _output_records(self, limit: int = 80) -> list[dict]:
         records: list[dict] = []
         seen: set[Path] = set()
         limit = max(1, min(limit, 200))
@@ -108,45 +168,275 @@ class SpriteUiHandler(BaseHTTPRequestHandler):
                 if resolved in seen:
                     continue
                 seen.add(resolved)
-                stat = resolved.stat()
-                metadata = self._metadata_for(resolved)
-                folder = Path(rel).parent.as_posix()
-                if folder == ".":
-                    folder = ""
-                records.append(
-                    {
-                        "name": metadata.get("item_label") or metadata.get("batch_label") or resolved.name,
-                        "path": str(resolved),
-                        "relative_path": rel,
-                        "folder": folder,
-                        "url": f"/outputs/{source_id}/{self._quote_path(rel)}",
-                        "metadata_path": str(resolved.with_suffix(".json")) if resolved.with_suffix(".json").is_file() else "",
-                        "batch_id": metadata.get("batch_id", ""),
-                        "batch_type": metadata.get("batch_type", ""),
-                        "batch_label": metadata.get("batch_label", ""),
-                        "item_label": metadata.get("item_label", ""),
-                        "item_index": metadata.get("item_index", 0),
-                        "created": metadata.get("created") or metadata.get("created_at") or stat.st_mtime,
-                        "mtime": stat.st_mtime,
-                        "size": stat.st_size,
-                        "mime_type": mimetypes.guess_type(resolved.name)[0] or "image/png",
-                        "metadata": metadata,
-                        "source": source_id,
-                    }
-                )
+                records.append(self._output_record(source_id, root, resolved, rel))
 
         records.sort(key=lambda item: float(item.get("mtime") or 0), reverse=True)
-        self._send_bytes(json.dumps({"outputs": records[:limit]}, separators=(",", ":")).encode("utf-8"), "application/json")
+        return records[:limit]
 
-    def _metadata_for(self, path: Path) -> dict:
-        metadata_path = path.with_suffix(".json")
-        if not metadata_path.is_file():
-            return {}
+    def _output_record(self, source_id: str, root: Path, path: Path, rel: str) -> dict:
+        stat = path.stat()
+        metadata = self._metadata_for(path)
+        folder = Path(rel).parent.as_posix()
+        if folder == ".":
+            folder = ""
+        return {
+            "name": metadata.get("item_label") or metadata.get("batch_label") or path.name,
+            "path": str(path),
+            "relative_path": rel,
+            "folder": folder,
+            "url": f"/outputs/{source_id}/{self._quote_path(rel)}",
+            "metadata_path": str(path.with_suffix(".json")) if path.with_suffix(".json").is_file() else "",
+            "batch_id": metadata.get("batch_id", ""),
+            "batch_type": metadata.get("batch_type", ""),
+            "batch_label": metadata.get("batch_label", ""),
+            "item_label": metadata.get("item_label", ""),
+            "item_index": metadata.get("item_index", 0),
+            "created": metadata.get("created") or metadata.get("created_at") or stat.st_mtime,
+            "mtime": stat.st_mtime,
+            "size": stat.st_size,
+            "mime_type": mimetypes.guess_type(path.name)[0] or "image/png",
+            "metadata": metadata,
+            "source": source_id,
+        }
+
+    def _source_root(self, source_id: str) -> Path | None:
+        return dict(self.server.output_sources).get(source_id)
+
+    def _safe_output_path(self, source_id: str, relative_path: str) -> tuple[Path, Path, str]:
+        root = self._source_root(source_id)
+        if not root:
+            raise ValueError("Output source was not found.")
+        candidate = (root / relative_path).resolve()
         try:
-            data = json.loads(metadata_path.read_text(encoding="utf-8"))
-        except Exception:
-            return {}
-        return data if isinstance(data, dict) else {}
+            rel = candidate.relative_to(root).as_posix()
+        except ValueError as exc:
+            raise ValueError("Output path is invalid.") from exc
+        if not candidate.is_file():
+            raise ValueError("Output was not found.")
+        if candidate.suffix.lower() not in IMAGE_SUFFIXES:
+            raise ValueError("Output is not an image.")
+        return root, candidate, rel
+
+    def _resolve_output_ref(self, item) -> tuple[str, Path, Path, str]:
+        if isinstance(item, str):
+            source_id = ""
+            relative_path = item.strip()
+            absolute_path = item.strip()
+        elif isinstance(item, dict):
+            source_id = str(item.get("source") or "").strip()
+            relative_path = str(item.get("relative_path") or item.get("path") or "").strip()
+            absolute_path = str(item.get("path") or "").strip()
+        else:
+            raise ValueError("Output reference is invalid.")
+
+        if source_id and relative_path:
+            root, path, rel = self._safe_output_path(source_id, relative_path)
+            return source_id, root, path, rel
+
+        if absolute_path:
+            try:
+                candidate = Path(absolute_path).expanduser().resolve()
+            except OSError as exc:
+                raise ValueError("Output path is invalid.") from exc
+            for candidate_source_id, root in self.server.output_sources:
+                try:
+                    rel = candidate.relative_to(root).as_posix()
+                except ValueError:
+                    continue
+                if candidate.is_file() and candidate.suffix.lower() in IMAGE_SUFFIXES:
+                    return candidate_source_id, root, candidate, rel
+
+        if relative_path:
+            for candidate_source_id, root in self.server.output_sources:
+                try:
+                    resolved = (root / relative_path).resolve()
+                    rel = resolved.relative_to(root).as_posix()
+                except (OSError, ValueError):
+                    continue
+                if resolved.is_file() and resolved.suffix.lower() in IMAGE_SUFFIXES:
+                    return candidate_source_id, root, resolved, rel
+
+        raise ValueError("Output was not found.")
+
+    def _requested_outputs(self, payload: dict) -> list:
+        requested = payload.get("items")
+        if requested is None:
+            requested = payload.get("paths") or payload.get("relative_paths") or []
+        if not isinstance(requested, list):
+            raise ValueError("paths must be a list.")
+        requested = [item for item in requested if str(item).strip()]
+        if len(requested) > 200:
+            raise ValueError("Too many outputs selected.")
+        return requested
+
+    def _remove_empty_parents(self, root: Path, parent: Path) -> None:
+        while parent != root and root in parent.parents:
+            try:
+                parent.rmdir()
+            except OSError:
+                break
+            parent = parent.parent
+
+    def _safe_output_folder_name(self, value: str) -> str:
+        folder = re.sub(r"[^A-Za-z0-9._ -]+", "-", value.strip()).strip(" .-_")
+        folder = re.sub(r"\s+", " ", folder)[:80].strip()
+        if not folder:
+            raise ValueError("Folder name is required.")
+        if folder in {".", ".."}:
+            raise ValueError("Invalid folder name.")
+        return folder
+
+    def _output_collision_path(self, path: Path) -> Path:
+        if not path.exists():
+            return path
+        stem = path.stem
+        suffix = path.suffix
+        parent = path.parent
+        for index in range(1, 1000):
+            candidate = parent / f"{stem}-{index}{suffix}"
+            if not candidate.exists():
+                return candidate
+        raise ValueError("Could not create a unique output filename.")
+
+    def _delete_outputs(self) -> None:
+        payload = self._json_payload()
+        try:
+            requested = self._requested_outputs(payload)
+        except ValueError as exc:
+            self._send_json_error(400, str(exc))
+            return
+        if not requested:
+            self._send_json({"status": "ok", "removed": 0, "metadata_removed": 0, "outputs": self._output_records()})
+            return
+
+        removed = 0
+        metadata_removed = 0
+        removed_paths: list[str] = []
+        seen: set[Path] = set()
+        for item in requested:
+            try:
+                _, root, path, rel = self._resolve_output_ref(item)
+            except ValueError:
+                continue
+            if path in seen:
+                continue
+            seen.add(path)
+            metadata_path = path.with_suffix(".json")
+            try:
+                path.unlink()
+            except Exception:
+                continue
+            removed += 1
+            removed_paths.append(rel)
+            if metadata_path.is_file():
+                try:
+                    metadata_path.unlink()
+                    metadata_removed += 1
+                except Exception:
+                    pass
+            self._remove_empty_parents(root, path.parent)
+
+        self._send_json(
+            {
+                "status": "ok",
+                "removed": removed,
+                "metadata_removed": metadata_removed,
+                "removed_paths": removed_paths,
+                "outputs": self._output_records(),
+            }
+        )
+
+    def _move_outputs(self) -> None:
+        payload = self._json_payload()
+        try:
+            requested = self._requested_outputs(payload)
+            folder = self._safe_output_folder_name(str(payload.get("folder") or payload.get("folder_name") or ""))
+        except ValueError as exc:
+            self._send_json_error(400, str(exc))
+            return
+        if not requested:
+            self._send_json({"status": "ok", "folder": folder, "moved": 0, "metadata_moved": 0, "outputs": self._output_records()})
+            return
+
+        moved = 0
+        metadata_moved = 0
+        moved_paths: list[str] = []
+        seen: set[Path] = set()
+        for item in requested:
+            try:
+                _, root, path, _ = self._resolve_output_ref(item)
+            except ValueError:
+                continue
+            if path in seen:
+                continue
+            seen.add(path)
+            destination_dir = (root / folder).resolve()
+            try:
+                destination_dir.relative_to(root)
+            except ValueError:
+                continue
+            destination_dir.mkdir(parents=True, exist_ok=True)
+            target = self._output_collision_path(destination_dir / path.name)
+            metadata_path = path.with_suffix(".json")
+            try:
+                path.rename(target)
+            except Exception:
+                continue
+            moved += 1
+            try:
+                moved_paths.append(target.relative_to(root).as_posix())
+            except ValueError:
+                moved_paths.append(target.name)
+            if metadata_path.is_file():
+                metadata_target = self._output_collision_path(target.with_suffix(".json"))
+                try:
+                    metadata_path.rename(metadata_target)
+                    metadata_moved += 1
+                except Exception:
+                    pass
+            self._remove_empty_parents(root, path.parent)
+
+        self._send_json(
+            {
+                "status": "ok",
+                "folder": folder,
+                "moved": moved,
+                "metadata_moved": metadata_moved,
+                "moved_paths": moved_paths,
+                "outputs": self._output_records(),
+            }
+        )
+
+    def _delete_output_folder(self) -> None:
+        payload = self._json_payload()
+        raw_folder = str(payload.get("folder") or payload.get("folder_name") or "").strip()
+        if not raw_folder:
+            self._send_json_error(400, "Folder name is required.")
+            return
+        if "/" in raw_folder or "\\" in raw_folder:
+            self._send_json_error(400, "Only top-level managed output folders can be deleted.")
+            return
+        try:
+            folder = self._safe_output_folder_name(raw_folder)
+        except ValueError as exc:
+            self._send_json_error(400, str(exc))
+            return
+        if folder != raw_folder:
+            self._send_json_error(400, "Only top-level managed output folders can be deleted.")
+            return
+
+        removed = 0
+        for _, root in self.server.output_sources:
+            folder_dir = (root / folder).resolve()
+            if folder_dir.parent != root or not folder_dir.is_dir():
+                continue
+            removed += len([path for path in folder_dir.rglob("*") if path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES])
+            try:
+                shutil.rmtree(folder_dir)
+            except Exception:
+                pass
+
+        self._send_json({"status": "ok", "folder": folder, "removed": removed, "outputs": self._output_records()})
 
     def _send_output_file(self, route: str) -> None:
         if not route:
