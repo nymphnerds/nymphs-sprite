@@ -1455,6 +1455,10 @@
         "nunchaku-precision": zSelection.nunchaku_precision,
         directions: directions.join("+")
       };
+      if (selectedSources.length) {
+        args["source-mode"] = "controlnet";
+        args["controlnet-scale"] = "0.55";
+      }
       addEncodedArg(args, "subject-prompt", value("subject-prompt"));
       addEncodedArg(args, "negative-prompt", value("negative-prompt"));
       addEncodedArg(args, "lora-path", state.selectedLoraPath);
@@ -1638,7 +1642,7 @@
       $("empty").hidden = false;
       const sourcesOnly = action === "sources_only";
       const processingSelected = selectedSources.length > 0;
-      setProgress("Generate", sourcesOnly ? "Generating source directions." : (processingSelected ? "Processing selected source images." : "Generating and processing batch."), 10);
+      setProgress("Generate", sourcesOnly ? "Generating source directions." : (processingSelected ? "Guiding directions with selected source images." : "Generating guided batch."), 10);
       setBusy(true, "Generate");
       (async () => {
         let sources = selectedSources;

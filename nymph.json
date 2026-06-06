@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.31",
+  "version": "0.1.32",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -292,7 +292,7 @@
   },
   "notes": [
     "Initial scaffold captures Sprite Foundry ComfyUI workflow templates, Z-Image Turbo request profiles, pixel-art LoRA candidates, Z-Image ControlNet Union, Depth Anything, a sprite-specific Manager UI, and the NymphsCore module contract.",
-    "The direction runner calls Nymphs Image /generate with the chosen Z-Image Turbo LoRA. ControlNet and Depth Anything fetch/status surfaces are first-class; Z-Image ControlNet generation needs a backend path because the installed diffusers runtime exposes ZImagePipeline but not ZImageControlNetPipeline.",
+    "The direction runner calls Nymphs Image /generate with the chosen Z-Image Turbo LoRA. ControlNet and Depth Anything fetch/status surfaces are first-class; selected source images now flow through Z-Image Nunchaku controlnet_edit when used as guidance.",
     "v0.1.1 writes Sprite Foundry-style batch artifacts: copied direction images, sprite_batch.json, and an optional contact sheet when Pillow is available.",
     "v0.1.2 ports the MIT-licensed Sprite Foundry post-processing method and exposes --sprite-size from 24 to 512 pixels, defaulting to 96 for Z-Image detail retention.",
     "v0.1.3 fixes the default mks0813 LoRA filename, emits standard MODEL FETCH progress, reports downloaded sprite assets in status, and adds module-owned LoRA weight deletion.",
@@ -323,6 +323,7 @@
     "v0.1.28 restores generate_sources as the local_html Manager transport while keeping the shared Nymphs Image/Z-Image runtime, venv, model cache, and LoRA library. Sprite no longer browser-fetches the Z-Image API directly from its local_html UI.",
     "v0.1.29 flushes Sprite bridge progress immediately and merges Z-Image JSON preview URLs back onto their local output paths so source generation feels less frozen and the strip does not show duplicate blank tiles.",
     "v0.1.30 restores the Nymphs Image forest stage background in Sprite by simplifying the viewer CSS to use the installed local forest PNG directly instead of the darker overlay/fallback stack.",
-    "v0.1.31 embeds the forest PNG into the installed local_html UI and makes the Recent strip proxy Nymphs Image /api/outputs with a filesystem fallback over the shared Z-Image output folders."
+    "v0.1.31 embeds the forest PNG into the installed local_html UI and makes the Recent strip proxy Nymphs Image /api/outputs with a filesystem fallback over the shared Z-Image output folders.",
+    "v0.1.32 wires selected/generated source images into Z-Image Nunchaku controlnet_edit so Generate + Process can run guided direction generation through ControlNet."
   ]
 }

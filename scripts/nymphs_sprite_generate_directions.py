@@ -8,6 +8,7 @@ mechanical alpha checks, and review/contact sheets.
 from __future__ import annotations
 
 import argparse
+import base64
 import datetime as dt
 import json
 import os
@@ -151,6 +152,25 @@ def source_direction_name(path: Path, index: int) -> str:
         if direction in stem:
             return direction
     return f"source_{index:02d}"
+
+
+def image_data_url(path: Path) -> str:
+    payload = base64.b64encode(path.read_bytes()).decode("ascii")
+    return f"data:image/png;base64,{payload}"
+
+
+def control_sources_by_direction(paths: list[Path], directions: list[str]) -> dict[str, Path]:
+    by_direction: dict[str, Path] = {}
+    ordered_fallback: list[Path] = []
+    for index, path in enumerate(paths, start=1):
+        direction = source_direction_name(path, index)
+        if direction in DIRECTIONS and direction not in by_direction:
+            by_direction[direction] = path
+        ordered_fallback.append(path)
+    for index, direction in enumerate(directions):
+        if direction not in by_direction and index < len(ordered_fallback):
+            by_direction[direction] = ordered_fallback[index]
+    return by_direction
 
 
 def response_output_path(response: dict[str, Any]) -> Path | None:
@@ -541,6 +561,8 @@ def write_sprite_artifacts(
                 "index": item["index"],
                 "seed": item["seed"],
                 "prompt": item["prompt"],
+                "generation_mode": item.get("mode", "txt2img"),
+                "control_source_path": item.get("control_source_path", ""),
                 "source_output_path": str(source) if source else "",
                 "source_metadata_path": str(response.get("metadata_path") or ""),
                 "source_url": str(response.get("url") or ""),
@@ -578,6 +600,8 @@ def write_sprite_artifacts(
         "seed_step": args.seed_step,
         "sprite_size": args.sprite_size,
         "post_process": args.post_process,
+        "source_mode": args.source_mode,
+        "controlnet_conditioning_scale": args.controlnet_scale if args.source_mode == "controlnet" else None,
         "processed_count": processed_count,
         "mechanical_passes": mechanical_passes,
         "directions": copied_items,
@@ -616,6 +640,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--profile", default="")
     parser.add_argument("--directions", default=",".join(DIRECTIONS.keys()))
     parser.add_argument("--source-images", default="")
+    parser.add_argument("--source-mode", choices=["process", "controlnet"], default="process")
+    parser.add_argument("--controlnet-scale", type=float, default=0.55)
     parser.add_argument("--contact-cell-size", type=int, default=192)
     parser.add_argument("--raw-cell-size", type=int, default=192)
     parser.add_argument("--preview-size", type=int, default=192)
@@ -645,40 +671,49 @@ def main() -> int:
 
     source_images = split_source_images(args.source_images)
     batch_id = f"nymphs-sprite-{args.subject_id}-{uuid.uuid4().hex[:8]}"
+    direction_names = [item.strip() for item in re.split(r"[,+]", args.directions) if item.strip()]
+    invalid = [name for name in direction_names if name not in DIRECTIONS]
+    if invalid:
+        raise SystemExit(f"ERROR: unknown direction(s): {', '.join(invalid)}")
+    if args.controlnet_scale <= 0 or args.controlnet_scale > 2:
+        raise SystemExit("ERROR: --controlnet-scale must be greater than 0 and <= 2.")
+
     if source_images:
         missing = [str(path) for path in source_images if not path.is_file()]
         if missing:
             raise SystemExit(f"ERROR: selected source image(s) not found: {', '.join(missing)}")
         print(f"batch_id={batch_id}", flush=True)
         print(f"source_images={len(source_images)}", flush=True)
-        generated = []
-        for index, source in enumerate(source_images, start=1):
-            direction = source_direction_name(source, index)
-            generated.append(
-                {
-                    "direction": direction,
-                    "index": index,
-                    "seed": args.seed + (index - 1) * args.seed_step,
-                    "prompt": args.subject_prompt,
-                    "response": {"output_path": str(source), "url": "", "metadata_path": ""},
-                }
+        print(f"source_mode={args.source_mode}", flush=True)
+        if args.source_mode == "process":
+            generated = []
+            for index, source in enumerate(source_images, start=1):
+                direction = source_direction_name(source, index)
+                generated.append(
+                    {
+                        "direction": direction,
+                        "index": index,
+                        "seed": args.seed + (index - 1) * args.seed_step,
+                        "prompt": args.subject_prompt,
+                        "response": {"output_path": str(source), "url": "", "metadata_path": ""},
+                    }
+                )
+                print(f"output_{direction}={source}", flush=True)
+            artifacts = write_sprite_artifacts(
+                outputs_root=Path(args.outputs_root),
+                subject_id=args.subject_id,
+                batch_id=batch_id,
+                lora_path=args.lora_path.strip() or str(profile.get("lora_path") or "").strip(),
+                lora_trigger=args.lora_trigger.strip() or str(profile.get("lora_trigger") or "").strip(),
+                args=args,
+                generated=generated,
             )
-            print(f"output_{direction}={source}", flush=True)
-        artifacts = write_sprite_artifacts(
-            outputs_root=Path(args.outputs_root),
-            subject_id=args.subject_id,
-            batch_id=batch_id,
-            lora_path=args.lora_path.strip() or str(profile.get("lora_path") or "").strip(),
-            lora_trigger=args.lora_trigger.strip() or str(profile.get("lora_trigger") or "").strip(),
-            args=args,
-            generated=generated,
-        )
-        print(f"sprite_batch_dir={artifacts['batch_dir']}", flush=True)
-        print(f"sprite_manifest={artifacts['manifest_path']}", flush=True)
-        if artifacts["contact_sheet"]:
-            print(f"sprite_contact_sheet={artifacts['contact_sheet']}", flush=True)
-        print(json.dumps({"status": "ok", "batch_id": batch_id, "outputs": [], "artifacts": artifacts}, indent=2), flush=True)
-        return 0
+            print(f"sprite_batch_dir={artifacts['batch_dir']}", flush=True)
+            print(f"sprite_manifest={artifacts['manifest_path']}", flush=True)
+            if artifacts["contact_sheet"]:
+                print(f"sprite_contact_sheet={artifacts['contact_sheet']}", flush=True)
+            print(json.dumps({"status": "ok", "batch_id": batch_id, "outputs": [], "artifacts": artifacts}, indent=2), flush=True)
+            return 0
 
     lora_path = args.lora_path.strip() or str(profile.get("lora_path") or "").strip()
     if not lora_path:
@@ -687,10 +722,7 @@ def main() -> int:
         raise SystemExit("ERROR: no LoRA path supplied and /api/loras returned no available LoRAs.")
 
     lora_trigger = args.lora_trigger.strip() or str(profile.get("lora_trigger") or "").strip()
-    direction_names = [item.strip() for item in re.split(r"[,+]", args.directions) if item.strip()]
-    invalid = [name for name in direction_names if name not in DIRECTIONS]
-    if invalid:
-        raise SystemExit(f"ERROR: unknown direction(s): {', '.join(invalid)}")
+    control_sources = control_sources_by_direction(source_images, direction_names) if source_images and args.source_mode == "controlnet" else {}
 
     print(f"batch_id={batch_id}", flush=True)
     print(f"lora_path={lora_path}", flush=True)
@@ -706,9 +738,10 @@ def main() -> int:
             STYLE_SUFFIX,
         ]
         prompt = ", ".join(part for part in prompt_parts if part)
+        control_source = control_sources.get(direction)
         payload = {
             "provider": "zimage",
-            "mode": "txt2img",
+            "mode": "controlnet_edit" if control_source is not None else "txt2img",
             "model_id": "Tongyi-MAI/Z-Image-Turbo",
             "nunchaku_rank": args.nunchaku_rank,
             "nunchaku_precision": args.nunchaku_precision,
@@ -728,6 +761,10 @@ def main() -> int:
             "item_index": index,
             "item_total": len(direction_names),
         }
+        if control_source is not None:
+            payload["image"] = image_data_url(control_source)
+            payload["controlnet_conditioning_scale"] = args.controlnet_scale
+            print(f"controlnet_{direction}={control_source} scale={args.controlnet_scale}", flush=True)
         print(f"generate={direction} seed={payload['seed']}", flush=True)
         response = request_json("POST", f"{zimage_url.rstrip('/')}/generate", payload=payload)
         outputs.append(response)
@@ -737,6 +774,8 @@ def main() -> int:
                 "index": index,
                 "seed": payload["seed"],
                 "prompt": prompt,
+                "mode": payload["mode"],
+                "control_source_path": str(control_source) if control_source is not None else "",
                 "response": response,
             }
         )

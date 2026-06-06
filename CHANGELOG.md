@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.32 - 2026-06-06
+
+- Wire selected/generated source images into Z-Image Nunchaku
+  `controlnet_edit` for guided direction generation.
+- Preserve the old selected-image post-processing behavior behind the
+  `--source-mode process` CLI path while the Manager Generate + Process flow
+  now uses `--source-mode controlnet`.
+- Record `generation_mode`, `control_source_path`, and
+  `controlnet_conditioning_scale` in `sprite_batch.json`.
+
 ## 0.1.31 - 2026-06-05
 
 - Embed the forest PNG as a data URI during install/update so Sprite's
