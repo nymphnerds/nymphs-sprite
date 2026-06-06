@@ -25,7 +25,7 @@ later dedicated conversion module.
 Current source version target:
 
 ```text
-nymphs-sprite 0.1.37
+nymphs-sprite 0.1.38
 ```
 
 Latest pushed source state from 2026-06-06:
@@ -42,6 +42,8 @@ Latest pushed source state from 2026-06-06:
 - `0.1.37` makes Open Outputs visible as a first-class Runtime control, renames
   the Z-Image launcher, and keeps the strip folder menu matched to Nymphs Image:
   Choose Folder, Move Selected, Delete Folder.
+- `0.1.38` moves Open Outputs onto its own full-width Runtime row so the
+  sidebar does not crowd four text buttons into one line.
 
 Current tested dev sanity state:
 
@@ -105,7 +107,7 @@ Do not manually copy source files into the test/runtime WSL.
 
 ## Current Source Summary
 
-The Sprite repo is expected to be clean after `0.1.37` is pushed. The current
+The Sprite repo is expected to be clean after `0.1.38` is pushed. The current
 module baseline is:
 
 ```text
@@ -709,7 +711,8 @@ curl -L -s https://raw.githubusercontent.com/nymphnerds/nymphs-sprite/main/nymph
 - Open Sprite UI from Manager.
 - Confirm no `Foundry Run` button in the left workflow.
 - Confirm no visible `Foundry Status` action in the Manager action row.
-- Confirm the Runtime row has separate `Z-Image` and `Open Outputs` buttons.
+- Confirm the Runtime controls show `Z-Image`, `Refresh`, and `Check` on the
+  first row, with `Open Outputs` as its own full-width second row.
 - Confirm the output strip `...` menu contains only Choose Folder, Move
   Selected, and Delete Folder.
 - Confirm Recent thumbnails render actual images.

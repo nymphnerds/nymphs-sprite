@@ -250,7 +250,6 @@
     }
     .two { grid-template-columns: 1fr 1fr; }
     .three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .no-top { margin-top: 0; }
 
     .check-grid {
@@ -675,11 +674,13 @@
 
       <section class="section">
         <div class="section-title"><span>Runtime</span><span id="runtime-chip">Z-Image</span></div>
-        <div class="command-row four no-top">
+        <div class="command-row three no-top">
           <button id="open-zimage" type="button">Z-Image</button>
-          <button id="open-outputs" type="button">Open Outputs</button>
           <button id="refresh-status" type="button">Refresh</button>
           <button id="check-runtime" type="button">Check</button>
+        </div>
+        <div class="command-row">
+          <button id="open-outputs" type="button">Open Outputs</button>
         </div>
       </section>
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.38 - 2026-06-06
+
+- Move Open Outputs onto its own full-width Runtime row so the Z-Image,
+  Refresh, and Check buttons no longer crowd the sidebar.
+
 ## 0.1.37 - 2026-06-06
 
 - Move Open Outputs back to a first-class visible Runtime control and rename
