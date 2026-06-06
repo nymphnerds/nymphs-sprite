@@ -1310,6 +1310,12 @@
       return item?.path || item?.url || "";
     }
 
+    function localOutputPath(item) {
+      const path = String(item?.path || "").trim();
+      if (!path || /^(https?:|manual:)/i.test(path)) return "";
+      return path.startsWith("/") ? path : "";
+    }
+
     function updateSelectionCount() {
       const visibleKeys = new Set((state.visibleOutputs || []).map(outputKey));
       const count = [...state.selectedOutputPaths].filter((key) => visibleKeys.has(key)).length;
@@ -1318,6 +1324,10 @@
 
     function visibleSelectedOutputs() {
       return (state.visibleOutputs || []).filter((item) => state.selectedOutputPaths.has(outputKey(item)));
+    }
+
+    function visibleSelectedSourcePaths() {
+      return visibleSelectedOutputs().map(localOutputPath).filter(Boolean);
     }
 
     function currentManagedFolder() {
@@ -1640,12 +1650,15 @@
 
     async function generateZImageSources(directions) {
       setProgress("Z-Image", "Generating through shared Nymphs Image runtime.", 10);
-      const before = new Set(state.outputs.map(outputKey));
+      const before = new Set(state.outputs.map(localOutputPath).filter(Boolean));
       const text = await moduleAction("generate_sources", buildModuleArgs(directions), { busy: false });
       parseOutputPaths(text);
       const generatedPaths = state.outputs
-        .map(outputKey)
-        .filter((key) => key && !before.has(key) && !/^https?:/i.test(key));
+        .map(localOutputPath)
+        .filter((path) => path && !before.has(path));
+      if (!generatedPaths.length) {
+        throw new Error("Source generation did not return local image paths for ControlNet guidance.");
+      }
       setProgress("Done", `${generatedPaths.length} source image${generatedPaths.length === 1 ? "" : "s"} ready.`, 100);
       return generatedPaths;
     }
@@ -1732,9 +1745,7 @@
         append("ERROR: choose at least one direction.");
         return;
       }
-      const selectedSources = action === "generate_directions"
-        ? Array.from(state.selectedOutputPaths).filter((path) => path && !/^(https?:|manual:)/i.test(path))
-        : [];
+      const selectedSources = action === "generate_directions" ? visibleSelectedSourcePaths() : [];
       state.outputs = [];
       state.selectedIndex = -1;
       state.manualFolderName = "";

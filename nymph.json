@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.39",
+  "version": "0.1.40",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -339,6 +339,7 @@
     "v0.1.36 refreshes the handoff/changelog documentation to match the pushed Sprite UI/output-strip baseline, current Nunchaku/Z-Image ControlNet state, and next Manager test path.",
     "v0.1.37 moves Open Outputs back to a first-class visible runtime control, keeps the output strip folder menu aligned with Nymphs Image, and documents the current Sprite batch folder layout against original Sprite Foundry.",
     "v0.1.38 gives Open Outputs its own full-width Runtime row so the Z-Image, Refresh, and Check buttons no longer crowd the sidebar.",
-    "v0.1.39 documents the active no-depth/no-normal Sprite output flow and keeps future map derivation scoped to non-ComfyUI module work."
+    "v0.1.39 documents the active no-depth/no-normal Sprite output flow and keeps future map derivation scoped to non-ComfyUI module work.",
+    "v0.1.40 makes ControlNet guidance fail loudly when no local source image paths are available, preventing misleading controlnet-labeled txt2img batches."
   ]
 }

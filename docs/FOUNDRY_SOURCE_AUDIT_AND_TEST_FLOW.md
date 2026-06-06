@@ -296,6 +296,9 @@ Expected:
 
 - A batch appears under `/home/nymph/NymphsData/outputs/nymphs-sprite/goblin_scout/`.
 - `sprite_batch.json` exists.
+- `source_mode=controlnet`.
+- At least one direction records `generation_mode=controlnet_edit`.
+- ControlNet-guided directions record non-empty `control_source_path` values.
 - `preview/contact_sheet.png` exists.
 - `albedo/01_front.png` exists, is transparent, and is `sprite_size` square.
 
@@ -308,6 +311,9 @@ Expected:
 - 8 generated source images.
 - 8 processed albedo sprites.
 - `sprite_batch.json` records `processed_count=8`.
+- Guided directions are not silently downgraded to txt2img. If the backend
+  cannot run ControlNet, the run must fail clearly instead of writing a
+  misleading ControlNet batch.
 - Mechanical pass count is visible in the manifest.
 
 ### 6. Foundry Fork Canonical Test

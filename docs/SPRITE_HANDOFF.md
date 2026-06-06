@@ -25,7 +25,7 @@ later dedicated conversion module.
 Current source version target:
 
 ```text
-nymphs-sprite 0.1.39
+nymphs-sprite 0.1.40
 ```
 
 Latest pushed source state from 2026-06-06:
@@ -47,13 +47,21 @@ Latest pushed source state from 2026-06-06:
 - `0.1.39` is a workflow/docs clarification: current Sprite output does not
   include normal/depth maps or folders. Future map work must be local
   non-ComfyUI module work.
+- `0.1.40` fixes the source-image handoff so `Generate + Process` can no longer
+  write a ControlNet-labeled batch that actually used unguided txt2img.
 
-Current tested dev sanity state:
+Current tested state:
 
-- `Generate Sources` and ControlNet-guided direction generation have both run
-  successfully in dev WSL through shared Nymphs Image/Z-Image/Nunchaku.
-- The generated Sprite ControlNet smoke output was written under the shared
-  Z-Image output root and then surfaced in the Sprite strip.
+- The latest test WSL Sprite batch was correctly diagnosed as unguided txt2img:
+  `sprite_batch.json` said `source_mode=controlnet`, but every direction had
+  `generation_mode=txt2img` and an empty `control_source_path`.
+- Sprite `0.1.40` prevents that silent fallback by requiring real local source
+  image paths before the ControlNet pass starts.
+- Test WSL Z-Image reported module version `0.1.105`, but its
+  `.venv-nunchaku/.nymphs_nunchaku_runtime.json` still pinned Nunchaku
+  `a2a4f2444a092974ba53323ba0681a523ff98031`, the pre-ControlNet backup commit.
+  Update Nymphs Image/Z-Image through Manager after the Z-Image updater fix so
+  the runtime venv rebuilds to `b092d6904f6ace0cc6fa65f3ac0beb1cf257ac40`.
 - The Sprite UI now follows the standard generation-module contract:
   `local_url`, `/nymph`, `/health`, `/server_info`, `/api/outputs`, `/outputs`,
   and normal `/ui` assets.
@@ -110,7 +118,7 @@ Do not manually copy source files into the test/runtime WSL.
 
 ## Current Source Summary
 
-The Sprite repo is expected to be clean after `0.1.39` is pushed. The current
+The Sprite repo is expected to be clean after `0.1.40` is pushed. The current
 module baseline is:
 
 ```text
@@ -137,6 +145,8 @@ High-level state now:
 - Removes the fallback that silently avoided `mks0813_pixel_art`.
 - Uses selected source images as Z-Image/Nunchaku `controlnet_edit` guidance
   for `Generate + Process`.
+- Refuses to run ControlNet mode if generated/selected sources are not real
+  local file paths.
 - Keeps Depth Anything staged/fetchable for future research only. Depth/normal
   map production is not part of the current Sprite output contract, and new
   Sprite batches should not create `normal/` or `depth/` folders.
@@ -373,14 +383,16 @@ Current backend state:
 - Nymphs Image/Z-Image source pins that Nunchaku commit in
   `scripts/_zimage_common.sh`.
 - Z-Image `0.1.105` was pushed and its registry entry was updated after raw
-  manifest verification.
+  manifest verification, but the test WSL showed that wrapper-only updates can
+  leave the `.venv-nunchaku` runtime pinned to an older fork commit. The Z-Image
+  updater must rebuild when its runtime marker does not match the pinned
+  Nunchaku commit.
 - Sprite `Generate + Process` now sends selected source images to
   Z-Image `controlnet_edit` using `source-mode=controlnet` and a default
   `controlnet-scale=0.55`.
 
-The dev sanity test proved the code path in dev WSL. The real acceptance test
-still needs the user to update/install through Manager in the managed/test WSL
-and generate from the published artifacts.
+The real acceptance test still needs the user to update/install through Manager
+in the managed/test WSL and generate from the published artifacts.
 
 ## Current Working Flow
 

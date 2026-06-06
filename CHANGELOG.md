@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.40 - 2026-06-06
+
+- Stop `Generate + Process` from silently falling back to unguided txt2img when
+  no local source images are available for ControlNet guidance.
+- Make selected strip images feed the guided pass through their real local file
+  paths instead of selection/display keys.
+- Fail the direction runner early when `--source-mode controlnet` is used
+  without at least one local `--source-images` path.
+
 ## 0.1.39 - 2026-06-06
 
 - Clarify the active Sprite workflow: current batches produce source/raw,

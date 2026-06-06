@@ -275,20 +275,21 @@ pack metadata, and source config paths. Roster entries without a local prompt
 config remain visible as original roster entries but are disabled for direct
 generation until their prompt configs are available or reconstructed.
 
-## Foundry Bridge
+## Generation Flow
 
-The custom UI has two generation lanes:
+The Manager UI has one normal generation path:
 
 ```text
 Generate Sources / Generate + Process
-  Fast module batch path under $HOME/NymphsData/outputs/nymphs-sprite.
-
-Foundry Run
-  Canonical Sprite Foundry fork path using foundry generate-nymphscore.
+  Source images through Z-Image, then ControlNet-guided directions and
+  Sprite Foundry-style cleanup under $HOME/NymphsData/outputs/nymphs-sprite.
 ```
 
-`Foundry Run` uses the selected imported preset's `source_config` path and calls
-the local `sprite-foundry` fork. The default checkout is:
+If ControlNet source images are missing or the backend cannot run
+`controlnet_edit`, `Generate + Process` should fail clearly instead of writing
+an unguided txt2img batch. The local `sprite-foundry` fork remains reference
+material and a developer audit bridge, not the normal user UI flow. The default
+checkout is:
 
 ```text
 $HOME/NymphsModules/sprite-foundry

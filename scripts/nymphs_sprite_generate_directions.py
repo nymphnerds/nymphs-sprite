@@ -677,6 +677,8 @@ def main() -> int:
         raise SystemExit(f"ERROR: unknown direction(s): {', '.join(invalid)}")
     if args.controlnet_scale <= 0 or args.controlnet_scale > 2:
         raise SystemExit("ERROR: --controlnet-scale must be greater than 0 and <= 2.")
+    if args.source_mode == "controlnet" and not source_images:
+        raise SystemExit("ERROR: --source-mode controlnet requires --source-images with at least one local source image.")
 
     if source_images:
         missing = [str(path) for path in source_images if not path.is_file()]
