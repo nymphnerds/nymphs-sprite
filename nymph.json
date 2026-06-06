@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.38",
+  "version": "0.1.39",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -216,7 +216,7 @@
               {
                 "label": "Depth Anything V2 Small",
                 "value": "depth_anything_small",
-                "description": "Fetch only the depth extraction asset for sprite depth-map work"
+                "description": "Fetch only the staged Depth Anything asset for future non-ComfyUI map research"
               }
             ]
           },
@@ -291,9 +291,9 @@
   "dependencies": {
     "zimage": "Required generation backend for Tongyi-MAI/Z-Image-Turbo and Z-Image Turbo LoRA loading.",
     "zimage_controlnet_union": "alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union for depth/canny morphology control.",
-    "depth_anything": "depth-anything/Depth-Anything-V2-Small-hf for depth references and derived depth maps.",
+    "depth_anything": "depth-anything/Depth-Anything-V2-Small-hf is staged for future non-ComfyUI depth/normal research; it is not part of the current Sprite output contract.",
     "nymphscore": "Target orchestration layer for replacing the captured ComfyUI workflow behavior.",
-    "comfyui": "Optional reference runtime only while parity work is in progress."
+    "comfyui": "Reference material only; do not add ComfyUI as a Sprite runtime dependency."
   },
   "update_policy": {
     "channel": "experimental"
@@ -338,6 +338,7 @@
     "v0.1.35 removes visible Foundry-facing controls from the Sprite UI/Manager action row and adds Nymphs Image-style Move Selected, Delete Folder, and Delete selected output management through Sprite's local_url /api/outputs endpoints.",
     "v0.1.36 refreshes the handoff/changelog documentation to match the pushed Sprite UI/output-strip baseline, current Nunchaku/Z-Image ControlNet state, and next Manager test path.",
     "v0.1.37 moves Open Outputs back to a first-class visible runtime control, keeps the output strip folder menu aligned with Nymphs Image, and documents the current Sprite batch folder layout against original Sprite Foundry.",
-    "v0.1.38 gives Open Outputs its own full-width Runtime row so the Z-Image, Refresh, and Check buttons no longer crowd the sidebar."
+    "v0.1.38 gives Open Outputs its own full-width Runtime row so the Z-Image, Refresh, and Check buttons no longer crowd the sidebar.",
+    "v0.1.39 documents the active no-depth/no-normal Sprite output flow and keeps future map derivation scoped to non-ComfyUI module work."
   ]
 }

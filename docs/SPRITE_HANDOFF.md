@@ -25,7 +25,7 @@ later dedicated conversion module.
 Current source version target:
 
 ```text
-nymphs-sprite 0.1.38
+nymphs-sprite 0.1.39
 ```
 
 Latest pushed source state from 2026-06-06:
@@ -44,6 +44,9 @@ Latest pushed source state from 2026-06-06:
   Choose Folder, Move Selected, Delete Folder.
 - `0.1.38` moves Open Outputs onto its own full-width Runtime row so the
   sidebar does not crowd four text buttons into one line.
+- `0.1.39` is a workflow/docs clarification: current Sprite output does not
+  include normal/depth maps or folders. Future map work must be local
+  non-ComfyUI module work.
 
 Current tested dev sanity state:
 
@@ -107,7 +110,7 @@ Do not manually copy source files into the test/runtime WSL.
 
 ## Current Source Summary
 
-The Sprite repo is expected to be clean after `0.1.38` is pushed. The current
+The Sprite repo is expected to be clean after `0.1.39` is pushed. The current
 module baseline is:
 
 ```text
@@ -134,8 +137,9 @@ High-level state now:
 - Removes the fallback that silently avoided `mks0813_pixel_art`.
 - Uses selected source images as Z-Image/Nunchaku `controlnet_edit` guidance
   for `Generate + Process`.
-- Keeps Depth Anything staged/fetchable, but depth/normal map production is not
-  wired as a finished output stage yet.
+- Keeps Depth Anything staged/fetchable for future research only. Depth/normal
+  map production is not part of the current Sprite output contract, and new
+  Sprite batches should not create `normal/` or `depth/` folders.
 - Keeps source generation on module-owned scripts that call the shared Z-Image
   API, while the Sprite UI itself is served through the standard local
   `http://127.0.0.1:8098/nymph` route.
@@ -487,7 +491,7 @@ select original Foundry roster preset
   -> generate 8 source directions
   -> inspect raw/pixel contact sheets
   -> accept/reject/regen attempts
-  -> produce depth and normal maps
+  -> optional future local map derivation, once non-ComfyUI nodes exist
   -> inspect finish board
   -> export deterministic Foundry pack
 ```
@@ -504,12 +508,13 @@ bakeoff/<run_id>/
 
 exports/<subject_slug>/<run_id>/
   albedo/
-  normal/
-  depth/
   preview/
   manifest.json
   checksums
 ```
+
+Do not add `normal/` or `depth/` to the active Sprite output/export shape until
+a local Nymphs-owned non-ComfyUI map stage exists and has been tested.
 
 Current Nymphs Sprite batch shape:
 
@@ -524,9 +529,9 @@ $HOME/NymphsData/outputs/nymphs-sprite/<subject-id>/<batch-id>/
 
 This is why the output folder currently contains several subfolders. It is
 closer to a combined working/export bundle than original Foundry's final export
-contract. Until normal/depth/finish parity exists, the UI should guide users to
-the visible strip, the `Open Outputs` button, `albedo/`, and `preview/` rather
-than making `raw/` and `directions/` feel like separate user workflows.
+contract. The UI should guide users to the visible strip, the `Open Outputs`
+button, `albedo/`, and `preview/` rather than making `raw/` and `directions/`
+feel like separate user workflows.
 
 ## What Is Not Full Flow Yet
 
@@ -536,7 +541,7 @@ Missing Manager-visible lifecycle pieces:
 - raw/pixel accept
 - raw/pixel reject
 - regen loop
-- produce depth/normal/finish artifacts
+- produce finish/export artifacts
 - finish board
 - deterministic export
 - export manifest/checksum surfacing
@@ -547,9 +552,9 @@ Missing backend parity:
 
 - Z-Image/Nunchaku `controlnet_edit` works as a first guided path, but it is
   not yet full Sprite Foundry morphology parity.
-- Depth Anything is fetched/staged but not wired as a full per-direction map
-  production stage.
-- Normal maps are not proven.
+- Depth Anything is fetched/staged but is not used by the current workflow.
+- Future depth/normal work should recreate the useful Foundry map stage with
+  local non-ComfyUI module code, if we decide to return to it.
 - Godot finish-lab parity is not wired.
 - Mesh generation is intentionally out of scope for this module.
 
@@ -577,10 +582,21 @@ Likely next backend work:
 generate source candidates
   -> guide directions with controlnet_edit
   -> compare consistency across all 8 directions
-  -> derive depth with Depth Anything
-  -> derive normals from depth
-  -> decide whether additional canny/depth conditioning is needed
+  -> improve source/processed output clarity
+  -> decide later whether local depth/normal nodes are worth adding
 ```
+
+Future map plan, parked:
+
+```text
+processed sprite/albedo
+  -> local Depth Anything
+  -> local normal-from-depth or standalone normal estimator
+  -> optional map bundle/export layer
+```
+
+This is explicitly not current workflow work, and it must not add ComfyUI or
+SDXL as module dependencies.
 
 ## Image Strip / Browser
 
@@ -738,7 +754,7 @@ curl -L -s https://raw.githubusercontent.com/nymphnerds/nymphs-sprite/main/nymph
 
 ```text
 A. Full Foundry review/accept/reject/regenerate lifecycle
-B. Depth/normal map production from accepted sprite sources
+B. Future local non-ComfyUI depth/normal map production from accepted sprites
 C. ControlNet consistency/morphology refinement across all 8 directions
 D. Deterministic Foundry-style export pack once review/accept exists
 ```

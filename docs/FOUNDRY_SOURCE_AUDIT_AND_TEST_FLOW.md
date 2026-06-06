@@ -1,6 +1,6 @@
 # Foundry Source Audit And Test Flow
 
-Last updated: 2026-06-05
+Last updated: 2026-06-06
 
 ## Scope
 
@@ -118,7 +118,8 @@ What is missing for close Foundry parity:
 - No `subject-add`, `register-run`, or `register-attempt` bridge from module batches into Foundry.
 - No raw/pixel accept/reject states.
 - No `regen` loop.
-- No `produce` path for normal/depth maps.
+- No current `produce` path for normal/depth maps. Continue without this for
+  now; do not create `normal/` or `depth/` folders in active Sprite output.
 - No Godot finish-lab bridge.
 - No deterministic Foundry export command from the module UI.
 - No body-class morphology/control path yet through Z-Image ControlNet Union.
@@ -182,6 +183,20 @@ Suggested new module actions:
 - `foundry_export`: call `python3 -m foundry.cli export <run_id> --overwrite`.
 
 Keep backend adapters inside Foundry pipeline scripts where possible. The module UI should select presets, LoRAs, sizes, and review decisions; Foundry should own lifecycle, registry, gates, provenance, and exports.
+
+Current decision for Nymphs Sprite: do not reintroduce ComfyUI to get
+normal/depth maps. The active module workflow stops at generated sources,
+cleaned transparent albedo sprites, contact/inspection previews, and
+`sprite_batch.json`. Future map work can investigate local Nymphs-owned nodes:
+
+```text
+accepted/processed sprite
+  -> local Depth Anything
+  -> local normal-from-depth or standalone normal estimator
+  -> optional maps bundle
+```
+
+Until that exists and is tested, normal/depth are future-plan items only.
 
 ## Test Flow
 
@@ -329,7 +344,7 @@ Expected:
 
 - Review queue shows generated/check-passed attempts for visual decision.
 
-### 7. Review, Produce, Export Test
+### 7. Future Review, Produce, Export Test
 
 After visual review, accept one complete 8-direction run:
 
@@ -341,13 +356,13 @@ python3 -m foundry.cli batch-accept <run_id>
 python3 -m foundry.cli export <run_id> --overwrite
 ```
 
-Expected:
+Expected for the future Foundry bridge, not the current Sprite UI:
 
-- Normal/depth/finish artifacts are produced or clearly report the missing backend dependency.
-- Export writes `exports/{subject_slug}/{run_id}`.
-- `manifest.json` includes schema, provenance, and checksums.
-
-Note: map and finish paths still need extra validation because `foundry_maps.py` has been size-adapted but still has legacy ComfyUI assumptions in parts of the pipeline.
+- If map production is enabled, it must use local non-ComfyUI module code.
+- Until that exists, no `normal/` or `depth/` folders should be emitted by the
+  active Sprite workflow.
+- Export work should write only proven assets and should not advertise map
+  layers that were not generated.
 
 ## Definition Of Done For Foundry Parity
 
@@ -359,7 +374,8 @@ select Foundry preset
   -> generate 8 sources
   -> inspect raw/pixel contact sheets
   -> accept/reject/regen attempts
-  -> produce maps and finish review board
+  -> optionally produce maps only after local non-ComfyUI map nodes exist
+  -> finish review board
   -> export deterministic Foundry pack
 ```
 
@@ -367,5 +383,8 @@ And the filesystem/registry results match the original Foundry contract:
 
 - Foundry DB has subjects, runs, attempts, artifacts, reviews, and gates.
 - `bakeoff/{run_id}` contains raw, pixel, recipe, manifest, and review sheets.
-- Export folder contains `albedo`, `normal`, `depth`, `preview`, and manifest checksums.
+- Current Sprite exports/batches contain generated sources, cleaned albedo
+  sprites, previews, and manifest/provenance only.
+- Future full Foundry export can add `normal` and `depth` only after local
+  non-ComfyUI map derivation is implemented and tested.
 - Sprite size is recorded and honored; it is not silently forced to 48.

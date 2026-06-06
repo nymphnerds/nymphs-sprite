@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.39 - 2026-06-06
+
+- Clarify the active Sprite workflow: current batches produce source/raw,
+  cleaned albedo sprites, preview/contact sheets, and manifests only.
+- Mark depth/normal map production as future non-ComfyUI module work, not part
+  of the current output contract.
+- Document that Sprite should not create `normal/` or `depth/` folders until a
+  local Nymphs-owned map derivation stage exists.
+
 ## 0.1.38 - 2026-06-06
 
 - Move Open Outputs onto its own full-width Runtime row so the Z-Image,

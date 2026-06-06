@@ -55,11 +55,15 @@ modes:      canny, hed, depth, pose, mlsd
 status:     staged by Nymphs Sprite; requires a Z-Image ControlNet backend path
 ```
 
-For depth maps and depth conditioning refs, the first target is:
+For possible future depth maps and depth conditioning refs, the research target
+is:
 
 ```text
 depth: depth-anything/Depth-Anything-V2-Small-hf
 ```
+
+This is not part of the active Sprite output contract. Current Sprite batches
+do not create `normal/` or `depth/` folders.
 
 ## Current Status
 
@@ -230,9 +234,13 @@ sprite_batch.json    prompts, seeds, LoRA settings, source Z-Image responses, an
 
 Original Sprite Foundry separated the same idea into a working `bakeoff/<run_id>`
 folder and a final `exports/<subject_slug>/<run_id>` pack. Nymphs Sprite
-currently writes a single batch folder while parity work continues. In normal
-use, `albedo/` and `preview/` are the useful folders; `raw/`, `directions/`,
-and `sprite_batch.json` are provenance/debug artifacts.
+currently writes a single batch folder while the user workflow is kept simple.
+In normal use, `albedo/` and `preview/` are the useful folders; `raw/`,
+`directions/`, and `sprite_batch.json` are provenance/debug artifacts.
+
+Nymphs Sprite intentionally does not create `normal/` or `depth/` folders yet.
+Those folders should only appear after a local, non-ComfyUI map derivation
+stage exists and has been proven.
 
 The sprite processor uses the MIT-licensed Sprite Foundry method as its
 reference: background cleanup, foreground crop, square padding, nearest-neighbor
@@ -322,7 +330,7 @@ ZImageControlNetPipeline
 ZImage ControlNet model class
 ```
 
-Nymphs Sprite still stages the models now so the next backend work has no hidden
+Nymphs Sprite still stages the models now so future backend work has no hidden
 download step:
 
 ```bash
@@ -332,8 +340,10 @@ scripts/nymphs_sprite_check_runtime.sh
 ```
 
 Status reports downloaded sprite LoRAs, ControlNet, and Depth Anything assets
-back to the Manager. Sprite LoRA weights are deletable through the module-owned
-`delete_models` entrypoint, one selected profile at a time.
+back to the Manager. Depth Anything is staged only for future non-ComfyUI map
+research; it is not run by the current Sprite workflow. Sprite LoRA weights are
+deletable through the module-owned `delete_models` entrypoint, one selected
+profile at a time.
 
 The integration target is documented in
 `profiles/zimage_turbo_controlnet_request.json`.
