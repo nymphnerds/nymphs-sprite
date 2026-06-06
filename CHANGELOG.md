@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.37 - 2026-06-06
+
+- Move Open Outputs back to a first-class visible Runtime control and rename
+  the Z-Image launcher so the two actions are not confused.
+- Keep the output strip folder menu aligned with Nymphs Image: Choose Folder,
+  Move Selected, and Delete Folder only. Select, Select All, Clear, and Delete
+  remain visible strip actions.
+- Document the current Sprite batch folder layout against original Sprite
+  Foundry's bakeoff/export output shapes.
+
 ## 0.1.36 - 2026-06-06
 
 - Refresh the Sprite handoff to match the pushed `0.1.35` UI/output-strip

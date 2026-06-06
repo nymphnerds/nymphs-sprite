@@ -25,7 +25,7 @@ later dedicated conversion module.
 Current source version target:
 
 ```text
-nymphs-sprite 0.1.36
+nymphs-sprite 0.1.37
 ```
 
 Latest pushed source state from 2026-06-06:
@@ -34,11 +34,14 @@ Latest pushed source state from 2026-06-06:
   `b092d6904f6ace0cc6fa65f3ac0beb1cf257ac40`.
 - Nymphs Image/Z-Image `0.1.105` pushed and registry-updated; raw manifest was
   verified before registry update.
-- Nymphs Sprite `0.1.35` pushed with the current user-facing UI baseline:
+- Nymphs Sprite `0.1.35` pushed with the user-facing UI baseline:
   standard `local_url` UI, same-origin output browser, hidden Foundry-facing
   controls, and Nymphs Image-style output strip management.
 - `0.1.36` is a docs/handoff refresh so the next session starts from the actual
   pushed state instead of the older `0.1.33` transition notes.
+- `0.1.37` makes Open Outputs visible as a first-class Runtime control, renames
+  the Z-Image launcher, and keeps the strip folder menu matched to Nymphs Image:
+  Choose Folder, Move Selected, Delete Folder.
 
 Current tested dev sanity state:
 
@@ -54,6 +57,10 @@ Current tested dev sanity state:
 - The visible `Foundry Run` button and visible `Foundry Status` Manager action
   are removed. The underlying Foundry scripts remain available as developer
   reference/parity tools, not as the normal user workflow.
+- The Sprite UI has two different "open" actions now:
+  `Z-Image` starts/opens the shared Nymphs Image backend, while `Open Outputs`
+  opens the generated output folder. Do not bury Open Outputs in the strip
+  folder menu.
 
 Registry note:
 
@@ -98,7 +105,7 @@ Do not manually copy source files into the test/runtime WSL.
 
 ## Current Source Summary
 
-The Sprite repo is expected to be clean after `0.1.36` is pushed. The current
+The Sprite repo is expected to be clean after `0.1.37` is pushed. The current
 module baseline is:
 
 ```text
@@ -502,6 +509,23 @@ exports/<subject_slug>/<run_id>/
   checksums
 ```
 
+Current Nymphs Sprite batch shape:
+
+```text
+$HOME/NymphsData/outputs/nymphs-sprite/<subject-id>/<batch-id>/
+  raw/                 original Z-Image outputs before sprite cleanup
+  directions/          copied generated direction images, when source paths exist
+  albedo/              cleaned transparent sprites; this is the useful sprite output
+  preview/             contact sheets and raw inspection sheets
+  sprite_batch.json    prompts, seeds, backend responses, provenance, checks
+```
+
+This is why the output folder currently contains several subfolders. It is
+closer to a combined working/export bundle than original Foundry's final export
+contract. Until normal/depth/finish parity exists, the UI should guide users to
+the visible strip, the `Open Outputs` button, `albedo/`, and `preview/` rather
+than making `raw/` and `directions/` feel like separate user workflows.
+
 ## What Is Not Full Flow Yet
 
 Missing Manager-visible lifecycle pieces:
@@ -685,6 +709,9 @@ curl -L -s https://raw.githubusercontent.com/nymphnerds/nymphs-sprite/main/nymph
 - Open Sprite UI from Manager.
 - Confirm no `Foundry Run` button in the left workflow.
 - Confirm no visible `Foundry Status` action in the Manager action row.
+- Confirm the Runtime row has separate `Z-Image` and `Open Outputs` buttons.
+- Confirm the output strip `...` menu contains only Choose Folder, Move
+  Selected, and Delete Folder.
 - Confirm Recent thumbnails render actual images.
 - Select output(s), then test Delete selected.
 - Move selected output(s) to a folder.

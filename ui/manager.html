@@ -250,6 +250,7 @@
     }
     .two { grid-template-columns: 1fr 1fr; }
     .three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .no-top { margin-top: 0; }
 
     .check-grid {
@@ -674,8 +675,9 @@
 
       <section class="section">
         <div class="section-title"><span>Runtime</span><span id="runtime-chip">Z-Image</span></div>
-        <div class="command-row three no-top">
-          <button id="open-zimage" type="button">Open</button>
+        <div class="command-row four no-top">
+          <button id="open-zimage" type="button">Z-Image</button>
+          <button id="open-outputs" type="button">Open Outputs</button>
           <button id="refresh-status" type="button">Refresh</button>
           <button id="check-runtime" type="button">Check</button>
         </div>
@@ -779,8 +781,6 @@
                 <button id="choose-folder" type="button">Choose Folder</button>
                 <button id="move-selected" type="button">Move Selected</button>
                 <button class="danger" id="delete-folder" type="button">Delete Folder</button>
-                <button id="open-outputs" type="button">Open Outputs</button>
-                <button id="open-logs" type="button">Logs</button>
               </div>
             </details>
             <span class="selection-count" id="selection-count">0 selected</span>
@@ -1691,7 +1691,6 @@
     $("open-zimage").addEventListener("click", () => moduleAction("start_zimage").catch(() => {}));
     $("check-runtime").addEventListener("click", () => moduleAction("check_runtime").catch(() => {}));
     $("open-outputs").addEventListener("click", () => moduleAction("open_outputs").catch(() => {}));
-    $("open-logs").addEventListener("click", () => moduleAction("logs").catch(() => {}));
     $("strip-prev").addEventListener("click", () => stepOutput(-1));
     $("strip-next").addEventListener("click", () => stepOutput(1));
     $("choose-folder").addEventListener("click", () => {

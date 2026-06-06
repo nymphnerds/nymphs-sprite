@@ -221,10 +221,18 @@ $HOME/NymphsData/outputs/nymphs-sprite/<subject-id>/<batch-id>
 The bundle contains:
 
 ```text
+raw/                 source images copied from Z-Image before sprite cleanup
 directions/          copied per-direction image files when Z-Image returns local paths
+albedo/              cleaned transparent sprite PNGs, one per generated direction
+preview/             contact sheets and inspection sheets
 sprite_batch.json    prompts, seeds, LoRA settings, source Z-Image responses, and paths
-contact_sheet.png    quick visual sheet when Pillow is available
 ```
+
+Original Sprite Foundry separated the same idea into a working `bakeoff/<run_id>`
+folder and a final `exports/<subject_slug>/<run_id>` pack. Nymphs Sprite
+currently writes a single batch folder while parity work continues. In normal
+use, `albedo/` and `preview/` are the useful folders; `raw/`, `directions/`,
+and `sprite_batch.json` are provenance/debug artifacts.
 
 The sprite processor uses the MIT-licensed Sprite Foundry method as its
 reference: background cleanup, foreground crop, square padding, nearest-neighbor
