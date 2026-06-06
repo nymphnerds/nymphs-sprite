@@ -15,7 +15,7 @@ case "${limit}" in
     ;;
 esac
 
-python3 - "${NYMPHS_SPRITE_ZIMAGE_URL}" "${limit}" "${NYMPHS_DATA_ROOT}/outputs/zimage" "${HOME}/Z-Image/outputs" "${HOME}/NymphsModules/zimage/outputs" <<'PY'
+python3 - "${NYMPHS_SPRITE_ZIMAGE_URL}" "${NYMPHS_SPRITE_UI_URL}" "${limit}" "${NYMPHS_DATA_ROOT}/outputs/zimage" "${HOME}/Z-Image/outputs" "${HOME}/NymphsModules/zimage/outputs" <<'PY'
 from __future__ import annotations
 
 import json
@@ -27,25 +27,32 @@ import urllib.request
 from pathlib import Path
 
 base_url = sys.argv[1].rstrip("/")
+sprite_ui_url = sys.argv[2].rstrip("/")
 try:
-    limit = max(1, min(200, int(sys.argv[2])))
+    limit = max(1, min(200, int(sys.argv[3])))
 except Exception:
     limit = 80
-fallback_roots = [Path(item).expanduser() for item in sys.argv[3:] if item.strip()]
+fallback_roots = [
+    ("zimage", Path(sys.argv[4]).expanduser()),
+    ("zimage-legacy", Path(sys.argv[5]).expanduser()),
+    ("zimage-dev", Path(sys.argv[6]).expanduser()),
+]
 
 image_suffixes = {".png", ".jpg", ".jpeg", ".webp"}
 
 
-def output_url(path: Path, root: Path, use_api_urls: bool) -> str:
+def output_url(path: Path, source_id: str, root: Path, use_api_urls: bool) -> str:
     try:
         rel = path.resolve().relative_to(root.resolve()).as_posix()
     except Exception:
         rel = path.name
-    if use_api_urls and root == fallback_roots[0] and base_url:
+    if use_api_urls and source_id == "zimage" and base_url:
         from urllib.parse import quote
 
         return f"{base_url}/outputs/{quote(rel, safe='/')}"
-    return path.resolve().as_uri()
+    from urllib.parse import quote
+
+    return f"{sprite_ui_url}/outputs/{quote(source_id, safe='')}/{quote(rel, safe='/')}"
 
 
 def metadata_for(path: Path) -> dict:
@@ -62,7 +69,7 @@ def metadata_for(path: Path) -> dict:
 def filesystem_outputs(use_api_urls: bool = False) -> list[dict]:
     seen: set[str] = set()
     records: list[dict] = []
-    for root in fallback_roots:
+    for source_id, root in fallback_roots:
         if not root.is_dir():
             continue
         for path in root.rglob("*"):
@@ -83,7 +90,7 @@ def filesystem_outputs(use_api_urls: bool = False) -> list[dict]:
                     "name": metadata.get("item_label") or metadata.get("batch_label") or path.stem,
                     "path": str(path),
                     "relative_path": rel,
-                    "url": output_url(path, root, use_api_urls),
+                    "url": output_url(path, source_id, root, use_api_urls),
                     "created": metadata.get("created") or metadata.get("created_at") or stat.st_mtime,
                     "mtime": stat.st_mtime,
                     "size": stat.st_size,
@@ -103,7 +110,7 @@ def filesystem_outputs(use_api_urls: bool = False) -> list[dict]:
 
 url = f"{base_url}/api/outputs?limit={limit}"
 try:
-    with urllib.request.urlopen(url, timeout=10) as response:
+    with urllib.request.urlopen(url, timeout=2) as response:
         body = json.loads(response.read().decode("utf-8"))
 except urllib.error.URLError as exc:
     print(json.dumps({"outputs": filesystem_outputs(use_api_urls=False), "source": "filesystem", "api_error": str(exc.reason)}))

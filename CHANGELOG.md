@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.34 - 2026-06-06
+
+- Mirror the Nymphs Image output-browser contract in Sprite's `local_url` UI:
+  the browser now refreshes Recent with same-origin `/api/outputs?limit=80`.
+- Serve browsed Sprite and Z-Image files as same-origin `/outputs/<source>/...`
+  URLs so thumbnails and the main preview render inside WebView2.
+- Keep the legacy Manager `list_outputs` helper on the same `/outputs/...` URL
+  scheme if it is called outside the UI.
+
 ## 0.1.33 - 2026-06-06
 
 - Switch the Sprite Manager UI from `local_html` to the standard Nymphs

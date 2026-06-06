@@ -1028,8 +1028,38 @@
 
     function pathToFileUrl(path) {
       if (!path) return "";
-      if (/^(file|https?):\/\//i.test(path)) return path;
-      return encodeURI(`file://${path}`);
+      if (/^https?:\/\//i.test(path)) return path;
+      if (/^\/outputs\//i.test(path)) return path;
+      if (/^file:\/\//i.test(path)) {
+        try {
+          path = decodeURIComponent(new URL(path).pathname);
+        } catch {
+          path = path.replace(/^file:\/\//i, "");
+        }
+      }
+      const normalized = String(path).replace(/\\/g, "/");
+      const roots = [
+        { marker: "/NymphsData/outputs/nymphs-sprite/", source: "sprite" },
+        { marker: "/NymphsData/outputs/zimage/", source: "zimage" },
+        { marker: "/Z-Image/outputs/", source: "zimage-legacy" },
+        { marker: "/NymphsModules/zimage/outputs/", source: "zimage-dev" }
+      ];
+      for (const root of roots) {
+        const index = normalized.indexOf(root.marker);
+        if (index >= 0) {
+          const relative = normalized.slice(index + root.marker.length).split("/").map(encodeURIComponent).join("/");
+          return `/outputs/${root.source}/${relative}`;
+        }
+      }
+      return normalized.startsWith("/") ? "" : normalized;
+    }
+
+    function previewUrl(output) {
+      if (!output?.url) return "";
+      if (String(output.url).startsWith("blob:")) return output.url;
+      const stamp = output.created ? String(Math.round(Number(output.created) * 1000)) : "";
+      if (!stamp) return output.url;
+      return `${output.url}${output.url.includes("?") ? "&" : "?"}v=${encodeURIComponent(stamp)}`;
     }
 
     function addOutput(path, label, previewUrl = "") {
@@ -1211,7 +1241,7 @@
         node.dataset.key = key;
         node.innerHTML = `
           <label class="thumb-check" title="Select output"><input type="checkbox" ${state.selectedOutputPaths.has(key) ? "checked" : ""}></label>
-          <img src="${escapeHtml(item.url)}" alt="">
+          <img src="${escapeHtml(previewUrl(item))}" alt="">
           <span>${escapeHtml(item.label)}</span>
         `;
         const checkbox = node.querySelector("input");
@@ -1227,7 +1257,10 @@
 
     function normalizeManagedOutput(item, index) {
       const rawPath = item.path || item.output_path || item.relative_path || item.url || "";
-      const url = item.url || pathToFileUrl(rawPath);
+      let url = item.url || pathToFileUrl(rawPath);
+      if (url && !/^https?:\/\//i.test(url) && !url.startsWith("/")) {
+        url = pathToFileUrl(url);
+      }
       return {
         path: rawPath || url || `output:${index}`,
         relative_path: item.relative_path || rawPath,
@@ -1242,8 +1275,9 @@
     async function refreshRecentOutputs(selectFirst = false) {
       if (state.viewerSource === "manual" || state.viewerSource === "batch") return;
       try {
-        const text = await moduleAction("list_outputs", { limit: "80" }, { quiet: true, busy: false });
-        const body = JSON.parse(String(text || "{}"));
+        const response = await fetch("/api/outputs?limit=80", { cache: "no-store" });
+        if (!response.ok) throw new Error("Could not refresh outputs.");
+        const body = await response.json();
         state.outputs = (body.outputs || []).map(normalizeManagedOutput);
         state.viewerSource = "outputs";
         state.selectedOutputPaths.clear();
@@ -1261,7 +1295,7 @@
       if (!item) return;
       state.selectedIndex = index;
       const image = $("result-image");
-      image.src = item.url;
+      image.src = previewUrl(item);
       image.style.display = "block";
       $("empty").hidden = true;
       $("output-label").textContent = item.label || basename(item.path);

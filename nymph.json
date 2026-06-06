@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "0.1.33",
+  "version": "0.1.34",
   "description": "Sprite Foundry-inspired 8-direction sprite pipeline module for NymphsCore, targeting Z-Image Turbo with a compatible sprite LoRA.",
   "category": "image",
   "kind": "sprite",
@@ -339,6 +339,7 @@
     "v0.1.30 restores the Nymphs Image forest stage background in Sprite by simplifying the viewer CSS to use the installed local forest PNG directly instead of the darker overlay/fallback stack.",
     "v0.1.31 embeds the forest PNG into the installed local_html UI and makes the Recent strip proxy Nymphs Image /api/outputs with a filesystem fallback over the shared Z-Image output folders.",
     "v0.1.32 wires selected/generated source images into Z-Image Nunchaku controlnet_edit so Generate + Process can run guided direction generation through ControlNet.",
-    "v0.1.33 switches Sprite's Manager UI from local_html to the standard Nymphs local_url /nymph contract, serves http://127.0.0.1:8098/nymph with /health, /server_info, and /ui assets, and removes the duplicate in-page title."
+    "v0.1.33 switches Sprite's Manager UI from local_html to the standard Nymphs local_url /nymph contract, serves http://127.0.0.1:8098/nymph with /health, /server_info, and /ui assets, and removes the duplicate in-page title.",
+    "v0.1.34 mirrors the Nymphs Image output-browser contract by serving Sprite and Z-Image Recent records from Sprite's local_url /api/outputs endpoint with same-origin /outputs/<source>/... image URLs."
   ]
 }
