@@ -25,7 +25,7 @@ later dedicated conversion module.
 Current source version target:
 
 ```text
-nymphs-sprite 0.1.31
+nymphs-sprite 0.1.33
 ```
 
 Latest pushed/tested state from 2026-06-05:
@@ -57,8 +57,13 @@ Remaining roughness found during test:
   URI during install/update. It also fixes the Recent strip to proxy the same
   Nymphs Image `/api/outputs?limit=80` source and fall back to scanning shared
   Z-Image output folders if the API returns empty or is unavailable.
+- `0.1.33` removes the `local_html` UI path for Sprite and aligns it with the
+  standard generation-module contract: `local_url`, `/nymph`, `/health`,
+  `/server_info`, and `/ui/nymphs_preview_forest.png` served from the module.
+  The 0.1.31 data-URI forest embed is removed because it made the WebView HTML
+  oversized and diverged from the Nymphs Image UI standard.
 
-Current source tree may have uncommitted changes while preparing `0.1.31`.
+Current source tree may have uncommitted changes while preparing `0.1.33`.
 Do not update the registry until:
 
 1. The source diff is reviewed.
@@ -127,9 +132,9 @@ High-level state now:
 - Removes the fallback that silently avoided `mks0813_pixel_art`.
 - Keeps ControlNet/Depth as staged assets only, not as a claimed working
   generation path.
-- Restores source generation through the Manager action transport, because
-  Sprite's `local_html` WebView cannot reliably use Nymphs Image's direct
-  relative browser `fetch()` model.
+- Keeps source generation on module-owned scripts that call the shared Z-Image
+  API, while the Sprite UI itself is served through the standard local
+  `http://127.0.0.1:8098/nymph` route.
 - Keeps the actual generation method copied from Nymphs Image at the API
   contract level: `/api/model/load` then `/generate`, same model/rank/LoRA
   payload fields, same shared runtime.
@@ -316,10 +321,11 @@ Sprite should follow that pattern through the module bridge:
 
 - module bridge route in `scripts/nymphs_sprite_generate_directions.py`
 
-Important: `ui/manager.html` is `local_html`, not the Z-Image-served Nymphs
-Image page. It must not browser-fetch `http://127.0.0.1:8090/generate`
-directly. That caused WebView `Failed to fetch`. Keep browser calls on the
-Manager module-action transport, and let the script call the shared Z-Image API.
+Important: Sprite's Manager-facing UI should follow the same served UI family
+as Nymphs Image and other generation modules: `local_url`, `/nymph`, cheap
+`/health` and `/server_info`, and normal module-served `/ui` assets. Generation
+still goes through the shared Z-Image API/runtime rather than a Sprite-owned
+model backend.
 
 Sprite status now forwards these values from `zimage_status.sh`:
 

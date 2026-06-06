@@ -10,6 +10,7 @@ runtime_present=false
 data_present=false
 version=not-installed
 running=false
+ui_server_running=false
 state=available
 health=unavailable
 detail="${NYMPHS_SPRITE_MODULE_NAME} is not installed."
@@ -59,9 +60,15 @@ fi
 if [[ -d "${NYMPHS_SPRITE_WORKFLOWS_DIR}" &&
       -d "${NYMPHS_SPRITE_PROFILES_DIR}" &&
       -f "${NYMPHS_SPRITE_UI_DIR}/manager.html" &&
+      -f "${NYMPHS_SPRITE_INSTALL_DIR}/scripts/nymphs_sprite_ui_server.py" &&
       -f "${NYMPHS_SPRITE_INSTALL_DIR}/nymph.json" &&
       -f "${NYMPHS_SPRITE_INSTALL_DIR}/README.md" ]]; then
   runtime_present=true
+fi
+
+if nymphs_sprite_probe_url "${NYMPHS_SPRITE_UI_URL}/server_info" >/dev/null 2>&1; then
+  ui_server_running=true
+  running=true
 fi
 
 if [[ -d "${NYMPHS_SPRITE_OUTPUTS_ROOT}" ||
@@ -316,12 +323,17 @@ runtime_present=${runtime_present}
 data_present=${data_present}
 version=${version}
 running=${running}
+ui_server_running=${ui_server_running}
 state=${state}
 health=${health}
 install_root=${NYMPHS_SPRITE_INSTALL_DIR}
 outputs_root=${NYMPHS_SPRITE_OUTPUTS_ROOT}
 config_dir=${NYMPHS_SPRITE_CONFIG_DIR}
 logs_dir=${NYMPHS_SPRITE_LOGS_DIR}
+url=${NYMPHS_SPRITE_UI_URL}
+health_url=${NYMPHS_SPRITE_UI_URL}/health
+server_info_url=${NYMPHS_SPRITE_UI_URL}/server_info
+frontend_url=${NYMPHS_SPRITE_UI_URL}/nymph
 models_root=${NYMPHS_SPRITE_MODELS_ROOT}
 models_ready=${models_ready}
 assets_ready=${assets_ready}
@@ -335,6 +347,8 @@ profiles_dir=${NYMPHS_SPRITE_PROFILES_DIR}
 docs_dir=${NYMPHS_SPRITE_DOCS_DIR}
 ui_dir=${NYMPHS_SPRITE_UI_DIR}
 manager_ui=${NYMPHS_SPRITE_UI_DIR}/manager.html
+manager_ui_url=${NYMPHS_SPRITE_UI_URL}/nymph
+ui_server_pid_file=${NYMPHS_SPRITE_UI_PID_FILE}
 lora_root=${NYMPHS_SPRITE_LORA_ROOT}
 lora_dir=${NYMPHS_SPRITE_LORA_DIR}
 downloaded_loras=${downloaded_loras}

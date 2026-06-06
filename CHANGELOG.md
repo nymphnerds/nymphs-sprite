@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.33 - 2026-06-06
+
+- Switch the Sprite Manager UI from `local_html` to the standard Nymphs
+  `local_url` `/nymph` contract used by generation modules.
+- Add the module UI runtime routes at `http://127.0.0.1:8098/nymph`,
+  `/health`, and `/server_info`, with `open_nymph_ui` as the Manager start
+  action.
+- Serve `ui/nymphs_preview_forest.png` as a normal `/ui` asset instead of
+  embedding it into the HTML, avoiding WebView2 local HTML size failures.
+- Remove the duplicate in-page `Nymphs Sprite` title and keep the Manager
+  shell header as the module title.
+
 ## 0.1.32 - 2026-06-06
 
 - Wire selected/generated source images into Z-Image Nunchaku

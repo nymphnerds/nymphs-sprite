@@ -63,8 +63,8 @@ depth: depth-anything/Depth-Anything-V2-Small-hf
 
 ## Current Status
 
-This module now installs a Manager-hosted sprite UI and a Nymphs-native
-direction runner. The first working flow is:
+This module now installs a Nymphs Image-style localhost Sprite UI and a
+Nymphs-native direction runner. The first working flow is:
 
 ```text
 Nymphs Sprite UI -> Open Z-Image -> fetch/select Z-Image Turbo LoRA -> Generate 8-Way
@@ -72,7 +72,9 @@ Nymphs Sprite UI -> Open Z-Image -> fetch/select Z-Image Turbo LoRA -> Generate 
 
 The copied Nymphs Image UI is kept in `ui/nymph_image_reference.html` for parity
 work, but `ui/manager.html` is the module-owned screen. It calls Manager module
-actions instead of direct browser fetches, so it can run as `local_html`.
+actions for filesystem work and serves its own static UI/assets at
+`http://127.0.0.1:8098/nymph`, while generation still runs through the shared
+Z-Image backend.
 
 ## Install Paths
 

@@ -8,6 +8,9 @@ NYMPHS_SPRITE_INSTALL_DIR="${NYMPHS_SPRITE_INSTALL_ROOT:-${NYMPHS_SPRITE_INSTALL
 NYMPHS_SPRITE_OUTPUTS_ROOT="${NYMPHS_SPRITE_OUTPUTS_ROOT:-${NYMPHS_DATA_ROOT}/outputs/nymphs-sprite}"
 NYMPHS_SPRITE_CONFIG_DIR="${NYMPHS_SPRITE_CONFIG_DIR:-${NYMPHS_DATA_ROOT}/config/nymphs-sprite}"
 NYMPHS_SPRITE_LOGS_DIR="${NYMPHS_SPRITE_LOGS_DIR:-${NYMPHS_DATA_ROOT}/logs/nymphs-sprite}"
+NYMPHS_SPRITE_UI_HOST="${NYMPHS_SPRITE_UI_HOST:-127.0.0.1}"
+NYMPHS_SPRITE_UI_PORT="${NYMPHS_SPRITE_UI_PORT:-8098}"
+NYMPHS_SPRITE_UI_URL="${NYMPHS_SPRITE_UI_URL:-http://${NYMPHS_SPRITE_UI_HOST}:${NYMPHS_SPRITE_UI_PORT}}"
 NYMPHS3D_HF_CACHE_DIR="${NYMPHS3D_HF_CACHE_DIR:-${NYMPHS_DATA_ROOT}/cache/huggingface}"
 HF_HOME="${HF_HOME:-${NYMPHS_DATA_ROOT}/cache/huggingface-home}"
 HF_HUB_CACHE="${HF_HUB_CACHE:-${NYMPHS3D_HF_CACHE_DIR}}"
@@ -22,6 +25,8 @@ NYMPHS_SPRITE_DOCS_DIR="${NYMPHS_SPRITE_INSTALL_DIR}/docs"
 NYMPHS_SPRITE_UI_DIR="${NYMPHS_SPRITE_INSTALL_DIR}/ui"
 NYMPHS_SPRITE_MARKER_FILE="${NYMPHS_SPRITE_INSTALL_DIR}/.nymph-module-version"
 NYMPHS_SPRITE_LOG_FILE="${NYMPHS_SPRITE_LOGS_DIR}/nymphs-sprite.log"
+NYMPHS_SPRITE_UI_PID_FILE="${NYMPHS_SPRITE_CONFIG_DIR}/ui-server.pid"
+NYMPHS_SPRITE_UI_LOG_FILE="${NYMPHS_SPRITE_LOGS_DIR}/nymphs-sprite-ui.log"
 NYMPHS_SPRITE_LORA_ROOT="${NYMPHS_SPRITE_LORA_ROOT:-${ZIMAGE_LORA_ROOT:-${HOME}/LoRA/loras}}"
 NYMPHS_SPRITE_ZIMAGE_URL="${NYMPHS_SPRITE_ZIMAGE_URL:-http://127.0.0.1:8090}"
 NYMPHS_SPRITE_LORA_DIR="${NYMPHS_SPRITE_LORA_DIR:-${NYMPHS_SPRITE_LORA_ROOT}}"
@@ -100,6 +105,19 @@ PY
 nymphs_sprite_touch_log() {
   nymphs_sprite_ensure_dirs
   touch "${NYMPHS_SPRITE_LOG_FILE}"
+}
+
+nymphs_sprite_probe_url() {
+  local url="$1"
+  python3 - "${url}" <<'PY'
+from __future__ import annotations
+
+import sys
+from urllib.request import urlopen
+
+with urlopen(sys.argv[1], timeout=1.5) as response:
+    raise SystemExit(0 if 200 <= response.status < 300 else 1)
+PY
 }
 
 nymphs_sprite_foundry_root() {

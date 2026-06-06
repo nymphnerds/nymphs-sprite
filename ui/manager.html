@@ -177,18 +177,9 @@
     .brand {
       display: flex;
       align-items: baseline;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 10px;
       padding-bottom: 11px;
-    }
-
-    h1 {
-      margin: 0;
-      color: var(--text);
-      font-family: var(--font-head);
-      font-size: 20px;
-      font-weight: 900;
-      line-height: 1;
     }
 
     .status-pill {
@@ -316,8 +307,7 @@
       border: 1px solid rgba(40, 68, 70, 0.9);
       border-radius: 8px;
       background:
-        url("nymphs_preview_forest.png") center center / cover no-repeat,
-        url("__NYMPHS_SPRITE_FOREST_URI__") center center / cover no-repeat,
+        url("/ui/nymphs_preview_forest.png") center center / cover no-repeat,
         rgba(4, 12, 11, 0.82);
       display: grid;
       place-items: center;
@@ -679,7 +669,6 @@
   <main class="app">
     <aside class="sidebar">
       <div class="brand">
-        <h1>Nymphs Sprite</h1>
         <div id="status-pill" class="status-pill warn">checking</div>
       </div>
 
