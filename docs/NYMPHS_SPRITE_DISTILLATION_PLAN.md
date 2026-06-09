@@ -322,19 +322,18 @@ another image model to invent an OpenPose map. The UI owns a small editable rig:
 - direction strip sits directly underneath the rig editor
 - each direction saves its own joint positions
 - drag colored points to move joints
-- Pose IK mode keeps limb proportions while dragging wrists, ankles, knees,
-  elbows, hips, shoulders, pelvis, or neck
-- Edit Lengths mode moves the selected point directly, which lets that
-  direction change bone lengths/proportions before switching back to IK
-- Shift-drag is a quiet shortcut for temporarily editing lengths/free-moving
-  the selected point without switching the mode selector
+- Move Points is the default mode and moves only the selected joint
+- Keep Lengths is an optional IK helper for wrists and ankles
 - Reset restores the active direction
 - Mirror mirrors the active direction
 - Copy All copies the active pose into every direction slot
 
-When `Commit Refs` is pressed, Nymphs Sprite renders each direction slot into
-its own black-background OpenPose-style ref and saves the refs into Nymphs
-Sprite-owned outputs:
+When `Commit Refs` is pressed, Nymphs Sprite stores the editable pose set as
+`pose_set.json`. The backend also renders each direction slot into a
+black-background OpenPose-style PNG for preview and ControlNet handoff. The PNGs
+are generated artifacts, not the source of truth.
+
+Committed sets live in Nymphs Sprite-owned outputs:
 
 ```text
 $HOME/NymphsData/outputs/nymphs-sprite/pose_lab/refs/<subject>/<timestamp>/
@@ -356,6 +355,7 @@ Ref management should remain lightweight for now:
 - clicking a ref thumbnail reloads the saved pose set into the editor
 - checking refs selects them for future generation wiring or contact sheet export
 - do not build a large ref database yet
+- do not add a premade pose preset library until the rig editor feels excellent
 
 Future promotion path:
 

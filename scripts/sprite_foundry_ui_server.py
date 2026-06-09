@@ -739,6 +739,25 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
         target_dir = (self.server.output_root / "pose_lab" / "refs" / subject_id / timestamp).resolve()
         target_dir.mkdir(parents=True, exist_ok=True)
         batch_id = f"pose-lab-local-{int(time.time())}"
+        created_at = datetime.now(timezone.utc).isoformat()
+        pose_set_manifest = {
+            "provider": "Nymphs Sprite",
+            "mode": "pose_lab_set",
+            "batch_id": batch_id,
+            "batch_label": "Pose Lab Ref Set",
+            "batch_type": "sprite_direction_ref_set",
+            "subject_id": subject_id,
+            "body_type": body_type,
+            "control_type": "pose_skeleton",
+            "direction_count": direction_count,
+            "selected_directions": selected_directions,
+            "directions": directions,
+            "pose_data": pose_data,
+            "guide_strength": str(payload.get("guide_strength") or "normal"),
+            "sprite_prompt_context": str(payload.get("subject_prompt") or ""),
+            "created_at": created_at,
+            "assets": [],
+        }
         records = []
         for index, name in enumerate(selected_directions, start=1):
             pixels = bytearray(width * height * 3)
@@ -766,17 +785,24 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
                 "selected_directions": selected_directions,
                 "directions": directions,
                 "pose_data": pose_data,
+                "pose_set_path": "pose_set.json",
                 "guide_strength": str(payload.get("guide_strength") or "normal"),
                 "sprite_prompt_context": str(payload.get("subject_prompt") or ""),
-                "created_at": datetime.now(timezone.utc).isoformat(),
+                "created_at": created_at,
             }
             target.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+            pose_set_manifest["assets"].append({
+                "direction": name,
+                "image": target.name,
+                "metadata": target.with_suffix(".json").name,
+            })
             rel = target.relative_to(self.server.output_root).as_posix()
             record = self._output_record(target, rel)
             record["source"] = "outputs"
             record["url"] = f"/outputs/outputs/{quote(rel, safe='/')}"
             record["folder"] = f"outputs/{record['folder']}".rstrip("/")
             records.append(record)
+        (target_dir / "pose_set.json").write_text(json.dumps(pose_set_manifest, indent=2), encoding="utf-8")
         self._send_json({"status": "ok", "prompt": "Generated deterministic local OpenPose direction refs.", "outputs": records})
 
     def _send_output_file(self, relative: str) -> None:

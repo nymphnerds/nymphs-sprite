@@ -80,8 +80,8 @@ Choose or write the character prompt, subject id, and negative prompt.
 
 ### Pose Lab
 
-Choose body type, ref strength, and 8 or 16 directions. Pose Lab owns all
-ControlNet prep flows:
+Choose ref strength and 8 or 16 directions. Pose Lab owns all ControlNet prep
+flows:
 
 - OpenPose Skeleton: local editable rig; implemented first.
 - Canny / Line: future outline/silhouette lane.
@@ -91,14 +91,14 @@ ControlNet prep flows:
 OpenPose is the first-class path. Expanding Pose Lab hot-swaps the main preview
 area into a large rig editor with the direction strip underneath. Select a
 direction in the strip, adjust the stick rig, and commit pose refs. The current
-direction keeps its own pose, so front, left, back, and 16-way
-in-between slots can be tuned independently. Pose IK preserves limb proportions
-while you drag wrists, ankles, knees, elbows, hips, shoulders, pelvis, or neck;
-reset, mirror, and copy-all keep the panel fast. Edit Lengths moves joints
-directly, so the current direction can have stretched or shortened limb
-proportions before switching back to IK. Commit exports separate per-direction
-ControlNet refs, so a 16-way pose set can later be filtered down to an 8-way
-generation pass from the output selection strip.
+direction keeps its own pose, so front, left, back, and 16-way in-between slots
+can be tuned independently. Move Points is the default mode and moves only the
+joint you drag. Keep Lengths is an optional IK helper for wrists and ankles.
+Reset, mirror, and copy-all keep the panel fast.
+
+The editable pose set is stored as JSON. PNG OpenPose maps are rendered from
+that JSON for preview and ControlNet handoff; they are generated artifacts, not
+the source of truth.
 
 Committed refs stay under:
 
@@ -106,9 +106,11 @@ Committed refs stay under:
 $HOME/NymphsData/outputs/nymphs-sprite/pose_lab/refs/
 ```
 
-They appear in the same preview strip/gallery. Clicking a committed ref reloads
-that saved pose set into Pose Lab for more editing. Checking refs selects them
-for future generation wiring or optional contact sheet export.
+Each commit includes `pose_set.json` plus rendered per-direction OpenPose PNGs
+with sidecar metadata. They appear in the same preview strip/gallery. Clicking
+a committed ref reloads that saved pose set into Pose Lab for more editing.
+Checking refs selects the rendered PNG maps for future generation wiring or
+optional contact sheet export.
 
 ### Style
 

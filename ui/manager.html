@@ -373,8 +373,10 @@
     }
 
     .stage-pose-lab {
-      width: min(72vh, 74vw, 760px);
+      width: min(100%, 860px);
+      height: 100%;
       max-width: calc(100% - 24px);
+      max-height: 100%;
       display: none;
       grid-template-rows: minmax(0, 1fr) auto;
       gap: 10px;
@@ -382,6 +384,8 @@
       justify-items: center;
       position: relative;
       z-index: 3;
+      box-sizing: border-box;
+      padding: 10px 0;
     }
 
     .image-shell.pose-mode .stage-pose-lab {
@@ -740,7 +744,10 @@
     }
 
     .stage-pose-lab .pose-editor-wrap {
-      width: 100%;
+      width: auto;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
       margin: 0;
       border-color: rgba(221, 111, 224, 0.72);
       box-shadow:
@@ -783,6 +790,7 @@
       width: 100%;
       margin: 0;
       grid-template-columns: repeat(8, minmax(0, 1fr));
+      align-self: end;
     }
     .pose-dir-strip button {
       height: 24px;
@@ -855,13 +863,7 @@
           <div class="field wide">
             <label for="body-guide">Body Type</label>
             <select id="body-guide">
-              <option value="humanoid">Humanoid</option>
-              <option value="wide_squat">Wide Squat</option>
-              <option value="tall_thin">Tall Thin</option>
-              <option value="amorphous">Amorphous</option>
-              <option value="quadruped">Quadruped</option>
-              <option value="winged">Winged</option>
-              <option value="custom">Custom</option>
+              <option value="humanoid">Humanoid Rig</option>
             </select>
           </div>
           <div class="field wide">
@@ -890,13 +892,13 @@
             <div class="field">
               <label for="pose-edit-mode">Mode</label>
               <select id="pose-edit-mode">
-                <option value="ik">Pose IK</option>
-                <option value="fk">Edit Lengths</option>
+                <option value="direct">Move Points</option>
+                <option value="ik">Keep Lengths</option>
               </select>
             </div>
           </div>
           <select id="pose-edit-direction" hidden></select>
-          <p class="flow-note">Pose IK keeps limb lengths. Edit Lengths moves points directly for proportions.</p>
+          <p class="flow-note">Move Points edits exactly what you drag. Keep Lengths is optional IK for wrists and ankles.</p>
           <div class="command-row three">
             <button id="pose-reset" type="button">Reset</button>
             <button id="pose-mirror" type="button">Mirror</button>
@@ -1098,6 +1100,7 @@
       activeRunOutputDir: "",
       activeDirection: "",
       poseDirection: "front",
+      poseProportions: "humanoid",
       poseDragging: null,
       posePointers: {},
     };
@@ -1564,7 +1567,7 @@
 
     function loadPoseRefIntoEditor(item) {
       const metadata = item?.metadata || {};
-      if (metadata.mode !== "pose_lab_direction_ref" || !metadata.pose_data?.directions) return false;
+      if (!["pose_lab_direction_ref", "pose_lab_set"].includes(metadata.mode) || !metadata.pose_data?.directions) return false;
       const directionCount = String(metadata.direction_count || "");
       if (["8", "16"].includes(directionCount)) $("guide-direction-count").value = directionCount;
       ensurePoseLab();
@@ -1576,7 +1579,7 @@
       $("pose-lab-panel").open = true;
       renderPoseLabEditor();
       syncPoseLabStage();
-      setProgress("Pose Lab", `Editing ${state.poseDirection.replaceAll("_", " ")} ref.`, 100);
+      setProgress("Pose Lab", `Editing ${poseDirectionLabel(state.poseDirection)} ref set.`, 100);
       return true;
     }
 
@@ -2089,40 +2092,78 @@
       return (degrees[direction] || 0) * Math.PI / 180;
     }
 
-    function defaultPose(direction = "front") {
+    function poseDirectionLabel(direction) {
+      const labels = {
+        front: "Front",
+        front_front_left: "F-FL",
+        front_left: "Front Left",
+        left_front_left: "L-FL",
+        left: "Left",
+        left_back_left: "L-BL",
+        back_left: "Back Left",
+        back_back_left: "B-BL",
+        back: "Back",
+        back_back_right: "B-BR",
+        back_right: "Back Right",
+        right_back_right: "R-BR",
+        right: "Right",
+        right_front_right: "R-FR",
+        front_right: "Front Right",
+        front_front_right: "F-FR"
+      };
+      return labels[direction] || direction.replaceAll("_", " ");
+    }
+
+    function currentPoseProportions() {
+      return bodyGuideValue(value("body-guide") || state.poseProportions || "humanoid");
+    }
+
+    function poseProfile(name = currentPoseProportions()) {
+      const profiles = {
+        humanoid: { headY: 34, neckY: 62, spineY: 98, pelvisY: 132, shoulder: 34, hip: 20, elbowY: 108, wristY: 150, kneeY: 184, ankleY: 232, elbowOut: 13, wristOut: 7, kneeOut: 4, ankleOut: 4, headX: 4 },
+        goblin: { headY: 42, neckY: 70, spineY: 105, pelvisY: 136, shoulder: 31, hip: 23, elbowY: 112, wristY: 153, kneeY: 181, ankleY: 222, elbowOut: 14, wristOut: 8, kneeOut: 8, ankleOut: 6, headX: 3 },
+        brute: { headY: 39, neckY: 68, spineY: 105, pelvisY: 140, shoulder: 42, hip: 29, elbowY: 114, wristY: 158, kneeY: 188, ankleY: 231, elbowOut: 16, wristOut: 9, kneeOut: 8, ankleOut: 7, headX: 3 },
+        wide_squat: { headY: 39, neckY: 68, spineY: 105, pelvisY: 140, shoulder: 42, hip: 29, elbowY: 114, wristY: 158, kneeY: 188, ankleY: 231, elbowOut: 16, wristOut: 9, kneeOut: 8, ankleOut: 7, headX: 3 },
+        tall_thin: { headY: 30, neckY: 59, spineY: 100, pelvisY: 139, shoulder: 28, hip: 16, elbowY: 111, wristY: 158, kneeY: 190, ankleY: 238, elbowOut: 10, wristOut: 5, kneeOut: 3, ankleOut: 3, headX: 5 },
+        digitigrade: { headY: 35, neckY: 64, spineY: 100, pelvisY: 132, shoulder: 30, hip: 18, elbowY: 110, wristY: 151, kneeY: 170, ankleY: 232, elbowOut: 12, wristOut: 7, kneeOut: 14, ankleOut: 22, headX: 5 },
+        amorphous: { headY: 38, neckY: 68, spineY: 106, pelvisY: 141, shoulder: 38, hip: 27, elbowY: 116, wristY: 160, kneeY: 190, ankleY: 231, elbowOut: 12, wristOut: 8, kneeOut: 7, ankleOut: 7, headX: 3 },
+        quadruped: { headY: 35, neckY: 64, spineY: 100, pelvisY: 132, shoulder: 30, hip: 18, elbowY: 110, wristY: 151, kneeY: 170, ankleY: 232, elbowOut: 12, wristOut: 7, kneeOut: 14, ankleOut: 22, headX: 5 },
+        winged: { headY: 34, neckY: 62, spineY: 98, pelvisY: 132, shoulder: 44, hip: 20, elbowY: 110, wristY: 154, kneeY: 184, ankleY: 232, elbowOut: 18, wristOut: 13, kneeOut: 4, ankleOut: 4, headX: 4 }
+      };
+      return profiles[name] || profiles.humanoid;
+    }
+
+    function defaultPose(direction = "front", proportions = currentPoseProportions()) {
+      const profile = poseProfile(proportions);
       const yaw = poseYaw(direction);
       const side = Math.abs(Math.sin(yaw));
       const facing = Math.sin(yaw);
-      const shoulder = 38 - side * 22;
-      const hip = 23 - side * 12;
-      const depth = facing * 8;
+      const xScale = 1 - side * 0.64;
+      const shoulder = profile.shoulder * xScale;
+      const hip = profile.hip * xScale;
+      const elbowOut = profile.elbowOut * (0.72 + xScale * 0.28);
+      const wristOut = profile.wristOut * (0.72 + xScale * 0.28);
+      const kneeOut = profile.kneeOut * (0.75 + xScale * 0.25);
+      const ankleOut = profile.ankleOut * (0.75 + xScale * 0.25);
       const center = 128;
       const pose = {
-        head: [center + facing * 6, 38],
-        neck: [center + depth * 0.4, 66],
-        spine: [center, 103],
-        pelvis: [center - depth * 0.2, 132],
+        head: [center + facing * profile.headX, profile.headY],
+        neck: [center + facing * 2, profile.neckY],
+        spine: [center, profile.spineY],
+        pelvis: [center - facing * 2, profile.pelvisY],
       };
-      pose.left_shoulder = [pose.neck[0] - shoulder, 70];
-      pose.right_shoulder = [pose.neck[0] + shoulder, 70];
-      pose.left_hip = [pose.pelvis[0] - hip, 132];
-      pose.right_hip = [pose.pelvis[0] + hip, 132];
-      pose.left_elbow = [pose.left_shoulder[0] - 18 - side * 10, 118];
-      pose.right_elbow = [pose.right_shoulder[0] + 18 + side * 10, 118];
-      pose.left_wrist = [pose.left_elbow[0] - 12 - side * 8, 169];
-      pose.right_wrist = [pose.right_elbow[0] + 12 + side * 8, 169];
-      pose.left_knee = [pose.left_hip[0] - 8 - side * 9, 190];
-      pose.right_knee = [pose.right_hip[0] + 8 + side * 9, 190];
-      pose.left_ankle = [pose.left_knee[0] - 8, 239];
-      pose.right_ankle = [pose.right_knee[0] + 8, 239];
-      if (side > 0.82) {
-        const compress = facing * 9;
-        for (const [left, right] of poseMirrorPairs) {
-          const base = left.includes("shoulder") ? pose.neck[0] : pose.pelvis[0];
-          pose[left][0] = base - compress;
-          pose[right][0] = base + compress;
-        }
-      }
+      pose.left_shoulder = [pose.neck[0] - shoulder, profile.neckY + 4];
+      pose.right_shoulder = [pose.neck[0] + shoulder, profile.neckY + 4];
+      pose.left_hip = [pose.pelvis[0] - hip, profile.pelvisY + 2];
+      pose.right_hip = [pose.pelvis[0] + hip, profile.pelvisY + 2];
+      pose.left_elbow = [pose.left_shoulder[0] - elbowOut, profile.elbowY];
+      pose.right_elbow = [pose.right_shoulder[0] + elbowOut, profile.elbowY];
+      pose.left_wrist = [pose.left_elbow[0] - wristOut, profile.wristY];
+      pose.right_wrist = [pose.right_elbow[0] + wristOut, profile.wristY];
+      pose.left_knee = [pose.left_hip[0] - kneeOut, profile.kneeY];
+      pose.right_knee = [pose.right_hip[0] + kneeOut, profile.kneeY];
+      pose.left_ankle = [pose.left_knee[0] - ankleOut, profile.ankleY];
+      pose.right_ankle = [pose.right_knee[0] + ankleOut, profile.ankleY];
       return JSON.parse(JSON.stringify(pose));
     }
 
@@ -2283,7 +2324,7 @@
       stage.hidden = !open;
       if (open) {
         renderPoseLabEditor();
-        $("output-label").textContent = `Pose Lab / ${state.poseDirection.replaceAll("_", " ")}`;
+        $("output-label").textContent = `Pose Lab / ${poseDirectionLabel(state.poseDirection)}`;
       } else {
         const item = (state.visibleOutputs || [])[state.selectedIndex];
         $("output-label").textContent = item ? (item.label || basename(item.path)) : "No output";
@@ -2297,7 +2338,7 @@
       for (const direction of poseDirectionList()) {
         const button = document.createElement("button");
         button.type = "button";
-        button.textContent = direction.replaceAll("_", " ");
+        button.textContent = poseDirectionLabel(direction);
         button.className = direction === state.poseDirection ? "active" : "";
         button.title = "Edit this direction slot.";
         button.addEventListener("click", () => {
@@ -2313,6 +2354,15 @@
     function resetCurrentPose() {
       state.posePointers[state.poseDirection] = defaultPose(state.poseDirection);
       renderPoseLabEditor();
+    }
+
+    function resetPoseLabSlots() {
+      const directions = poseDirectionList();
+      state.posePointers = {};
+      state.poseDirection = directions.includes(state.poseDirection) ? state.poseDirection : directions[0];
+      for (const direction of directions) state.posePointers[direction] = defaultPose(direction);
+      renderPoseLabEditor();
+      syncPoseLabStage();
     }
 
     function mirrorCurrentPose() {
@@ -2551,10 +2601,13 @@
       const aliases = {
         bipedal: "humanoid",
         humanoid: "humanoid",
+        goblin: "goblin",
+        brute: "brute",
         wide: "wide_squat",
         wide_squat: "wide_squat",
         tall: "tall_thin",
         tall_thin: "tall_thin",
+        digitigrade: "digitigrade",
         amorphous: "amorphous",
         quadruped: "quadruped",
         arthropod: "quadruped",
@@ -2680,13 +2733,16 @@
     $("subject-prompt").addEventListener("input", markPromptCustom);
     $("negative-prompt").addEventListener("input", markPromptCustom);
     $("run-id").addEventListener("input", updateFoundryControls);
-    $("body-guide").addEventListener("change", updateFoundryControls);
+    $("body-guide").addEventListener("change", () => {
+      resetPoseLabSlots();
+      updateFoundryControls();
+      setProgress("Pose Lab", "Body type applied to fresh direction slots.", 100);
+    });
     $("guide-strength").addEventListener("change", updateFoundryControls);
     $("guide-direction-count").addEventListener("change", () => {
-      ensurePoseLab();
-      renderPoseLabEditor();
-      syncPoseLabStage();
+      resetPoseLabSlots();
       updateFoundryControls();
+      setProgress("Pose Lab", `${value("guide-direction-count")} direction slots ready.`, 100);
     });
     $("pose-lab-panel").addEventListener("toggle", syncPoseLabStage);
     $("pose-edit-direction").addEventListener("change", () => {
