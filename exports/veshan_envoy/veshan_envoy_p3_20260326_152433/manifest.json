@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:30:14.340211+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "veshan_envoy",
+    "display_name": "Veshan House Envoy",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "veshan_envoy_p3_20260326_152433",
+    "seed": 881144,
+    "generated_at": "2026-03-26T15:25:27.625376+00:00",
+    "accepted_at": "2026-03-26T15:29:04.888864+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "db4c725a496124b966c193e6b5266d2d62703693a0144022439f9df8c1c2fb2c",
+    "normal/front.png": "4490a61ac373b5f27586f34b98d7866358960367ab1d08f4887092ca149bcbe5",
+    "depth/front.png": "0486c130811af89496ccde6454a1ee70918d42e062bb8218dfafab2a4d8b940a",
+    "albedo/front_left.png": "b681109c83f6a01744f2d7d1f5481d0ff3e13ae54d82c7c5a9cba776e842278d",
+    "normal/front_left.png": "a58e8bf24d2a3556ba5734f9cadc1c8efd26d316e0461c3d15e0648e5700810f",
+    "depth/front_left.png": "fde82bb750770f5c97573cea704b28bf839dba66c3c4782a3f133c7c5f513cf8",
+    "albedo/left.png": "b6d2730e6a3ab0665265ffbca072290830038dce84c7aea4fed7005cca562c50",
+    "normal/left.png": "cd61e06f941ad1bee463ffd122d2ed875e98e38e39ac14a4f5d5562371104185",
+    "depth/left.png": "96f3c1d38f0162bcb7869940c7f7b85a728e6ffca9a34b9cb0df1967949a0c0a",
+    "albedo/back_left.png": "6f6813e8bdb94f8559f251040cf9dd59ae15b9fcc93bf3121cc30c2fcfc426b3",
+    "normal/back_left.png": "bcb60eabd1f9789c62bfb30e68596db5eee33832312520639ba8f2e44675bf3d",
+    "depth/back_left.png": "ea12b855fba00f464fcbfa83df21f93cc913982cbaa9a6febb8e87225cb1374b",
+    "albedo/back.png": "e7b30c7faabb82d9b659a1575e9329cefe0860d755f17d4229830f0b00edfe32",
+    "normal/back.png": "a85b9e055255770f49b5aba2010341b38a87e9678bde7d17043f693f5b2a44dd",
+    "depth/back.png": "b92440c723cccaee818f0987b62936e6229ca5823c632448852c5b9a31f40a17",
+    "albedo/back_right.png": "e8d346e69b4b4029a4ed7724d53d694979a49f25d15cf1cb2430c17dabe5964e",
+    "normal/back_right.png": "a7b7e55e1aa1780e8faa7c08b384059ffc8339eb2062cb3d93d0ff26dbdf979d",
+    "depth/back_right.png": "5332be79f5d7afa3faf6350cdbee77639c3d001ec88015154e6cf32797287fdd",
+    "albedo/right.png": "00fb9175ce660bcb9b842e40ad6fa792703623e9b47bc4b7cd5ce3e6c1a2108e",
+    "normal/right.png": "0e840370e1fb0e513d88773d7ad6ad3f9342f415a9eb37c60b502e50661d4144",
+    "depth/right.png": "721bbaf88282764ae9cb8a8698ca08d62a85866f23508a5ec52b765804cd8657",
+    "albedo/front_right.png": "2b331eab7e115359f44c39514fb5d677e9e6c260ef1d2178e11337efb46aca15",
+    "normal/front_right.png": "13f2081d8e1fbe910024820e48de3faba1c4da0e635c74889e8439352d53faa4",
+    "depth/front_right.png": "90e198964e96ab06605f2c4b60889a1b443ce2b99d27d0aad1e96e0899dc4a0d",
+    "preview/contact_sheet.png": "81bfc7af52932dc454c6b30859fd530669dff16482d7c278f67c09a6b8d566bf"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\veshan_envoy_p3_20260326_152433",
+    "maps_dir": "bakeoff\\veshan_envoy_p3_20260326_152433_maps"
+  },
+  "notes": null
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:42:18.859173+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "orryn_broker",
+    "display_name": "Orryn Broker",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "orryn_broker_p3_20260326_072045",
+    "seed": 338855,
+    "generated_at": "2026-03-26T07:21:41.001213+00:00",
+    "accepted_at": "2026-03-26T07:23:00.348776+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "dc82ac164bea0ed5e09da43016860fcffa289283b141a444f75c41c1d91f1e6d",
+    "normal/front.png": "4059375fda60d211e8ff5a18647c838afb17060287b34ae9098998f12ccd93e2",
+    "depth/front.png": "68f292d719bf2988e2702a5611a7a16b1dde269cddb5cb5378092ba056280088",
+    "albedo/front_left.png": "ece4e0d2a172a5e404c5164268e909535f05cd17bd14838269fd3f2c30850a16",
+    "normal/front_left.png": "5c6778e5810f399e69531146b8acef6b8035d39d659ec5d0506ad2a8a047d2f5",
+    "depth/front_left.png": "7e31791df0de23abd149c12844b7a549d592e53c6a5c885a9b884c2403a8780e",
+    "albedo/left.png": "bed3a6135c9c069bcdd40bbf75778565db6a9017a063e49ffad5250a8ea7d68e",
+    "normal/left.png": "37ef9b78a85bba10e6f2a59270a225166d6e49e338b92a8077f486143023f89d",
+    "depth/left.png": "e327b6e3d293ecff45e97e63de379e09e8e845026435f3656f7f3a81463d2bce",
+    "albedo/back_left.png": "113917d13ead97ab5c7bc7aea23dfca1190abdacf713ada38a1beef5638a4f1f",
+    "normal/back_left.png": "00328a626a554003b30ddeb9a85aa25146e0fcce1aabca96713af127a97d58dd",
+    "depth/back_left.png": "00ce3b21c4db43692e159467ab46a162c3c42f6e084d3087f1cdd54608b3b103",
+    "albedo/back.png": "ce0a4dfefa23b78e0592d09e30a9f3378b757e9c1e28d3edb67d5054feb66c7c",
+    "normal/back.png": "3e5c1fd7b18d06f8f4950cd4c71ba3e26379e628c64a950c01b0060c7326a2e4",
+    "depth/back.png": "0cbfa9d363f2afce9b7e9309e3fbf5e5bfb3864108facfbbc345f8e279487da7",
+    "albedo/back_right.png": "5b620eaf81da2c4f565e6a5d2ae81d7da72dfa68745bfd635c2bff41875d1e93",
+    "normal/back_right.png": "1720ceb69568665afe0bcc57472b21a50fd7f4f8fb93f6f7864eb52755c89019",
+    "depth/back_right.png": "615a60f80adc342c625ae9a2da6310c9de9d41c9aab689178cae929f6a144e68",
+    "albedo/right.png": "cc1016d77eedcfcc89b610393eeef86f5ef55da5ad57e60e43ebc12b0ac3eeaa",
+    "normal/right.png": "6ebd162352d1d15d8ea1a76725ee65df87cec4f886074d119e45f6444b8fcf4a",
+    "depth/right.png": "78c010abde0a872f16b87c817451d66cfd7841e6379f670c8cddfe5f2daf8cf5",
+    "albedo/front_right.png": "eccbf4953802fbb5c3edbc44be0d1cda6a0b6f98374cec94285850828109eb44",
+    "normal/front_right.png": "cf9c39f51871225de98ebd1aaa9a28937743ff4cf5ce88712e1226459cacdc71",
+    "depth/front_right.png": "b79c323c561f3e8640d82e745a94633cdf0ffc46ddb10dacae66d6e16cf22a11",
+    "preview/contact_sheet.png": "4a98eaeb9b38fa168422f5121093c3f07465376155de8a618de7d47e44a82097"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\orryn_broker_p3_20260326_072045",
+    "maps_dir": "bakeoff\\orryn_broker_p3_20260326_072045_maps"
+  },
+  "notes": null
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:42:18.533956+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "nera_quill",
+    "display_name": "Nera Quill",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "nera_quill_p3_20260326_071227",
+    "seed": 442288,
+    "generated_at": "2026-03-26T07:13:22.156877+00:00",
+    "accepted_at": "2026-03-26T07:15:30.281552+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "5c6211c6dfb56dd30cf92bc1ee8163d4e16903b93ee31e11e08ea7f89bfb56ee",
+    "normal/front.png": "f600f0bd625550b71f569ca78289e27bf017238d2d74c86b0de642275cba8b7f",
+    "depth/front.png": "7756cc5c24f473268aedca707da04985724398b58df45a5569191c9e86583c42",
+    "albedo/front_left.png": "ad1178c5dbc952462bbb56e2eabb2b3d276bc2c853b798b1d0563c27f1e288dc",
+    "normal/front_left.png": "970b4a7f350417fd9d4debbe799d6e89f2ab2892fc4e14818c44d3bd3fc22a6c",
+    "depth/front_left.png": "b8c782e46f42cf1763cdd395dcbb8c2de04dcfa2f99cadccbcb7b988ea2ae5da",
+    "albedo/left.png": "1f444e46de5f9fb294ccd4b1ad0a27de708b84ec5cdf4980556880d270577530",
+    "normal/left.png": "e729b2043de939809b4b1d3e828215421aab617f1a27258f5bb550e22ce29b4c",
+    "depth/left.png": "30319f0b5c8073ce4ee834df5d3f131d24bd490048bb42f06c579c797dfd3e81",
+    "albedo/back_left.png": "5f01a1167fbde7c3ea71bdb40103401bc32a903d0edfe89cfcdd1459bd5e41ab",
+    "normal/back_left.png": "d1b396d0c84e045cb09efe068113625b762e869ece89a27e6767ac491acd9e80",
+    "depth/back_left.png": "5f517d76147d9c7259cc3ae22af9018090793464bc4f67d93a302bfa00036c9f",
+    "albedo/back.png": "c2f0d123ea7758c4e20f28752ec1b2366c19239201db9d7c6b6e360081e58186",
+    "normal/back.png": "6a8d88499436d0f841d3a9ca302158b83da4c7d210ceeff400ee24e4839c4d87",
+    "depth/back.png": "37b4c53034c68e6a41e327d95f9e60dc05ed7338814ce91371e757ce9062f6d8",
+    "albedo/back_right.png": "d461926d3e31423d341e658268cb51e205bd1a578a030535c503d43793504c20",
+    "normal/back_right.png": "73b8f439b85895bfc66844979de91c31b867a6af56c76bf2f19a52f104886563",
+    "depth/back_right.png": "606c1e95a9f7128ed0b3636e1f3229c15d7a4f9b5076ec12bbcf8ddf73ad5b61",
+    "albedo/right.png": "2f4fa1170102f83bcc92313944fa8924adf9a54d2477776f23cf56f533e8e7b1",
+    "normal/right.png": "272c37fc9a1ac899ac56d75490c2c7213ca5f4185ed2392065857e67f847fc36",
+    "depth/right.png": "0d1068fbc244b87ca65b5cb3e23a295583709340d449d3d55772efde5c76c687",
+    "albedo/front_right.png": "0c5dcfb3b4e75acdd87fac9d21c903ab361f0e8a8cd9baa6368b273b2e1cb589",
+    "normal/front_right.png": "ee900b6e3b5d53542ea0e1f4308d42aec83f8c3321716f08e60134148a5336ff",
+    "depth/front_right.png": "6c6c3d00e43b95fc8dc3526414a59b88be0d0214593074c73f0629cd00b3abcb",
+    "preview/contact_sheet.png": "72363041145f6eb4464be327de4dc9af229a1971dcc947d3de25d743c75ac80b"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\nera_quill_p3_20260326_071227",
+    "maps_dir": "bakeoff\\nera_quill_p3_20260326_071227_maps"
+  },
+  "notes": null
+}

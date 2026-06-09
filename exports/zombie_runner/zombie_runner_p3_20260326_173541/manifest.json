@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T17:41:58.784148+00:00",
+  "foundry_version": "baededa",
+  "identity": {
+    "subject_slug": "zombie_runner",
+    "display_name": "Runner",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "zombie_runner_p3_20260326_173541",
+    "seed": 800200,
+    "generated_at": "2026-03-26T17:36:42.710744+00:00",
+    "accepted_at": "2026-03-26T17:41:41.040322+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "baededa"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "d0f0b5d5c7271d521508d1af8a93135e20a7a0006934f47a0301aa0657fcb50f",
+    "normal/front.png": "a7d10ce1af7f0eb33bf6791d8e2a7c2b09555e8f5083ed508d79ad2904c0812e",
+    "depth/front.png": "baa44c3c9fa1fa8aa53296c8fd003ce31f3244ecf90836a0d9769cbf0bb4fbb6",
+    "albedo/front_left.png": "2c585b84e579b5b626437ebd3dae158278e9c4db41f5d462c980bc52e3e98d6f",
+    "normal/front_left.png": "3619bf62bd78ddc0dd77216b2080fc780c28e467e6ec27cbc4d6d4725233d02e",
+    "depth/front_left.png": "40d6263217cb32019f9a906f54d7b6d0b98912d7997635aae65d095e21d2cc3c",
+    "albedo/left.png": "a993bb89ac7f16dfd767792c0c391c48197a989e49654fdabe2c7c5bf532522e",
+    "normal/left.png": "3d77d0a3bf7996e6e9565c393b26eb4c8417e53f9c037931bc4fb282352194fe",
+    "depth/left.png": "59060fb520946a6233ac16d2fd7e2bab36ca28ac362340bd29ab2cb22490601b",
+    "albedo/back_left.png": "569f7d5cc97a5b9581489a21444e170a3a6f3eb6b94f0634bb5b8170825809c3",
+    "normal/back_left.png": "0b51ebf0efc7dc542f003d4537ee5cdfcbb63a1ae7dde2b4e9b30f9ab56c1729",
+    "depth/back_left.png": "91b30826e6a1ed2dadbb792eee0eeef08f1865f07e96fcd9370a8cc7b73d72fe",
+    "albedo/back.png": "61ebe822d13bd5d44b0d59a519a339a5e8df25be4cbad70ed6e983c3c26a5291",
+    "normal/back.png": "faa6810b57254c85c726c35634f7b6ef78768b89fa0875776deee32b7d20e65e",
+    "depth/back.png": "1947a758751f3d329594d4e105d189cd7e7c4e3e43ad027d7e9304f1177e1d8e",
+    "albedo/back_right.png": "12c693f6f03e47f33d7983ed25821bc9c972acd0651e79bc25468f796af82800",
+    "normal/back_right.png": "a1c866789a660a50fbb6354233de4962b3e82e199f28eb44c96033e4660b24ca",
+    "depth/back_right.png": "4e3c1de92ca887ab6f98c2f8b123025b4dc05b47b90b8b7eacb0eea74807ef5c",
+    "albedo/right.png": "4ff9bd228b584f91a33fc639ba94935c7b63d5640b9e8f9ea84beb40ba8d0a6b",
+    "normal/right.png": "a2dec976096a26dd21eade37d668b7f2481d4c14763015aee852772f6fa34155",
+    "depth/right.png": "9ca31814fb79cc1af03787113db1bb5c14fbb5fddb3231e442f3806cd7cd4240",
+    "albedo/front_right.png": "2eb7aca5c2396f5c9e701400193f8dc3d81a72c8808e17f37d6388b14213bb10",
+    "normal/front_right.png": "6182a7de0897ea3e92194cabcf36fa16e2e3c891730bc74ba1389c0647686307",
+    "depth/front_right.png": "ef65b26528a81cebe3ce6b955cd5f34b430b1bea8816cee60448a296f370338b",
+    "preview/contact_sheet.png": "9004fc1506747dc8485d18c7e5617f79c0c68e89e2b599d91977d68bd8dd5fa3"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\zombie_runner_p3_20260326_173541",
+    "maps_dir": "bakeoff\\zombie_runner_p3_20260326_173541_maps"
+  },
+  "notes": null
+}

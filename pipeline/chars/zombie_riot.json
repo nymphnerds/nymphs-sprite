@@ -1,0 +1,16 @@
+{
+  "subject_id": "zombie_riot",
+  "display_name": "Riot Zombie",
+  "pack": "undead-patrol-01",
+  "seed": 800300,
+  "role": "armored tank",
+  "silhouette_thesis": "heavy shoulders, shield/armor bulk — reads as armored and hard to kill",
+  "reject_conditions": [
+    "lean or thin build",
+    "no visible armor or protection",
+    "reads as civilian zombie",
+    "silhouette collapses into Worker or Shambler"
+  ],
+  "subject_prompt": "solo, 1character, single character only, one figure, an armored riot police zombie undead, heavy stocky build with wide shoulders, wearing a cracked damaged black riot helmet with broken visor, dark navy riot vest body armor cracked and dented with bite marks, one arm carrying a battered cracked riot shield held at side, heavy reinforced boots, torn dark tactical pants, pale grey rotting skin visible on exposed forearms and neck, shield arm forward defensive stance, slow heavy intimidating posture, bulky armored silhouette distinct from unarmored zombies, fully visible full body",
+  "negative_prompt": "multiple people, two characters, group, couple, pair, reflection, mirror, turnaround sheet, model sheet, reference sheet, split view, blurry, smooth, photorealistic, 3D render, low quality, deformed, extra limbs, text, watermark, signature, frame, border, lean build, thin body, no armor, civilian clothes, bright colors, vivid colors, clean uniform, healthy skin, living appearance, smile, medieval armor, fantasy armor, cape, wings, magic effects, gun, firearm, sword, busy background, cropped, cut off, partial body"
+}

@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:41:24.757368+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "cargo_beast",
+    "display_name": "Cargo Beast",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "cargo_beast_p5a_20260326_060955",
+    "seed": 992255,
+    "generated_at": "2026-03-26T06:11:07.999226+00:00",
+    "accepted_at": "2026-03-26T06:45:53.384009+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2_morph",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "e54e51e396f1ceb969915bb507b7923c04dd20bf664695c1c4fdd077481320b4",
+    "normal/front.png": "5df25ef26e549c43daa038413b9b929871e77b3efa85fe01fcd96d2b5d507461",
+    "depth/front.png": "3feb63161d8daead05a46e76ab57838fabd78d14c56c283a68a65e4156e6404c",
+    "albedo/front_left.png": "74c534647294dd32c6bad0b30788a224122f108bd8b355518389735221f449ab",
+    "normal/front_left.png": "3c5002e621da28eb0cde4addc91eb998d8a4233a3dc09c5033aab7242fcf4667",
+    "depth/front_left.png": "0d2aaadc0666f11b051b2b5c57d2c921e24dcc2198d9e317e955a9bde22eb600",
+    "albedo/left.png": "3a5f004aca29b5be1c14f0ef9025ce04d8f00a73cc17626b5d2dbc579b9b853e",
+    "normal/left.png": "5b5f1b0a3d2ba9016eda52b9b49b603d301ccac66b05deaf5b7fb59867814dd2",
+    "depth/left.png": "7459d6b270d946cc1b16be4f9d038fe52edd518d9caaf333642c2e3557ec564a",
+    "albedo/back_left.png": "6986daefcf6851d8ebc584d403724ed3427d0c1489e29fd18dd00a03ca96e2eb",
+    "normal/back_left.png": "9a2df8ae05e112f3593c9d86bd547f2968200db84aa83a12e96d3a4231616d1e",
+    "depth/back_left.png": "f90d6bae9391adf36741d4628ba1892145cf7c32a6a77dd5de32aa3251c96969",
+    "albedo/back.png": "6747789e8271bbd688dc9cbfbd9f7942df6884dfcbb0c9980eb1633acd799cd3",
+    "normal/back.png": "0c0e795ca9966ea954f0916d12af92f57e8903004f297cac57c466e252932a7d",
+    "depth/back.png": "535b335a92a3660a874f2b3a463e64ddbea18a94f508e25e9aea0c9c5a8e55a6",
+    "albedo/back_right.png": "5686da37e30d463a6679aec4cde7f9deba29b1cfb2d7d8b91eb7d55acae8d74d",
+    "normal/back_right.png": "1cb823c335881bd843a1334ce547c9ad16eb4b595cdce6412b6720c6be3eb88a",
+    "depth/back_right.png": "f4df9b90ace9de2cfd325b8a35dc4ed09aede6a6d098a1b01e3c44cd614b4061",
+    "albedo/right.png": "dad2650e3393f908f02ad9ff5644336e6ecf7da041e589c2f19b5aa174d3dfec",
+    "normal/right.png": "3b3b92a669b141deb1119cfd598d733004575bae27728c85c916f4d1d091da00",
+    "depth/right.png": "217add74c1038418ae0b2244122a0d4db45996ec0115d9f7a63a635e0eb27b41",
+    "albedo/front_right.png": "dd841b6c05c674ecf0b12ccf3a81171eb95f932683501bc9581beed0244dbfb7",
+    "normal/front_right.png": "684f4076c379abd8857d3fdce542f05735634076b5cfe4d9932699c31d7d34cb",
+    "depth/front_right.png": "ebf6514ff968bb301c91e2bbba04f2e56a0cb078c5e307cccc2dad5b142a4b37"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\cargo_beast_p5a_20260326_060955",
+    "maps_dir": "bakeoff\\cargo_beast_p5a_20260326_060955_maps"
+  },
+  "notes": null
+}

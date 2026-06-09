@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:42:17.900307+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "ilen_marr",
+    "display_name": "Ilen Marr",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "ilen_marr_p3_20260326_044636",
+    "seed": 949494,
+    "generated_at": "2026-03-26T04:47:31.043093+00:00",
+    "accepted_at": "2026-03-26T05:19:24.857094+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "4f9903793f68dc1135254b4225aebec986dc0661871c856c11a40dc1cc6744b0",
+    "normal/front.png": "71b41aa65ad191c182cae271ccbb04140fb024ce732c0c07bff4e07f49cd95f4",
+    "depth/front.png": "5ea7d0f26328c84d7e1f1542166abab18b2905240977e162ede630ea23d5ffff",
+    "albedo/front_left.png": "1c73e4fb1206d3582488e7e279c541047d30be2b54af0f873741ebd522d0590e",
+    "normal/front_left.png": "d07f10e21f6e36d57cf11a2786854706ef3f7ab72bdb70e0a484382ac9f79c26",
+    "depth/front_left.png": "f08cd9b36eb01e183fc8c8fd2fcfaa3195bb9326ddfa6fd68ae8e863dd8829b2",
+    "albedo/left.png": "bc125b364faf96d95be6374ea8bd2871d87c8bd5e8195fd98e7d7006bd726e08",
+    "normal/left.png": "a3ad12498e98223aa4d6b99d5e62f24f982e3d20d503e4247ae1d4a25a70428c",
+    "depth/left.png": "7f9979cfdcd2bcd5bda7d3f269df2a4310e77fa6fc76a806081f0de2ab23a08f",
+    "albedo/back_left.png": "2d8b421cefa664587077283f06543e03e001ff4347cdaeacf1731ab3630c5bba",
+    "normal/back_left.png": "e140a75ca2e7c9ccc91407302f4093b60c2921815ff39f49858971fc04caa886",
+    "depth/back_left.png": "83106cd6da511e80bcfca4ac69c9d7ef3da6bf2eb932ceca627f68808a9f8f42",
+    "albedo/back.png": "0ac646f6d10e269900f63c1dd82549efba980f03e3455dc126bdb1658e49b169",
+    "normal/back.png": "cb5e981d335f97af8818904428a1bd698d851e7d4564421addb8dba6a31bf234",
+    "depth/back.png": "b218ea4698b0758937267483e21ac1cbf2d2d96d6d7508a740b24d02a35fbbb7",
+    "albedo/back_right.png": "d84c650679f4e4112340758cc6039c814fac261b8fa3f03ee4663259568b5940",
+    "normal/back_right.png": "adb7380ffd49cf7114f0bfa7c3a21c234dd25b7236a5fb65fcaef6b497c1035f",
+    "depth/back_right.png": "731eb4d2582c3092f8c0f3e9c7119f6f4c932e1cc908b66b6bbd402886eda94b",
+    "albedo/right.png": "31589b6db75d65f2cd277e7d6c29aaf6410ae93dd6f64d93c9605f98a4f63935",
+    "normal/right.png": "43aa42c6cebfeb489c470c80f69606ddf58362e587da11b8ed74752edb9c735e",
+    "depth/right.png": "87fb45dc55fa205433de111fd836234845ff988734ad3e76a8474837a0f99384",
+    "albedo/front_right.png": "402485ea050251825a702ae9970227709682e54494b842fc9820a89c384c9dda",
+    "normal/front_right.png": "70235ebf3bfcd1a5de48b40a91d6c98a391ede8196195c16bd05299e9b5b54de",
+    "depth/front_right.png": "de76efe8f9ddeebec54921eea4243499b92d757a57fa74d2287a4b895b8e1bb2",
+    "preview/contact_sheet.png": "f0ad6074370e8b5caef929f1ea1a62b5404bed704d17458a9d1d1d7ed8c17da2"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\ilen_marr_p3_20260326_044636",
+    "maps_dir": "bakeoff\\ilen_marr_p3_20260326_044636_maps"
+  },
+  "notes": null
+}

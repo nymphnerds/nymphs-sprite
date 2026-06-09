@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:42:20.018224+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "thal",
+    "display_name": "Thal",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "thal_p3_20260326_044905",
+    "seed": 727272,
+    "generated_at": "2026-03-26T04:49:54.513842+00:00",
+    "accepted_at": "2026-03-26T05:19:34.308287+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "2e439100aeea420bf9edbfc4703718f52d5270cda9919e56709ec8cea0b60356",
+    "normal/front.png": "926d3354942d748401b1a66a9e45af2a1fed5f4cb8aae3c30394a171093842e3",
+    "depth/front.png": "36526fe89a2dce2986a98e1d68e7680afda383fe3325b0d941727b2f97c9274c",
+    "albedo/front_left.png": "32b3d3e215b8aa8f601d0de6d2aecda2420cc35b13a5a1e15c1b427ee0d3f3be",
+    "normal/front_left.png": "421ddb4378d1af12333c64e858b83145ec54717959876220abc13d901f685fcd",
+    "depth/front_left.png": "9406d3b06ecd0fa8d6fa6eea0a7c473ac3641776933cb76f3442ed5fa9fd4e2a",
+    "albedo/left.png": "c5fa247e3575a87e90acc84af4cd60208ad39833ff1c79330d2be8e5cf04a458",
+    "normal/left.png": "315762db962020f750753143b28683f463ad3f218faca5cb211c625377adceea",
+    "depth/left.png": "ddd24b0da9f4a0708c549bb43bbf937552e699b67d5347ebb3c55d4dd4bc37f3",
+    "albedo/back_left.png": "8832c658b8039a96a7fe0cc17eb49ce3e5f8fbde3c630b1b8dd1ff29b61bc4f3",
+    "normal/back_left.png": "26ebdaad7b93de48c28798c3220e135c3cd14bfda6e94b74de69edefb189b978",
+    "depth/back_left.png": "4b3478bc26d3089acc71cf390b7cda56d7870a5a977a29e68d15ea17932b73a5",
+    "albedo/back.png": "4ad41b4f9de708f5139a2c7e576394e95b853ebc4797f0f2aa31b558f0bb85e2",
+    "normal/back.png": "55a7a9cd72af0126ddb7ea00099f2e2b27326c0d1d0f608fea784ef6a2f1b286",
+    "depth/back.png": "e22d586dbf022b91df06876bd02ea7d7d3151c236fbaaa827968a0867f55d5db",
+    "albedo/back_right.png": "784d708ca0bd7a616370a58ee9174c4c1cee4dac8a594d560f90f95be3c2ebaa",
+    "normal/back_right.png": "d9624987d3612aee29720e46efdd3687b5b8c5db31da8671e39a418a036e48b7",
+    "depth/back_right.png": "cbc24cda39df6effc3278d9e478bf6e3c3484e8d6ad4d29f76654c9010a4def3",
+    "albedo/right.png": "12c0fb564a12f3952c2905da630f42fb3721fc609d5e90448d8c58b380adfad1",
+    "normal/right.png": "ab481963460fd84003df7adc7153e0941d3c870b63e3100a7587c0d7830ed37a",
+    "depth/right.png": "48f96eea85e7bcc2db0cccb8ca587a9f2f60c34f7d17cd2091226081871b5c59",
+    "albedo/front_right.png": "14a0a235f95689a93b2b60807ce0e82ba691d7562b7dd5ee7a02a6904e7b8e90",
+    "normal/front_right.png": "01f810114357b26765ab289c907f531929cdc72d340668a8392c5ebf11325fd8",
+    "depth/front_right.png": "e895a0eb34b2050bfc29aa36c347c1f8e12f707dfe0fafe20b66403044cf8a26",
+    "preview/contact_sheet.png": "b48bbbeb4a76231646aa63046ef4326ac30f09d04f924df88a21ad6238097d2b"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\thal_p3_20260326_044905",
+    "maps_dir": "bakeoff\\thal_p3_20260326_044905_maps"
+  },
+  "notes": null
+}

@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T22:38:44.571808+00:00",
+  "foundry_version": "90ef703",
+  "identity": {
+    "subject_slug": "beast_mud_revenant",
+    "display_name": "Mud Revenant",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_mud_revenant_p5a_20260327_223323",
+    "seed": 818500,
+    "generated_at": "2026-03-27T22:34:36.184974+00:00",
+    "accepted_at": "2026-03-27T22:37:03.736216+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "90ef703"
+  },
+  "generation": {
+    "stack_id": "A_v2_morph",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": "controlnet-depth-sdxl-1.0.safetensors",
+    "controlnet_depth_strength": 0.35,
+    "controlnet_depth_end_percent": 0.65,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "de30ef16af978303fd791a7efdba6b6e3a8845a225ef7647827c57cb106ee343",
+    "normal/front.png": "5a74b83e62733d1bfa038a0aeb109e319903a942610641bfab57dfca552c93a2",
+    "depth/front.png": "8ef6e90b6eca30f05e9d0e57350f37ba88504a6a068cc36d18019091df1a4e52",
+    "albedo/front_left.png": "1166aac8179b40d698741bdc3e471d26f3574cbbaeb60b131a73e350bb7c01b0",
+    "normal/front_left.png": "fcabc5b9b37bea659bffa75c475552a583f3151762d8e95d7507fa1ec0b3bb6b",
+    "depth/front_left.png": "b161fcff8405f78ea69cf3460b564c07e3cd06f0844f308edb932a6e849b0a64",
+    "albedo/left.png": "4bbba1fc147fe611afee98cef6226f6b8e5853c255eb95b23c39ef0c52b9a934",
+    "normal/left.png": "698c05b4c5f5c1277a38bd1efbaf5ffc31e41ead9ba82e72f05cafa3fe0fcb87",
+    "depth/left.png": "19bf02fe6270c6ac9b9421c33e81f87384a59741fb68d840fc485221ad510f28",
+    "albedo/back_left.png": "f609ce4fb00f3c27ac559800059025e736a9ce8a460557d6130635dfa9d91f04",
+    "normal/back_left.png": "5bbcbeed3e745167a28721083783b07cc64f13d8de1cf5aa3e08793f688efe00",
+    "depth/back_left.png": "e6ff037a05796f375c6cc6b80725d9ce3dbff668c094856fef03104882b60c86",
+    "albedo/back.png": "e7e2fdc6ae7c3498ea59912a715f472dfb856a57f474811cc5a8b1c6447b8943",
+    "normal/back.png": "50ce22862187f7df70740c7a05da12a16b4cc6e810208f3919062ecdceb08aea",
+    "depth/back.png": "0f882baf1020b5755b968427de668813dc3b4b42454c134988d9ed25ab85e19e",
+    "albedo/back_right.png": "e55603f53a86072e3594bf217b3c00e69bfced83a518a4722dbadf36eebc1254",
+    "normal/back_right.png": "a537513f858ca4a10535d70d5d1fe8d13aab07120ab90a56f17b1d8e7f259492",
+    "depth/back_right.png": "7989aba5d86c5688eadc111953c9c7aa3fd60c1bbbdbcc8dfe2604d56e2f1878",
+    "albedo/right.png": "5087a1ebbdc6868a9653b71473c5ae1a59a577531d7afbd794e255cd52c21935",
+    "normal/right.png": "b2f99f01558b4db3970e36427e5fc09e352a5ee8f941f151566c7228b8ad4226",
+    "depth/right.png": "26221662cc2130e64802a11de164d069694d5c01b103ccfd5af10bbe69d6d3e9",
+    "albedo/front_right.png": "797fde62954b23951da4e52b4679757372bd71a05ff6921f24bb713c3e62f577",
+    "normal/front_right.png": "e001c163d00ed1747e8529db6528207f353f6c12db1ed8240cc6e6d986811d49",
+    "depth/front_right.png": "b1458817acb36ac7542d7de60d7a1d3e59425fe275ce78ecaa44835a3568b620"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_mud_revenant_p5a_20260327_223323",
+    "maps_dir": "bakeoff\\beast_mud_revenant_p5a_20260327_223323_maps"
+  },
+  "notes": null
+}

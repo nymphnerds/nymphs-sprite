@@ -1,0 +1,80 @@
+{
+  "pack_id": "undead-patrol-01",
+  "pack_name": "Undead Patrol — Pack 01",
+  "product_repo": "mcp-tool-shop-org/zombie-sprite-pack",
+  "npm_package": "@mcptoolshop/undead-patrol-48",
+  "version": "1.0.0",
+  "art_style": "pixel-art",
+  "tile_size": 48,
+  "directions": 8,
+  "layers": ["albedo", "normal", "depth"],
+  "body_plan": "humanoid",
+  "controlnet": {
+    "depth_strength": 0.60,
+    "depth_end_pct": 0.85,
+    "canny": false,
+    "notes": "Standard humanoid tuning. All 8 variants are bipedal upright-ish. No arthropod/winged morphs."
+  },
+  "subjects": [
+    {
+      "subject_id": "zombie_shambler",
+      "config": "pipeline/chars/zombie_shambler.json",
+      "slug": "shambler",
+      "export_dir": "assets/shambler"
+    },
+    {
+      "subject_id": "zombie_runner",
+      "config": "pipeline/chars/zombie_runner.json",
+      "slug": "runner",
+      "export_dir": "assets/runner"
+    },
+    {
+      "subject_id": "zombie_riot",
+      "config": "pipeline/chars/zombie_riot.json",
+      "slug": "riot-zombie",
+      "export_dir": "assets/riot-zombie"
+    },
+    {
+      "subject_id": "zombie_hazmat",
+      "config": "pipeline/chars/zombie_hazmat.json",
+      "slug": "hazmat-zombie",
+      "export_dir": "assets/hazmat-zombie"
+    },
+    {
+      "subject_id": "zombie_bloater",
+      "config": "pipeline/chars/zombie_bloater.json",
+      "slug": "bloater",
+      "export_dir": "assets/bloater"
+    },
+    {
+      "subject_id": "zombie_skeletal",
+      "config": "pipeline/chars/zombie_skeletal.json",
+      "slug": "skeletal-zombie",
+      "export_dir": "assets/skeletal-zombie"
+    },
+    {
+      "subject_id": "zombie_worker",
+      "config": "pipeline/chars/zombie_worker.json",
+      "slug": "worker-zombie",
+      "export_dir": "assets/worker-zombie"
+    },
+    {
+      "subject_id": "zombie_elite",
+      "config": "pipeline/chars/zombie_elite.json",
+      "slug": "elite-zombie",
+      "export_dir": "assets/elite-zombie"
+    }
+  ],
+  "export_law": {
+    "structure": "{export_dir}/{layer}/{direction}.png",
+    "preview": "{export_dir}/preview/contact-sheet.png",
+    "manifest": "{export_dir}/manifest.json"
+  },
+  "production_notes": [
+    "All variants are humanoid bipeds — no non-humanoid morphs in Pack 01",
+    "Each variant MUST have a distinct silhouette at 48px — review contact sheets side by side",
+    "Pack-wide palette should feel coherent: grey-green rotting tones, dark stained clothing",
+    "Direction readability must hold across all 8 views for every variant",
+    "Reject any generation that collapses into generic zombie — check against silhouette_thesis in each config"
+  ]
+}

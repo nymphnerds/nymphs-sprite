@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T17:56:31.649273+00:00",
+  "foundry_version": "baededa",
+  "identity": {
+    "subject_slug": "zombie_worker",
+    "display_name": "Worker Zombie",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "zombie_worker_p3_20260326_175208",
+    "seed": 800700,
+    "generated_at": "2026-03-26T17:53:03.798024+00:00",
+    "accepted_at": "2026-03-26T17:56:22.870573+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "baededa"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "596208619faf55eca316351479fcb0bf7a4daf30e47974898eaca003d0ebf2b9",
+    "normal/front.png": "e6a02aba37b7902f5f2136def3c76212f1f0f7a08362fcd362566889f98eabf7",
+    "depth/front.png": "def039fdad55230f07a4dc96f645d55a661aa235e36ace055dc19df841ebff27",
+    "albedo/front_left.png": "1269c44d3a72beb23ced79d9577d580131cd8b7f20937c8686bdac96af972dd4",
+    "normal/front_left.png": "380594c9663f4050c83dfa87b6d0d663e8bbde256f240599544a1b2bb59965ae",
+    "depth/front_left.png": "6eb22f3661e1e3d7342de168a58e1f712272455a4b73d38984c59e97e7d7d6e5",
+    "albedo/left.png": "f0a4d0102026b0d7bd9badde692a6fb7faec37077eb9d44e26321dc71d72f821",
+    "normal/left.png": "60140db507bbd5d90734e7d90f7ad163392c976a05bf7c87c58916c93a2761e0",
+    "depth/left.png": "d45f2093a1b361d7f6a4d8a958a497eaa62d1b56571f12a9183e45d3fb936af5",
+    "albedo/back_left.png": "061f9cc4e6aaf201df672d2582b3f6bd7ff0681ede050c2f4c4b1ea6e9432510",
+    "normal/back_left.png": "9ac966bfc9aa43ae707693399de8db69abc524a8313da10dd7a0794c96b70cac",
+    "depth/back_left.png": "d25431ab4d78b4692006d0f02ca8f57c48b085b3702a1438cc9981ef95098d20",
+    "albedo/back.png": "44c7a7d2bd70b16b840d1fe4bd61f7618753da167bab860fb087b2deb382d738",
+    "normal/back.png": "385c5aca0db8bd4b3f030b670c140cc8b8810aeba5614a6539438fa3e503c4dc",
+    "depth/back.png": "93d7938c1f30ac719ad70011833c7dc249d416d5eab96b17c706cad65682d832",
+    "albedo/back_right.png": "65c7db13d4de79c41ef5744a4cab80a51ed224ea42be9c5a75134a5f2aa1b0ac",
+    "normal/back_right.png": "12945a7ab8d32a925489da3ed32ef145f47f7eba10d777a73c89798ef2a4c472",
+    "depth/back_right.png": "f86ca78fcfcf5a51081c559d179d3bd524653b72f090adc6f9036a8e13099baf",
+    "albedo/right.png": "a94ce31120672a8ac710d29070d272a3d4443b058fff76f5bc25b141fccf09be",
+    "normal/right.png": "929d0e830c537650320c30646cc8e7836252de2e13c74c36724d424e76640e22",
+    "depth/right.png": "618262b7e86a037f56a4e398b66581fa6d4586e25f9d4f9e1769f66c472bd313",
+    "albedo/front_right.png": "313849a5e917d6b7f62280514de0f4ce4d674f2d189215fb49a9eb9d64efba17",
+    "normal/front_right.png": "dbc5a4d32ce0b23d52f052f19b7f7f453052589e5eab2bb4f5248daad7d61e7f",
+    "depth/front_right.png": "3626598fd5f1844e4fbeca91bbd07624b2681491cd91ba958ad259bc158efd85",
+    "preview/contact_sheet.png": "30953600bc345b14627220a1462a68fd5301a65fbf8cac2e5bfc006b554663ca"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\zombie_worker_p3_20260326_175208",
+    "maps_dir": "bakeoff\\zombie_worker_p3_20260326_175208_maps"
+  },
+  "notes": null
+}

@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T22:38:44.348062+00:00",
+  "foundry_version": "90ef703",
+  "identity": {
+    "subject_slug": "beast_root_puppet",
+    "display_name": "Root Puppet",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_root_puppet_p5a_20260327_221324",
+    "seed": 819000,
+    "generated_at": "2026-03-27T22:14:37.595521+00:00",
+    "accepted_at": "2026-03-27T22:24:22.827127+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "90ef703"
+  },
+  "generation": {
+    "stack_id": "A_v2_morph",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": "controlnet-depth-sdxl-1.0.safetensors",
+    "controlnet_depth_strength": 0.4,
+    "controlnet_depth_end_percent": 0.7,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "1b5997f743cfadc99f08fe31b8fde54ba617b97afb3a92f11aa839ca5e549f98",
+    "normal/front.png": "c95222e0ea2c16c41982b0b5d475df7bbf5d89e0ffeeeb6f7ec3360a7ad10d6f",
+    "depth/front.png": "9ffeef1f08ec7ee2c56e60a1c22df87933656191942bbed6ae81b8e2580b5413",
+    "albedo/front_left.png": "278a77cf12ddaefecfa2451539377461d5b8566e291476b7bd7b9f8566f8c4ea",
+    "normal/front_left.png": "85fa5a05e837789d3c836d1e528de2269ed6aabd96d2f9cecc57423b22d78645",
+    "depth/front_left.png": "f79352d1689f3532d89a0bbf614142418cc0125fa9f26eee84c336b3bba4c660",
+    "albedo/left.png": "df2317503e4135b6270276083e826e0ae774c1ae3fe838481ea5967809eb33ff",
+    "normal/left.png": "c20b312b43fb7153b9ed10e249b40f12dc9d07dcff18dc00ac2528edfe2337fd",
+    "depth/left.png": "b7ee6af111c842a9d56f27927cb5c30c1cd95367400eeb069ecde6ce2d5a7e71",
+    "albedo/back_left.png": "514af5c0117b364a370fe08fc78d6080e5f61a28190acee3424715b40af8c7f0",
+    "normal/back_left.png": "6cba35feb5de17835a57e419a09f82181e9d6b5f616db6833d81099fdbbfba36",
+    "depth/back_left.png": "d957751edeff481e0c43dc44c3cb079287c2134c26d396a52fc62614444607be",
+    "albedo/back.png": "35e3a433ab8ec75e6f0410faf7d26c468311a24cc4b33849b782dd8fa426b578",
+    "normal/back.png": "31160653176d18440066522988acfe61ec9bb01efd291817cd71a92c78f37b89",
+    "depth/back.png": "40a52df513f567871a72fa80a34cb454e6829f3e6deb50458f3cf98c50a8f438",
+    "albedo/back_right.png": "5257bf9b8ec67c4f74fc5ce415fb0a39e19771d566288f29d6defe9b8357aee3",
+    "normal/back_right.png": "02e73aba6dc84dcd80e6e5f585b6c75641324d08398141dc356b486c7c4cc994",
+    "depth/back_right.png": "07e80b1cd309c3a654fdc7ecdd69c3fa043ffd532e455fd535109b3c2a91806f",
+    "albedo/right.png": "a9fbc8194e12a49b48dce1d8df89fb1f4828dab7440b83116b004faf467aff4c",
+    "normal/right.png": "3976e9419bded0f20ee76afc8aa790605953bd2a4226348dd09838cab5430101",
+    "depth/right.png": "d3f13e9088f24d97c0ce78b22884a7c4c4c1153db1cf56f5ee674d846dcc5b55",
+    "albedo/front_right.png": "4af52896c0f2560486e4d292cc17624883ddf2509d517494d8a889ae69a6f6c7",
+    "normal/front_right.png": "5f408717bfa0d257d060815efbb0a0b3d5ce683b02532a2bfa24d1d7e3db8a3a",
+    "depth/front_right.png": "e138458e48a869b84ac3d96856bd20c18af35b2e1dff24745aec306a03fa9157"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_root_puppet_p5a_20260327_221324",
+    "maps_dir": "bakeoff\\beast_root_puppet_p5a_20260327_221324_maps"
+  },
+  "notes": null
+}

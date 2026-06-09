@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T23:38:08.568673+00:00",
+  "foundry_version": "321ecee",
+  "identity": {
+    "subject_slug": "beast_ink_shade",
+    "display_name": "Ink Shade",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_ink_shade_p3_20260327_212456",
+    "seed": 819100,
+    "generated_at": "2026-03-27T21:26:09.808756+00:00",
+    "accepted_at": "2026-03-27T23:32:05.286816+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "321ecee"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "de355311e77896df50339ba837aa451dc22a2fabc0215e732d2af2b7a041d3a9",
+    "normal/front.png": "5dac0d00e7f9399e2b767694074efb5a0b2450cbd4890af28e1da5c0175b7980",
+    "depth/front.png": "80bae7e65f9c5e55c603f8c670f20848270dad33982f32b547afc193284c83ac",
+    "albedo/front_left.png": "3b565fc3563896e1938d9958715946131796307f257edef8b2bc890dc9e71d5d",
+    "normal/front_left.png": "4849abf8fcc041321a4ee5d8b1c9a3879ea8ada6f43e464cb0249fad79e3e999",
+    "depth/front_left.png": "0d33611a28adf82c377f9cdaa3752e0fabea220b6db7703f5eba09c576f1c2bd",
+    "albedo/left.png": "8fa64d92b8c491d5d81f09e0ab0d690eed792f93910de19750b33dad89480868",
+    "normal/left.png": "1a8e515f09a9da8ee794c4208c5d128cbdb6e63524d9f869929a4c6756b4c261",
+    "depth/left.png": "8613d502e80cb26f5fa2c23085828dd99e33fe47ef8c424361ea9387e0025292",
+    "albedo/back_left.png": "aac432e7c7c5cf0415d1001ea413f2d6ec85256efbea0a35b66bb52645fae3d0",
+    "normal/back_left.png": "c02438b404a1dfd94b224e9f11309026a2b587b7cc3098d99c1e88fd67686de0",
+    "depth/back_left.png": "d786a6ab210182ee3dab2e5426f0134e3e1da94f3e74cf03156db12603289653",
+    "albedo/back.png": "f0dbe8c20975e8f0d3a073a4cb97bcef14634c620ef563ef2d08b7a40d2a92b9",
+    "normal/back.png": "9864b78f4ea132d456408f339f48bde5dc6fed20352bba31c60ddb5467100e6b",
+    "depth/back.png": "441ceabadb15092d644a96beafd41366b45e787cb27d528660b6f6d82a81b495",
+    "albedo/back_right.png": "a6508dae2b70edf674bc23b2b50f0dbb64537c0736ce5ce70a1a36ae58dd8894",
+    "normal/back_right.png": "d7e4b0f5571ac705234d55d0bda2c2e7c0f71168ffa59674e04d7b251522793a",
+    "depth/back_right.png": "1c9af1bd57e3fda7e4843d3c900cbd75202e85f75e7dd1a624bab990705f141f",
+    "albedo/right.png": "2fd731fd16baad232a73270ce259aa1dd56525a69494e70979b028fc248e6c11",
+    "normal/right.png": "a94641d1f8b16a55f5c5e0bf8de1751841ecc1e89d5b5fea8eba5e1ef0e60f50",
+    "depth/right.png": "ac46271bf516eafaff2644ec501e1f028e1c64d5a373d4f3d33519172ba3058a",
+    "albedo/front_right.png": "01f6ff910d9d6c1200a0031d86caf8b04a3628d9d675be96ff1912f1c5d0e7be",
+    "normal/front_right.png": "33fa73ead3c4f9ea8779b04787b5508b5b10508430d369c0c7d812385c527d42",
+    "depth/front_right.png": "109844a00ae5c626f43734bb5e62ef3653487efeca76de688647aa7c87049f25",
+    "preview/contact_sheet.png": "f50131564ac0ac04875d5889c1a62cbbd78a6b3817494f3cae6efefb73fb8033"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_ink_shade_p3_20260327_212456",
+    "maps_dir": "bakeoff\\beast_ink_shade_p3_20260327_212456_maps"
+  },
+  "notes": null
+}

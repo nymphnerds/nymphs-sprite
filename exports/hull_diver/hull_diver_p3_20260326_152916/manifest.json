@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:42:17.593443+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "hull_diver",
+    "display_name": "Hull Diver",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "hull_diver_p3_20260326_152916",
+    "seed": 556622,
+    "generated_at": "2026-03-26T15:30:11.472879+00:00",
+    "accepted_at": "2026-03-26T15:33:03.666917+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "d15b495d4dd93d26f84da26f3c8ca231d2d44ea40e67df0cef9c9788b6e85dd4",
+    "normal/front.png": "06d5fe4d1395ade87359c26a8884ac69e7bfae8c666aee80f9ce96f4b0eb2c8d",
+    "depth/front.png": "a5bb7987fdbee426bffcf992d8bacfd09c3301f9249283247e064a34990360de",
+    "albedo/front_left.png": "e5f1bde5479d73278fd5ba6fc7b812d95f83485df668cf52be69fb27e6f60388",
+    "normal/front_left.png": "66fa3f426188a05828f371edfbcb8bfa84a5c6cef29a1a7527e7dd568c876855",
+    "depth/front_left.png": "e2b3d8fe582633daf492f79f7cc84bf6b81cb48e5671deb7291c888def30b015",
+    "albedo/left.png": "65e7d57a03997dd5d21700d336117476ee1a664c5be766c70b484b24a367c9ee",
+    "normal/left.png": "3eeed18e0c0e8e609efe49f1bd68c27964f14c5959add491bb9be8cb5b23738f",
+    "depth/left.png": "467e49eef03460b9da3badaca8e240782ecab0fb41d09bb0f121e19c277ae30e",
+    "albedo/back_left.png": "365f8342c87b3aa98f57de13f63e93bac4993908d0fad692cd7579aa9cbed39e",
+    "normal/back_left.png": "64e82795ba4479244e3b6239a646a683bf545dcc2f9cfa31bb917507a3dd2020",
+    "depth/back_left.png": "fad5a9f1c840b22ab52a68c40ef455036490eab2c68db1c4c88249360123c8ea",
+    "albedo/back.png": "003de3cc3339372326fd0dfa0d33fe525b526248c66cd6dbb5fd74d4f812f22e",
+    "normal/back.png": "164ead7e5926c5e95cd0b1884e5bcb32e64ffdd952a6e11935131fe960196f3d",
+    "depth/back.png": "d0285f9a846eae9572989daed39882038383fdb0580173e369a7a779b2357e8b",
+    "albedo/back_right.png": "2a94ffd8d7253ce809b2d41fd83deb40528a1df16b1bbca20de9152d6c095fc1",
+    "normal/back_right.png": "b3a6566f2f56b49f292b5a2f41feba2c4362da70c81da1852a932c2e1ceb2b4a",
+    "depth/back_right.png": "69be07fb9e6b94223e72fe1a7349c3aeedc1d6a4a36947a957f8c37e37fec2b2",
+    "albedo/right.png": "cac11cf99ce67f224327a6a12571754d12ab0abcd148258738512c7591a81f4c",
+    "normal/right.png": "e6fb5a15e8b0fc9efc5b207517711c48bc0a9a80c75e7e16ef43bbc5ee3cb50d",
+    "depth/right.png": "ec3b77027dc523223b5ac449e2e730c8f11a7009804694da6edc8ff161e9ead0",
+    "albedo/front_right.png": "6527683a78ecdd46c7906ff4c87af29ca5c8cfb7be7be452bb298de435940648",
+    "normal/front_right.png": "2630eddfef4a78dc4efcf70b3a3507239aab615113cb5b852ba5392b6dcf0b67",
+    "depth/front_right.png": "6f3afbbca8fca7750088e5dda8bee0eeec86f93942f38cda1758096d95a04f12",
+    "preview/contact_sheet.png": "12176209c8a284182f64fb0ec11b85c1f86439afcb038b37c9865ed2e0ca7117"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\hull_diver_p3_20260326_152916",
+    "maps_dir": "bakeoff\\hull_diver_p3_20260326_152916_maps"
+  },
+  "notes": null
+}

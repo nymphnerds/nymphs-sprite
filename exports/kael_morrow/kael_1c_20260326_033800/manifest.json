@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:45:07.648311+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "kael_morrow",
+    "display_name": "Kael Morrow",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "kael_1c_20260326_033800",
+    "seed": 616161,
+    "generated_at": "2026-03-26T04:04:34.842435+00:00",
+    "accepted_at": "2026-03-26T04:05:30.246841+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "4a820f807dc635cc24a32f9b6f88c67423c4799ffc53ad4da864ae04636674b9",
+    "normal/front.png": "bb36bf446ead545e740e04d96d6ead551ad98e3c40cb09428c3ec086421d3bd6",
+    "depth/front.png": "7592f224ca418b6f6723ab74d17589fa8fbfa6b2632f7844a3ec71b878087dfb",
+    "albedo/front_left.png": "a259bf55f2dd9a020fc8223edf835c98e00d6eb1157b90dac32ef2cf38d09ca1",
+    "normal/front_left.png": "671d66b782df9539700e57589d7e2372b2028f08301e633c3f79cf3d684da019",
+    "depth/front_left.png": "cbf8c3adba3503aedb0d07590eaafd83397002cb8ea4797ae06d6898875692f4",
+    "albedo/left.png": "a0867d974cf2c8b5a62d55d8b9df11214728bae67fb04ffde322a7f94b9c2eb6",
+    "normal/left.png": "e6309e3ace9aad31fcad205ea2b8292805d491bbe1d74fcc82ac75a5e82c9eb0",
+    "depth/left.png": "ce29fda90b839ead3e9361e6b84b6fb1188a87ca665d93713a1c2a3cfb097a28",
+    "albedo/back_left.png": "027e18b087ed8c2c7c35253e244c227f6d9d963cb06c07439b10f6916ceb1029",
+    "normal/back_left.png": "fe36f45be135974cb8168bea60d9d1c43e0f85ec391a3e909d17b088a2444cd3",
+    "depth/back_left.png": "32665f39752d0dd5c43b666ffbff4b4f551daccc6b51df5ddc1563075aa19c98",
+    "albedo/back.png": "0cea20c5e22afb460806ff4de0fb79c9c81694e7a3398357dae660642be47c8c",
+    "normal/back.png": "b521e61d87e591f873ea1b6e95fec4dccb3d77e23e800b6c9a1abe32adcd4221",
+    "depth/back.png": "72416c290ceabac36f19d9a0898cd75047e2dbd83393eca27c864d84212c23e0",
+    "albedo/back_right.png": "62e7ed5b7db96e5012a539b8a32c59b12bc2c12660b28b451e864732ea5be5fd",
+    "normal/back_right.png": "b61fa628df2d3e9cf7ee337b2fcbc1f9a4ce2d4f332f105234cd0affd610b20c",
+    "depth/back_right.png": "469bf0ebbba1bdfe4eaa2ccf2f38cf264f8827171f6f4559de97574ff3e050f6",
+    "albedo/right.png": "5bc241994da1430ce41846f5944787450e56cedb258e1bb19523ef4466e46c3a",
+    "normal/right.png": "e8c173951aeb0d06e7a8cabcf12cad15d3f006d2a59d80f04c40175598b5d7d2",
+    "depth/right.png": "8a071101d6f12051dfdf7c6f5d760cf3e53df8b472aa76387cb94c26eab9873c",
+    "albedo/front_right.png": "fa949ac58f69bb843aa21bf837928287049f0ff3b7d1111bae1d0d3b25a8a005",
+    "normal/front_right.png": "12b28a4e84700991d88df8823341f7813b0fd1874f8f3a11e6d7cd7e4b6f7af7",
+    "depth/front_right.png": "2e4c5e7b1fb635d416c801f08ca4b10e94ece31d700fc478542d3a71a22005fe"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\kael_1c_20260326_033800",
+    "maps_dir": "bakeoff\\kael_1c_20260326_033800_maps"
+  },
+  "notes": null
+}

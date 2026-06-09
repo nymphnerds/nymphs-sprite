@@ -1,0 +1,7 @@
+{
+  "subject_id": "compact_patrol",
+  "display_name": "Compact Patrol Officer",
+  "seed": 224466,
+  "subject_prompt": "solo, 1man, single character only, one person, a Terran Compact patrol officer, human male, medium athletic build, upright rigid military posture, clean-shaven with short regulation brown hair, stern blue-grey eyes, wearing a dark slate blue military patrol jacket with high stiff collar and silver rank insignia bar on right breast, dark padded light body armor vest over the jacket, compact holstered sidearm at right hip in a dark hard-shell holster, dark utility belt with restraint cuffs and scanner pouch, dark navy cargo pants with reinforced knee panels, dark military boots, small shoulder-mounted comm unit on left shoulder, standing at attention neutral pose, clean authoritative military law enforcement appearance, fully clothed",
+  "negative_prompt": "multiple people, two characters, group, couple, pair, reflection, mirror, side by side, comparison, turnaround sheet, model sheet, reference sheet, split view, dual view, before and after, blurry, smooth, photorealistic, 3D render, low quality, deformed, extra limbs, text, watermark, signature, frame, border, dirty torn clothing, pirate, ragged, friendly casual expression, smiling, bright colors, vivid colors, cape, wings, medieval, fantasy, magic, rifle, bare chest, dramatic pose, busy background, cropped, cut off, partial body"
+}

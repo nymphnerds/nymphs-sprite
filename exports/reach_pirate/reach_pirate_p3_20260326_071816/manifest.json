@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:42:19.157801+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "reach_pirate",
+    "display_name": "Reach Pirate",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "reach_pirate_p3_20260326_071816",
+    "seed": 773399,
+    "generated_at": "2026-03-26T07:19:10.938372+00:00",
+    "accepted_at": "2026-03-26T07:20:30.285827+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "117ae5ac0a2a6ac760303f96eb7643fc0fef6872f4b5b5df496fff77d36099de",
+    "normal/front.png": "61baa9b3b7ff82960a73546c92955c8a894d695a18054128d04112d44644d83e",
+    "depth/front.png": "614ce10036e63699bb042c9b8155a4e4bf64948a97bb0e212cc0277bbc572a3a",
+    "albedo/front_left.png": "c4c9c64734b2ea919959a2633267786f9407fcb4127fee30e79540de45319a6b",
+    "normal/front_left.png": "e77d79f990e0307cd32190ce32e76d830030d7c96073d31eb4110a08c6e93b02",
+    "depth/front_left.png": "e96e37acd9de884448842a157a462df0974b2a1f0a0d0aa3cb13dc2d87ce95a9",
+    "albedo/left.png": "b812864616b99c16159a59b1d17424843701bf0bb8312a199e7432f734e7ee05",
+    "normal/left.png": "26a29b48bf647a254d9871bba694a38aaee135687d3150682e7da557099d5141",
+    "depth/left.png": "bd827283e47014ad014bf9ebeda52c9d9d12561dc49ec44a8f518feaa546d3b8",
+    "albedo/back_left.png": "2b5750235436e68aff861658020a79a213072d7cf729a34961aac02971dba989",
+    "normal/back_left.png": "dfd0e90af970829247f295d3a4277a3a5c5e0807c294b22a72f849ec955ecbbe",
+    "depth/back_left.png": "548fbd31e9178a23b470fedc5b569b86170304e88ac9f8c96da16b3e45aadaf6",
+    "albedo/back.png": "bd3f8f0f8bfee0a2b5c404c7077682d440bb99d4ab18543a7c6219a164722ed7",
+    "normal/back.png": "322cbcbe0e3e686dc432b682873856d31b2718ec5a76005a2510b04d04201730",
+    "depth/back.png": "adeceafad4ab5fa0cb9a31e76d1cbb68091083c16974032cc757c65aa03bd588",
+    "albedo/back_right.png": "797d4be663e04c2a1a624831d7e4f5d02cf3d0d30b9904bcc08e2795c4643f4d",
+    "normal/back_right.png": "634b0199454a9e182859fe51969dc13b776021ea2b18e95fb44932ea72d76e1d",
+    "depth/back_right.png": "806f8251360c40287289629cd3c3f52173b393629dab25127106de3440ff311e",
+    "albedo/right.png": "10aa6287e69dfd83650f6555c9922cb5d4333a7b00315503f34ab7f7c5bbbcf3",
+    "normal/right.png": "49d32e95fdc3f3b8ae2b6faffaf23902068c9df963324f227d3eb8193dc161a9",
+    "depth/right.png": "e6dbc81df3f76dd07ec080346a3c670d1f7f76b08d1d2652abd38520ca55dcf3",
+    "albedo/front_right.png": "a469f8ac37dc58e0318be7b398a037991314849570d97baa940ff5c5256c4a57",
+    "normal/front_right.png": "17a373e0c4e247e59248a4902d713f987e5a1151e1a6dda94983df70b313ae74",
+    "depth/front_right.png": "01426b02b81e7ae0b89472c70de72bb29616e36df269d6f6ca21fe331686bc60",
+    "preview/contact_sheet.png": "abd5ec02afa2ba4725110b436c60a96232093c7959944ee8b217527f43d5b77c"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\reach_pirate_p3_20260326_071816",
+    "maps_dir": "bakeoff\\reach_pirate_p3_20260326_071816_maps"
+  },
+  "notes": null
+}

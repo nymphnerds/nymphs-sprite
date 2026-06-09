@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T17:56:35.500657+00:00",
+  "foundry_version": "baededa",
+  "identity": {
+    "subject_slug": "zombie_elite",
+    "display_name": "Elite Zombie",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "zombie_elite_p3_20260326_175314",
+    "seed": 800800,
+    "generated_at": "2026-03-26T17:54:06.350625+00:00",
+    "accepted_at": "2026-03-26T17:56:22.996324+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "baededa"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "b9b1285ef2688ea248604fb11ec7ca3d06f7b7e781f8dddd3966310f233f8264",
+    "normal/front.png": "4a249a0525fa565073f0fee036a2254313251ad17ca4ed69810882115c8bf5a7",
+    "depth/front.png": "3d73839ce1014ccb44ff823946dc1362cb6eafe70b831e21b4021e2029f4ac94",
+    "albedo/front_left.png": "60257cfa0a2a17653886e106507fc1cbc969ab21c33d067c3bf88343af62bd44",
+    "normal/front_left.png": "033d61b5bc2cf688b7872e5397dcb5bb1a257a93d4aff72049f75012a86471c0",
+    "depth/front_left.png": "e968ba94b5004466dd6e52ba330e5a1b5871d34d6e589dc35e7bf3b9671c4224",
+    "albedo/left.png": "05d1dc4e06c21c07dcce95a28c316a28ff19b1b4bd59a825b487cc68c027104c",
+    "normal/left.png": "af308b94b0f505271be4a2c03790fdc8452200a73c0a5e19706686d5358e5162",
+    "depth/left.png": "5bba38d7aaf736eca6ef319729752b7642bfe41587ee973e39717f1a0e1d36ba",
+    "albedo/back_left.png": "30d6e52509e21422c19a98da180da437a397e1a90a6d5ae6b06207a9c606ced3",
+    "normal/back_left.png": "d6058fecbaa7a493290e06ce017ffb4b0bb8017740f7ffb7f92fb281b8c2e33f",
+    "depth/back_left.png": "25ad5cda92d02ca4fe38adbfa9b8cc972bc1bdf40cf26c3302b3c499e3b8f8dd",
+    "albedo/back.png": "0cc218a2c5ef3737196aceafb9f103a0c54cdce307f528a904c4e072aef1da82",
+    "normal/back.png": "2235a32b0ed7472f62fea3abccefcaf95f05773b93c41328065c4588187ef7f8",
+    "depth/back.png": "f4e455973c4ec6383e0f99b0ab138c17e5c65bd0042d8f42f3295dcbffe1ff8b",
+    "albedo/back_right.png": "700dba43aa5f45d8483000ac63e19f7b46933905aa622627c1fefe6aa19f16a6",
+    "normal/back_right.png": "df94383ef85f21b8f4e5921ec6721decf9f632fd8765825cfdd55e595dc3f627",
+    "depth/back_right.png": "2c2dea7a4375b87098eb5043fb79ac303de82d4a07b1377ba691ff8cf72cbe1a",
+    "albedo/right.png": "3041f1857886747e6e8b19a9f0fa8286fe7a47e2a16d44a226a11f02752936bc",
+    "normal/right.png": "f888a988a53a88c56764d9968e69a04dd304391ffe55a0e101a52920f04c1c67",
+    "depth/right.png": "607bb1127366a4e20643b119036b17042e199dc8301219a3ad1503a2bc3fe258",
+    "albedo/front_right.png": "017aacdaa823a9ac04e247bd2957bd22a565398235271feec260d8b9d9637942",
+    "normal/front_right.png": "ea9d7f399bddea4e5cd3cf10d8f44c05c92c75327822e1e6bd37edea22f03532",
+    "depth/front_right.png": "1d1fada4f097dfb3c747125a5432756a4c5430acad9b09128cf4b2f4a4a93683",
+    "preview/contact_sheet.png": "f8ab156e382a3facd7620efd1183a49b265ea268db5cc3789d33dc4d1deef754"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\zombie_elite_p3_20260326_175314",
+    "maps_dir": "bakeoff\\zombie_elite_p3_20260326_175314_maps"
+  },
+  "notes": null
+}

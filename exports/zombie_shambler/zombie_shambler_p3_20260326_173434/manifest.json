@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T17:41:54.266011+00:00",
+  "foundry_version": "baededa",
+  "identity": {
+    "subject_slug": "zombie_shambler",
+    "display_name": "Shambler",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "zombie_shambler_p3_20260326_173434",
+    "seed": 800100,
+    "generated_at": "2026-03-26T17:35:29.973227+00:00",
+    "accepted_at": "2026-03-26T17:41:36.885354+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "baededa"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "a8220b57b14c8af3276ef3d006aacdd6f2778dcf0433113c59fbcd6ee2ce8d60",
+    "normal/front.png": "427356650d24583578d030524f35e38c594d2c26df713377b17049c67410a14f",
+    "depth/front.png": "4ba8e2e566b86a53612734566899f2e4bc1ae8a3d0ac56e13d1bfefdbbde7c3c",
+    "albedo/front_left.png": "45dcd5c5134fd2483e472c1d1089c5b50cb4629ec9233fcd9ff0575d38155825",
+    "normal/front_left.png": "d1a498c80ee45edb1d1a08b60c16e4c2715d830058db225562af937742b2ba15",
+    "depth/front_left.png": "5f3c69dfee50448e456c29754303f78c9825e92d8cd083d278f286d1ba1cd82c",
+    "albedo/left.png": "09785d7b32fa3bb352bc782007ef1b975c576ccf9cfbd80783f7ad1d43c7cc1c",
+    "normal/left.png": "d5146662ebe6636bfd4fc99f9860b19a568b887eeb2bd061d4815254c1ced1da",
+    "depth/left.png": "f9a7233752bc97c270e1ca9fc913dc0b8388fc635c4d854b6c95e96052898e20",
+    "albedo/back_left.png": "f538b2ebbb85bbcadc34afd8957d57bad2a60146d82e70b9a34ce2133b2a4b56",
+    "normal/back_left.png": "97a5ca3e48badf37d98133b15ab1f0af42f6b17531df0de1d8a69e1d6f136c04",
+    "depth/back_left.png": "2a89a53829698e36647dd0e7319c7ea96be11ee8b5c9e274c5ee8ce11eb89021",
+    "albedo/back.png": "2e9d45fe45e7dd29ce8f4f87a0fb1d6c89c09e648723d5b1dac6c2fbdc5871c8",
+    "normal/back.png": "1ca5026bcdc58884eb68b6fcce5b76e57c38850a1c08583db4d247e2c47b219b",
+    "depth/back.png": "2ce2ef1dcf07e0fb72d589d2e3af0dcbb9f1e829851a56d3a3a0dfe88e026f74",
+    "albedo/back_right.png": "fb1e728b770f0d24b011a6900f09975a79aa6ae89cf410b445742880f52801b9",
+    "normal/back_right.png": "7678c1063ae0a45ad5b029f882791c8e55523d9c8f5e60cb4096d78025f804d4",
+    "depth/back_right.png": "19de4232bc93611a42e2da41b3404852bd44d5d4482e5b56143cc2bf0d77e546",
+    "albedo/right.png": "22ee3b94de487c5b9e895085603b44be50ecd159f97cde0cb48b1be5dc04c561",
+    "normal/right.png": "1cf9c912192e73214fed048bcb6451ebcf63249ef4030c1cebbb43467a4a56a8",
+    "depth/right.png": "8aa27651b5c9082b5a2cac2214efbc4bc9a11f8fc73babb196950e6eb82beef7",
+    "albedo/front_right.png": "8b45389191fd1cefbf1b63a59e131246deeb1bdd05d763c4addaf863413e3f10",
+    "normal/front_right.png": "659a35eaddf968c0fbd60d431e3eb648d50ccef1c14c9b4ab94ed604fb0eba31",
+    "depth/front_right.png": "0fc5c7b0e524fe0af0f4ddc37648bdb1f48fbd63e2431cad0da35a9e732e2c5f",
+    "preview/contact_sheet.png": "e0221ac5a89800bfb09ec939cd7d67ab3d93f58893b4ce53b7d24a4370030802"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\zombie_shambler_p3_20260326_173434",
+    "maps_dir": "bakeoff\\zombie_shambler_p3_20260326_173434_maps"
+  },
+  "notes": null
+}

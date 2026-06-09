@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:30:24.042836+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "interdiction_agent",
+    "display_name": "Compact Interdiction Agent",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "interdiction_agent_p3_20260326_153314",
+    "seed": 339977,
+    "generated_at": "2026-03-26T15:34:09.376439+00:00",
+    "accepted_at": "2026-03-26T15:37:11.857413+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "01af2461f37449a1fcc017c9c9a6115a59c48bf15a6e2e1e3578c962c0ff2e3e",
+    "normal/front.png": "3564a3ec99947a253dfca7bdbe7ebd57710caddb5833ab16b6532cd53dd973aa",
+    "depth/front.png": "e2068320f7f51a4ba1bbfc15486a6f2038c8ed9aedd05a430f73b55bddab6113",
+    "albedo/front_left.png": "5645dd6bcf4924e9ff411adeb7f3b4d787bb0c1e47b9363783af30a32b9efd49",
+    "normal/front_left.png": "60aacfe3a5bc9625848979e5704a01f3f89b738c68d8b6e5b00b269d31fb9d86",
+    "depth/front_left.png": "dfa70a8b75e74c6dbcf421141e4866a224b6bb88a1e89098583e2be2b1146aad",
+    "albedo/left.png": "a597d2cb20e701fec9b7f758d063939b1fc593abac1bda786bfcf1e70c5b0f62",
+    "normal/left.png": "35e9ef23312835cdb85192dba08e763ebf55a42ea465e87d5a2989a5a3ea35b1",
+    "depth/left.png": "fe14ace20be5820f1cd337309c391cb6edc461551fd3daf22868c693a6b79f31",
+    "albedo/back_left.png": "5184ea2ed8803bbde4957d3d5145ddcd2ed15780090e074749170b78f61633b7",
+    "normal/back_left.png": "643036cb4c89a35f31aa74ef679e386e41188146d989c6829cb26e219a9a3365",
+    "depth/back_left.png": "fa375ba951ffaa77ea2805a00c32b7b722b5489a5103c0ea9f82fbc8a33f36c6",
+    "albedo/back.png": "228bcb2358d291eaa7ce2df8fe21c4f4cbe86461e1ed75f51b121e8044e10297",
+    "normal/back.png": "42dc814cf3ad9de21724cc485a6bcbc30f4f5abef4018e91932c387815e299c1",
+    "depth/back.png": "29429cef2a5b1041e04b07d069b4014c66968384ed43ea798050ab618befc300",
+    "albedo/back_right.png": "b225c1ce31fdff1ee6a4c28476ada373410319fb11fcfbce7aa4eaf778e5a9c3",
+    "normal/back_right.png": "324e9d945da039698eee8d6cc00653439daac543092fba14580d405b207efc54",
+    "depth/back_right.png": "6bc4a959d99f348059008d8dcf6597811a54add16223c68f119b08ff20daea15",
+    "albedo/right.png": "a84cea097793945832d578efcc75c8c4875d4d0807746a859a696e5d7f997c31",
+    "normal/right.png": "e43f38466739f3b0b53f102e5dee66cbb049bc8596c127c61e01bb496c19d4b2",
+    "depth/right.png": "785cf9274d6aabcd500ed54d2e224e9d802ff839e90e5f59ae16c975f1ad3edb",
+    "albedo/front_right.png": "ae6df6e810e1c9515497f811c753ad6396fe1142e8ce7cfeec7e25715ead23e1",
+    "normal/front_right.png": "093cbe1b3f1b10448101b9bcf13a8f9116211b18df9b366e3b371ba4c5d3685b",
+    "depth/front_right.png": "4256fad26d8b9bce0034becc77163b631bb4c59bd86516d0a6321ee50f1ad490",
+    "preview/contact_sheet.png": "333a422eca39c1d4d917d49984c6454c3c8c1ad9722f8ab92e28787fa47035ba"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\interdiction_agent_p3_20260326_153314",
+    "maps_dir": "bakeoff\\interdiction_agent_p3_20260326_153314_maps"
+  },
+  "notes": null
+}

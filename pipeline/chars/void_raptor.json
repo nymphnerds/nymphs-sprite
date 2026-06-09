@@ -1,0 +1,7 @@
+{
+  "subject_id": "void_raptor",
+  "display_name": "Void Raptor",
+  "seed": 553366,
+  "subject_prompt": "solo, 1creature, single creature only, one alien creature, a tall narrow digitigrade alien predator called a Void Raptor, NOT humanoid NOT human proportions NOT round head, alien body plan like a tall thin raptor dinosaur with folded bat wings, two long digitigrade legs with backwards-bending knees and three-toed clawed feet, narrow vertical torso taller than it is wide, long thin neck ending in a small angular pointed head with a sharp beak and four narrow slit eyes glowing amber, two large folded leathery wings tucked tight against the back like a closed umbrella, dark matte black skin with faint purple iridescent sheen, bony ridged spine visible along the back, tall imposing alien predator perched stance with wings folded, full body view showing entire creature, digitigrade alien raptor not standard humanoid",
+  "negative_prompt": "multiple creatures, two creatures, group, pair, reflection, mirror, turnaround sheet, model sheet, reference sheet, blurry, smooth, photorealistic, 3D render, low quality, deformed, text, watermark, signature, frame, border, human proportions, human body shape, human face, round head, arms, hands, fingers, man, woman, person, cute, friendly, cartoon, bright vivid colors, neon, fur fluffy, robot, mechanical, busy background, cropped, cut off, partial body, four legs, quadruped, six legs, insect, spread wings, open wings, flying"
+}

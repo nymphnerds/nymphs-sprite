@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:42:17.308674+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "drift_maw",
+    "display_name": "Drift Maw",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "drift_maw_p3_20260326_053532",
+    "seed": 773311,
+    "generated_at": "2026-03-26T05:36:21.831012+00:00",
+    "accepted_at": "2026-03-26T05:40:39.877289+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "3fabbcc58b2612411627afedb0073874daa5ef2a1c85cf9b207cbe6f23a6b19c",
+    "normal/front.png": "beb23a459d66f9f1685b4db363bbea3db77a541e8d1184e68cea9a8f97d9cf57",
+    "depth/front.png": "5a7a07600ba50300ff993d174e6ed1c74b8b230e5b0c5ea202c2b25c8a968d99",
+    "albedo/front_left.png": "54a07f798295cffc54cc1752ba83de7d42b96cd7a91c7f17c20cea846354c285",
+    "normal/front_left.png": "c3bc1049d90db07022f48804d2914ab228bfa5c36c7773348f6c33aa989026d5",
+    "depth/front_left.png": "4f7e68dc5699a2d62c5d84f3ecc2adfb2d1004349cdd18a363deb0a45456ce2d",
+    "albedo/left.png": "c92881dec4635ffbc3d039aea5d35077434d7e31350dcac969e6293657144e52",
+    "normal/left.png": "7e301d70def0265c0b034f0a4934eb4a8d65d1dbfe997119355b796dca02bbec",
+    "depth/left.png": "f1f3d41290d0a11dda29bb2aac77022072a4db2548a341e8a5f4e29a4732f2a1",
+    "albedo/back_left.png": "c32dcacf4cd4903d20a0fdff5d878d6c0fcf34c20c2fd954332669325765c3b3",
+    "normal/back_left.png": "e589a9be740d6e6b802389bd1ec0be998f73884522bacdbc04e03881a4471a4d",
+    "depth/back_left.png": "db5fbf1d727846f8522baf0bf5efd0d50a52a698b5d1744754f154c72d5fd570",
+    "albedo/back.png": "d450333d337016db0e0382cdd2d1cea72d8c9a30e39a1cdc0e881107234d5bd5",
+    "normal/back.png": "ba1b19a8f0acb02aeb6b29a9e43bf745132b4c382ae09cf175f1633d48212329",
+    "depth/back.png": "279e30a9b36d6a39542ecb68337ac2b73273da4ce24fe5028807a231d55cbb77",
+    "albedo/back_right.png": "a32e2c6d69ed7ee21f2a31a152de7379c2e900c81798cc1d901e9ab87fa62068",
+    "normal/back_right.png": "821f83ff738bc0e63d7512242d5b8cfa5452e4b718e8f70141500e6c0cb9e255",
+    "depth/back_right.png": "6e99174a81bbb9fa1201264194c0cb07b62ee4e5ee144cb0fe0d271db6c62ee1",
+    "albedo/right.png": "a56ada8797a7ce77517517cfc8527bb21b178e3603227dd62c3ad2fc9e0edbfb",
+    "normal/right.png": "90e5bf7ea4913484553533f81016e4e17f90625681ffe5cf769a9e92b3ab0a70",
+    "depth/right.png": "d2d8a8b07337b61c175b62e2ced896d693042c85ad84344347534e0a177a0348",
+    "albedo/front_right.png": "831f19ad937939afce603cbd5cf4f4e48f4b4b9127fa5dfac54fbdd33d9ac16d",
+    "normal/front_right.png": "6c77671ed07d3b23864c50a7e4ec7c478c05f28140897c3203579998a382ae35",
+    "depth/front_right.png": "957d8ce30f3885ed04173bee35e8a80c7e06a9bb5ecdefc88b629ab61f84836d",
+    "preview/contact_sheet.png": "228d51a779cf2033faf1d6b03ebe406f9b0895049b966fcbcee9fa7b79dddc1e"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\drift_maw_p3_20260326_053532",
+    "maps_dir": "bakeoff\\drift_maw_p3_20260326_053532_maps"
+  },
+  "notes": null
+}

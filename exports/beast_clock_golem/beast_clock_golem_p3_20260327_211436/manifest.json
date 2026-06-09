@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T23:38:07.960340+00:00",
+  "foundry_version": "321ecee",
+  "identity": {
+    "subject_slug": "beast_clock_golem",
+    "display_name": "Clock Golem",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_clock_golem_p3_20260327_211436",
+    "seed": 818700,
+    "generated_at": "2026-03-27T21:15:43.334843+00:00",
+    "accepted_at": "2026-03-27T23:32:05.037273+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "321ecee"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "85d61cfd110a76ac7d4f11012a2cb037d306e7f1b5da4b12cec9dbd35d2959cc",
+    "normal/front.png": "b16f9ade1392b8d8ba71130bab7cacb48f905c5384e0a5f9d77514371649c298",
+    "depth/front.png": "555878afd93602039db36574392fc3ca3fc7c27579f51592e63caff03f4ce519",
+    "albedo/front_left.png": "456485f18f02fe680b78b69c2e227a05e015ee1e33b8dd46aad5fe507770f985",
+    "normal/front_left.png": "a04fd3c0087b41137740c85355f4a3d64f0f261035f4014867f40afa3e6a8b97",
+    "depth/front_left.png": "28552c0581786dc50b0ebd641bde7e1ef3f4be9aa02332e6257ac481f5ba74e2",
+    "albedo/left.png": "3869e8468182fb986daa89239d84518e29fb3f702cf9fffabfca483fba58b8e5",
+    "normal/left.png": "c29ccec4fd22ddb090bae6da1533e68fda4efec481c3b8590a44693ae495c3d9",
+    "depth/left.png": "e47b5f24b89f7736786552f8fb0d7633d1617413c9f1bcce21ff058c764ff4a2",
+    "albedo/back_left.png": "87ea8935a546c86ac4920209c52831251595188c52496880383ecb495ca7024c",
+    "normal/back_left.png": "71b380cecfed6e9fe40e536deae338849b7a7a7e79648fb554a847917bcd29d5",
+    "depth/back_left.png": "ea4e0dc148f276f1e1fbec2e044892a8d8d3163e4aaf9c61e3b317ba32a0f617",
+    "albedo/back.png": "2e0551a4aae0aa7d31245771c100e22e4dcea06161af9cb394c064464712d9cf",
+    "normal/back.png": "c3313e738f18a77aba6aa646a001c558c7b67c294143a3505ce74d350b801b88",
+    "depth/back.png": "90caec9416203869a6d8a5a3eb1b13e40f9ed2b9aeed75ad5c031b8c40e51225",
+    "albedo/back_right.png": "68c8c4025a9e5617ba2530eb04c1214439328b053f90b162bd569a056521e3fa",
+    "normal/back_right.png": "72155cbe97d0faa7da150541425d5668248d1d6b7238b270c824af03586ad781",
+    "depth/back_right.png": "9f1511ef3fc4db1f84cd8b93e30e3ac98310508de5b25568ea9dec1342700d0e",
+    "albedo/right.png": "5a14f46a8da92d72e1fa4f78d2c3388327014e2295f77dfb4d393ed736e86be9",
+    "normal/right.png": "f490c00f0357e3f11078f61eac409ac6648ca0a56cb47d6504b9e987ca193525",
+    "depth/right.png": "e5620a5869e0f93cf0025baffed657948c3d43319409ffbe251bf4986199dc13",
+    "albedo/front_right.png": "e93d111fba6723c5495930e526286fbfba54262012ece5b4c70d0299a8d1eca5",
+    "normal/front_right.png": "f27d2078c9eb96920295c87c1e221ede90f909893e986a01685dc647b9a70c64",
+    "depth/front_right.png": "2996cd47a11b98cffa15e1baadc5bf2ed8cd148aa31e013652d35d40b2575412",
+    "preview/contact_sheet.png": "c4d221d306aa5a7d63f46614c363fdbf1841a66eb7bd74c486acfb73c07fc46c"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_clock_golem_p3_20260327_211436",
+    "maps_dir": "bakeoff\\beast_clock_golem_p3_20260327_211436_maps"
+  },
+  "notes": null
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T23:38:08.850240+00:00",
+  "foundry_version": "321ecee",
+  "identity": {
+    "subject_slug": "beast_mirror_stalker",
+    "display_name": "Mirror Stalker",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_mirror_stalker_p3_20260327_210616",
+    "seed": 818200,
+    "generated_at": "2026-03-27T21:07:14.895477+00:00",
+    "accepted_at": "2026-03-27T23:32:05.425816+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "321ecee"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "0ecd74528023d8732cfff4010c8ddde9d99f7dc122e7957e2f0abdb3dd3c9cb5",
+    "normal/front.png": "6b1f0569e3a343c50756a253a340fb8238502eb0f4da7b9d331b5d5a21e5c405",
+    "depth/front.png": "51eb6f827fe778f55fa643f40fb26ad028839afe1bc2e2c03de7f81e6c85c2ef",
+    "albedo/front_left.png": "05ae0f02bf28621f9bc5d2481bc36eda45fa4daac827d56fe09e23617f5d3ae4",
+    "normal/front_left.png": "cf8cdd79c3a8aa77e0d1aa095c0dfaaf6abdfad2fb7c0744e83973e09c6c619d",
+    "depth/front_left.png": "7f389af0bf8c39bca8585bfab31d34a62d376fbc69b9104f161ea8ad3e0cfd21",
+    "albedo/left.png": "e88cc74992e1f63246482f74b6a426e8ec9adde8131d00cd84952fc240f18f44",
+    "normal/left.png": "2bb809d01123e3be2ffc27ffc1f3dae3f3e8d041e6c22f4437de30fbc2691ba8",
+    "depth/left.png": "a72b57647ad9bdf5311d49fb85220f2a8cb3451c566a01ba6a88e48d756d856a",
+    "albedo/back_left.png": "666b3ece6ef1961c15eaca871e4d8ad67652c692699979f5186d5767bdb76539",
+    "normal/back_left.png": "950d1adba3d60fc74910f23043b83966e2d2666c3f545226bc2a3b5be8be697b",
+    "depth/back_left.png": "163c4702ccb018e57e2399f9be6a1d92abca3582a3be16b7a2acf3b7108d5675",
+    "albedo/back.png": "a77d875a5add914f0b555ad8adefa604c6c61c199a791d52263be267c78b9623",
+    "normal/back.png": "f459bba2f70d071f6481eb027534e26d18809835a2b51e6c4bc2a73a96ee3797",
+    "depth/back.png": "ae2acd74dfd8a5513efacf26d0dbfb07fa7e827bdf47709b2362abd04b8f2c73",
+    "albedo/back_right.png": "fdf2eac19701427049e48c99b9cd8c4ba0581752bcbe47c920f4f4b36a84cf72",
+    "normal/back_right.png": "ededdebe8cd602f713d31a452b381924a61333113d63493636acee31bbee8893",
+    "depth/back_right.png": "981c8b93e1b17f2ce72b174e963fc94568841f325fb5106537e3bbdcb71c3f56",
+    "albedo/right.png": "de3af8840ea05898d535e7e32881fe4ae7fe473f027a249abba75c21732a868d",
+    "normal/right.png": "4410e9d285ea295077131e826db2ed1fa6adabb25b5b7625d3028a840d2038b9",
+    "depth/right.png": "e6f3b5601bde432423b18900c2a089dbcb649f4dbf4fd89ac5a29726818819e2",
+    "albedo/front_right.png": "7ae8b49301aea63464fde1c522c0cc62db3ea758d1ac283cef65f39c647639ca",
+    "normal/front_right.png": "a875e955a3de6d9696ddc696c7f3bdbf8c7088cfe4394b2b600fded9e6fddc71",
+    "depth/front_right.png": "708c501272b4bdd22c806e8ba05cdb01ce76de8d84c12ecf5ee0780ec45aaa5a",
+    "preview/contact_sheet.png": "2cd1ae777b1c3e70ccd6be5d5a16200fe30f6ae989deda228d73813a5da0cd77"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_mirror_stalker_p3_20260327_210616",
+    "maps_dir": "bakeoff\\beast_mirror_stalker_p3_20260327_210616_maps"
+  },
+  "notes": null
+}

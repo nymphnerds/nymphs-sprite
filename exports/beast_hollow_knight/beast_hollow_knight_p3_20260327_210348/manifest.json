@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T23:38:08.302243+00:00",
+  "foundry_version": "321ecee",
+  "identity": {
+    "subject_slug": "beast_hollow_knight",
+    "display_name": "Hollow Knight",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_hollow_knight_p3_20260327_210348",
+    "seed": 818000,
+    "generated_at": "2026-03-27T21:04:43.647822+00:00",
+    "accepted_at": "2026-03-27T23:32:05.155617+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "321ecee"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "21a067e6a39f4c702fa592d387c9c7f27ad1f14973d8737b37905eb1cff8ab87",
+    "normal/front.png": "a3a121883b6f2c8620ec4cdc0a8dfaafb6a569b9403b6dc026a104555bb983d6",
+    "depth/front.png": "a5a5f8a14b060950947f7b3c57af989f344dbb69252e9f91541426c2e7732dcf",
+    "albedo/front_left.png": "2d0e8c1146ff6783d994349e87c91165684089527e5c2d04f32ccd7b53ba546a",
+    "normal/front_left.png": "7408d8c65286bb42f7fbdcd898b79632ad9304b6fff0ec8b6888604060298ba7",
+    "depth/front_left.png": "3da8d3f2b7367be9bcf88f59d971102bba89e491564640383b027c67712e3dfe",
+    "albedo/left.png": "bc6be435656ac82683a6d3e987ade12367dd8e1f4d74b4266d54f9e3702ef687",
+    "normal/left.png": "853129ec237015ffe9faf6bb01d18e68593869cc26bd71b14c488dc32eb338d4",
+    "depth/left.png": "165de6aa083bd98e8d3b42419e656519eed34498203e0820a365632ffb0d758e",
+    "albedo/back_left.png": "31e52d8b65360b3608a16c6169238a7d9eddafa49036096117b58515e93542e9",
+    "normal/back_left.png": "69fa16c07cb83761ab6547cd4e77981276ae1f34cb035695ab54d2d904fa2361",
+    "depth/back_left.png": "ae46f712dcfb104d1b618fc121f725a7909fa8e5bcfe15cd4279e1423f6f94a0",
+    "albedo/back.png": "f20782476891e7e5c56af5e0115e03597e08567b87ab9c7f29e1d961deecea54",
+    "normal/back.png": "f8752919259896ead614af3e5c3f0a6d40f917ccf7b25a1170846e123233cdcf",
+    "depth/back.png": "fee452a33831f09bafa229196416640f8fc9d0a51cd8e7027ebddebe82548b77",
+    "albedo/back_right.png": "7828d82406375714576a454254e1ee51f994b240f3a17e91d60a154073fb5073",
+    "normal/back_right.png": "310bdd6878a0faae183ffad8fb5a0c6757ec40a6b9dfab71959a4a1c9d7023c2",
+    "depth/back_right.png": "74b853fb8dd7ee525e8da1b38275a36d8a86118ff2b73b1b39ee1ee03b5e8d0a",
+    "albedo/right.png": "d3aa2cb4bfd07e426e18c5219224fb8903c473eee0fcea97bcd1933bb9d94e9a",
+    "normal/right.png": "94aa071e364220a03bf3e626d6678e750264ae2e28385ecef096d8b3600fe6e9",
+    "depth/right.png": "e5c791e88435425988edff563a1c23a4e98198e99acfe478dd3c22e9956c9e99",
+    "albedo/front_right.png": "23434f6a5cbdd1d02e805c793c560b80004b620585bbfe2d921945c355c00753",
+    "normal/front_right.png": "030f09419ebc56b3627e7cebee3d0cd4f1d06438f77f3cc951dba3f9f5d44dcd",
+    "depth/front_right.png": "168338b3aaa6245e559114d6a0ee23415347098b3078af8c3e44d5f474c5f834",
+    "preview/contact_sheet.png": "a16ed2e0228cf8681940df8d5dd5638ed64c17733e37a7eb8a67cfd15d200d28"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_hollow_knight_p3_20260327_210348",
+    "maps_dir": "bakeoff\\beast_hollow_knight_p3_20260327_210348_maps"
+  },
+  "notes": null
+}

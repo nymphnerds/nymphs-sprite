@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T23:38:09.372059+00:00",
+  "foundry_version": "321ecee",
+  "identity": {
+    "subject_slug": "beast_throat_singer",
+    "display_name": "Throat Singer",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_throat_singer_p3_20260327_212144",
+    "seed": 818900,
+    "generated_at": "2026-03-27T21:22:58.157741+00:00",
+    "accepted_at": "2026-03-27T23:32:05.688230+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "321ecee"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "f0c79cd579a1b19e485b7123b945ed97188ed012611fed9b1d18a6f24b7230bd",
+    "normal/front.png": "a97babe193f29f22ef1c5598a70fdab12eb6ece4558e98337be67cfd383613af",
+    "depth/front.png": "666458ba1151f606653caac093394c79c3e5ef16a729216fb27c2c90fae5c2a3",
+    "albedo/front_left.png": "26c0f20d8f91b945487a3ca15e3e9de85c9dd09ebeead80aed07bc79af0843ff",
+    "normal/front_left.png": "8e78db4e9a38ce4f940509ba8d5329885ad3aa87f99964f826cd0008dbdd256f",
+    "depth/front_left.png": "03b3c6a58c8877aa873fc51a05aeed097a38116496b0bfd3cecbc263830f4127",
+    "albedo/left.png": "d14fd41e773741db0acad76aab5215d1c1c8d43b9ca7358146fac4df77348819",
+    "normal/left.png": "86b084d1ea92a53410cda9ac358d31315a78e288c0ebc033cfc8933bac468f48",
+    "depth/left.png": "ada85013c8c4f7b428a5a31fb5b75bd28ec9fa01670cc058e14c1a20fb748900",
+    "albedo/back_left.png": "a6d6d5609b1db520f969b2681915bae9169257773925662b3a8aa703c2be8e6b",
+    "normal/back_left.png": "e84298239dd5f113d175a14f0107c9154138afc1209fde0472b6f5c95315b16b",
+    "depth/back_left.png": "ae8e6e03daaca4b93a300c78f86aee662e2da3f1a467e84ad5e64c6180383366",
+    "albedo/back.png": "009a4e4a777ae1725bf6c6b59de75e9e443bd9c12ff0c86df163af04f5131ab0",
+    "normal/back.png": "d318978d08b21572f62b7f341f3190236f1e591ab2902acfdad90f563586d86b",
+    "depth/back.png": "94266ca16f9aee3c2b0ebb17aca81c344ec7f141563a764da79f0a3255398198",
+    "albedo/back_right.png": "37dc84b50db62477b466b311e08689cbae822fa3aa478ca362f32aa802e5886c",
+    "normal/back_right.png": "e82787b4da9e09d190d9252c2e0d8a5ed781af55bfdeb8715f2843371e32dfda",
+    "depth/back_right.png": "a1115106d9f74f52abeb06e48ea19f1561eef6101b2dd7294a7238c8c43fd1b6",
+    "albedo/right.png": "948f89976b8376877a1b082aed9d0b0d3c1f3d9b7200abf2abbe60d9982f9756",
+    "normal/right.png": "48f72609b2fe36fed3e694e71f1098b41ebaa1bacf2595e4488ddf9d52dff5f5",
+    "depth/right.png": "61933895366d2a08f8545de00e6a1ac46c1105ff6be98ebe45af03a776537506",
+    "albedo/front_right.png": "1f4c7909b932bb4a9138b64387f792cda176a141554fb3a7afe73165e13b8de2",
+    "normal/front_right.png": "4a3812f42566238a7f7be7c9c6f47e86bb9432c864ec3d93565c8249cb6e09ad",
+    "depth/front_right.png": "4d51a3615b782fa29683f5418b9a7b0aef254097628e2bbb36f52358c8e32090",
+    "preview/contact_sheet.png": "3be60b989080ae101bfa0f1a0d713ad34e87ede9dbbeb182dd4ec148092e281f"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_throat_singer_p3_20260327_212144",
+    "maps_dir": "bakeoff\\beast_throat_singer_p3_20260327_212144_maps"
+  },
+  "notes": null
+}

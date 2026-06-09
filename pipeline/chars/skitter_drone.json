@@ -1,0 +1,7 @@
+{
+  "subject_id": "skitter_drone",
+  "display_name": "Skitter Drone",
+  "seed": 881144,
+  "subject_prompt": "solo, 1creature, single creature only, one alien insect, a flat wide six-legged arthropod alien drone called a Skitter Drone, NOT humanoid NOT bipedal NOT standing upright NOT two legs, insect body plan like a large flat beetle or cockroach, six thin segmented legs splayed outward with body very low to the ground, wide flat horizontal oval body that is much wider than it is tall, smooth dark grey chitinous carapace shell covering the back, small angular head with twitching antennae and tiny mandibles, multiple small compound eyes glowing faint green, pale green bioluminescent stripe along each flank, segmented abdomen tapering to a short pointed tail, low flat scurrying stance hugging the ground, feral alien insect drone, full body view showing entire creature, arthropod not humanoid not bipedal",
+  "negative_prompt": "multiple creatures, two creatures, group, pair, reflection, mirror, turnaround sheet, model sheet, reference sheet, blurry, smooth, photorealistic, 3D render, low quality, deformed, text, watermark, signature, frame, border, humanoid, bipedal, standing upright on two legs, human proportions, human body shape, human face, human torso, arms, hands, fingers, anthropomorphic, man, woman, person, cute, friendly, cartoon, bright vivid colors, neon, wings, flying, feathers, fur fluffy, robot, mechanical, busy background, cropped, cut off, partial body, standing tall, vertical posture, two legs, biped, four legs, quadruped"
+}

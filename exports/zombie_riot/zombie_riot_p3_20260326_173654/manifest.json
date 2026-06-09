@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T17:42:03.038243+00:00",
+  "foundry_version": "baededa",
+  "identity": {
+    "subject_slug": "zombie_riot",
+    "display_name": "Riot Zombie",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "zombie_riot_p3_20260326_173654",
+    "seed": 800300,
+    "generated_at": "2026-03-26T17:37:46.757976+00:00",
+    "accepted_at": "2026-03-26T17:41:45.211013+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "baededa"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "cbfb3d115f434b4b58bf8dd3f19b037b015bd5fcd8115c53404232b7d4386b53",
+    "normal/front.png": "1e5c648aaebeab1ef4dc97a4f1181060bfeba210f3ec31edae099ca5962eecde",
+    "depth/front.png": "02032715fc938ce1f0d03448f49ffca4d78df7151bffe951e25d964c197f64df",
+    "albedo/front_left.png": "54da32f56bb83a29559f63ac832e4f0285d2d93335dad24ae513df4798f81ae6",
+    "normal/front_left.png": "8f5ab27334920e39f69d67c20c80824894126569d42b0ae20b02219754c6acf6",
+    "depth/front_left.png": "172ad238925d71d9201607c4346c8b9a9222a0752c4d758d87785e668fa8169a",
+    "albedo/left.png": "6102cd6b2f506b0771ee99a0573454bcab226611907b8eca0bf9b4c069101624",
+    "normal/left.png": "75cc14c29ef3641fe1d058a3771f5c1e5f0e4a662c8cae8f841b95a7069a5058",
+    "depth/left.png": "4b0fb1a33fb539e1f191298795a50488b526723e2f1b491bb534883acb0eb847",
+    "albedo/back_left.png": "6b3ac065cdf2b00a9faadc57bec2a0651580191b4303f2c6c3f31d9e9f7bc791",
+    "normal/back_left.png": "03cdda3c5681af815fa508c66b5ebfd87c09df7505481d983208cb0837350946",
+    "depth/back_left.png": "d98babf033c3d92b1d1639d71b46cddbf73dcb4ff517a351d45920e0e97c9d79",
+    "albedo/back.png": "c761c9c99dce39421aed6256e1307f03e0d7a1c5b4606cb93d0d6b32c8281a3e",
+    "normal/back.png": "aee689531383ebc95d5d8863e700bf8c1dcd86a1f478f1f33a5aad98ed3fb9d6",
+    "depth/back.png": "f0e41768f187f5382a052e1994cf130b4c93665e47adcc0e82096371d8d515a5",
+    "albedo/back_right.png": "bf4e36fbaee527596333754aabcd6314dad3d2bb4a40d4f7b2e75d0435149507",
+    "normal/back_right.png": "7c22ee23bd189e46bebfedbf90437a0a3d28de14ea45f431256afcb66027cfe0",
+    "depth/back_right.png": "43c17d1c7b4c6c9757d109aff1c34f08fd7b5ab07995b102c2b1e7ccfb25c001",
+    "albedo/right.png": "da357188ab5d712e1759fe0c033712cbcdfab70e807af30f58421d1608bc74ee",
+    "normal/right.png": "98d52f20ce32ca91c6351cb0a7e0b51fb7013421679683d9a0135524ec54248e",
+    "depth/right.png": "600064321387e0c8fe09b51658d43722643b41d0d5e17c83584c369aaebde26e",
+    "albedo/front_right.png": "33b238468292f6cef5b101dfb48dc92988b9f9878f4e1435471cd0634beb9d1d",
+    "normal/front_right.png": "b74d29c148bc24784cd070316f9b06a1836efb9751931253f50d15a347df1c00",
+    "depth/front_right.png": "1d1a1e505bed175153f7a9dc203528e173122153a3058dec66b7bf0888eb9b81",
+    "preview/contact_sheet.png": "bb4649d472fd35bd85eae1ed7fc84def391e0f80f72dc7bd59ef0b041e1da204"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\zombie_riot_p3_20260326_173654",
+    "maps_dir": "bakeoff\\zombie_riot_p3_20260326_173654_maps"
+  },
+  "notes": null
+}

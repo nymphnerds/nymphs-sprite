@@ -177,9 +177,41 @@
     .brand {
       display: flex;
       align-items: baseline;
-      justify-content: flex-end;
+      justify-content: space-between;
       gap: 10px;
       padding-bottom: 11px;
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 8px;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      border: 1px solid #e487ff;
+      border-radius: 7px;
+      color: #ffaaff;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .brand-name {
+      min-width: 0;
+      color: var(--text);
+      font-family: var(--font-head);
+      font-size: 17px;
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
     }
 
     .status-pill {
@@ -218,6 +250,13 @@
     }
     .section-title span:first-child::before { content: "// "; color: var(--cyan); }
     .section-title span:last-child { color: var(--cyan); }
+
+    .flow-note {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
 
     .field {
       display: grid;
@@ -669,13 +708,17 @@
   <main class="app">
     <aside class="sidebar">
       <div class="brand">
+        <div class="brand-lockup">
+          <div class="brand-mark">NS</div>
+          <div class="brand-name">Nymphs Sprite</div>
+        </div>
         <div id="status-pill" class="status-pill warn">checking</div>
       </div>
 
       <section class="section">
-        <div class="section-title"><span>Runtime</span><span id="runtime-chip">Z-Image</span></div>
+        <div class="section-title"><span>Runtime</span><span id="runtime-chip">Backend</span></div>
         <div class="command-row three no-top">
-          <button id="open-zimage" type="button">Z-Image</button>
+          <button id="start-backend" type="button">Start Backend</button>
           <button id="refresh-status" type="button">Refresh</button>
           <button id="check-runtime" type="button">Check</button>
         </div>
@@ -685,9 +728,9 @@
       </section>
 
       <section class="section">
-        <div class="section-title"><span>Prompt</span><span>8-way</span></div>
+        <div class="section-title"><span>Character</span><span>1</span></div>
         <div class="field">
-          <label for="prompt-preset">Prompt</label>
+          <label for="prompt-preset">Preset</label>
           <select id="prompt-preset"></select>
         </div>
         <div class="field">
@@ -702,48 +745,117 @@
       </section>
 
       <section class="section">
-        <div class="section-title"><span>Z-Image</span><span id="model-chip">r32</span></div>
+        <div class="section-title"><span>Guide</span><span>2</span></div>
+        <p class="flow-note">Body guides will become the ControlNet refs for each direction.</p>
         <div class="grid">
           <div class="field wide">
-            <label for="z-model-choice">Model</label>
-            <select id="z-model-choice">
-              <option value="auto_r32">Z-Image Nunchaku r32</option>
-              <option value="auto_r128">Z-Image Nunchaku r128</option>
-              <option value="int4_r256">Z-Image Nunchaku r256</option>
+            <label for="body-guide">Body Type</label>
+            <select id="body-guide">
+              <option value="humanoid">Humanoid</option>
+              <option value="wide_squat">Wide Squat</option>
+              <option value="tall_thin">Tall Thin</option>
+              <option value="amorphous">Amorphous</option>
+              <option value="quadruped">Quadruped</option>
+              <option value="winged">Winged</option>
+              <option value="custom">Custom</option>
             </select>
           </div>
-          <div class="field"><label for="width">Width</label><input id="width" type="number" min="256" max="2048" step="64" value="512"></div>
-          <div class="field"><label for="height">Height</label><input id="height" type="number" min="256" max="2048" step="64" value="512"></div>
-          <div class="field"><label for="steps">Steps</label><input id="steps" type="number" min="1" max="80" value="8"></div>
-          <div class="field"><label for="seed">Seed</label><input id="seed" type="number" value="0"></div>
-          <div class="field wide"><label for="lora-choice">LoRA</label><select id="lora-choice"></select></div>
-          <div class="field"><label for="lora-trigger">Trigger</label><input id="lora-trigger" maxlength="80" value="pxlstl"></div>
-          <div class="field"><label for="lora-scale">Scale</label><input id="lora-scale" type="number" min="0" max="2" step="0.05" value="1"></div>
+          <div class="field wide">
+            <label for="guide-strength">Guide Strength</label>
+            <select id="guide-strength">
+              <option value="normal">Normal</option>
+              <option value="soft">Soft</option>
+              <option value="strong">Strong</option>
+            </select>
+          </div>
         </div>
         <div class="command-row">
-          <button id="generate-sources" class="primary" type="button">Generate Sources</button>
+          <button id="preview-guides" type="button">Preview Guide Sheet</button>
         </div>
       </section>
 
       <section class="section">
-        <div class="section-title"><span>Sprite</span><span>post</span></div>
+        <div class="section-title"><span>Style</span><span>3</span></div>
         <div class="grid">
+          <div class="field wide"><label for="lora-choice">LoRA</label><select id="lora-choice"></select></div>
           <div class="field"><label for="sprite-size">Sprite Size</label><input id="sprite-size" type="number" min="24" max="512" step="8" value="96"></div>
           <div class="field"><label for="palette-colors">Palette</label><input id="palette-colors" type="number" min="0" max="256" step="1" value="0"></div>
         </div>
-        <div class="check-grid" id="directions">
-          <label class="check"><input type="checkbox" value="front" checked>Front</label>
-          <label class="check"><input type="checkbox" value="front_left">Front left</label>
-          <label class="check"><input type="checkbox" value="left">Left</label>
-          <label class="check"><input type="checkbox" value="back_left">Back left</label>
-          <label class="check"><input type="checkbox" value="back">Back</label>
-          <label class="check"><input type="checkbox" value="back_right">Back right</label>
-          <label class="check"><input type="checkbox" value="right">Right</label>
-          <label class="check"><input type="checkbox" value="front_right">Front right</label>
-        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title"><span>Generate</span><span>4</span></div>
         <div class="command-row">
-          <button id="generate-process" type="button">Generate + Process</button>
+          <button id="generate-foundry" class="primary" type="button">Generate Sprite Set</button>
         </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title"><span>Review</span><span>5</span></div>
+        <div class="command-row three">
+          <button id="review-select-all" type="button">Select All</button>
+          <button id="review-clear" type="button">Clear</button>
+          <button id="foundry-export" type="button">Export</button>
+        </div>
+        <details>
+          <summary>Advanced</summary>
+          <div class="grid">
+            <div class="field wide">
+              <label for="foundry-method">Method</label>
+              <select id="foundry-method">
+                <option value="nymphscore">NymphsCore / Z-Image</option>
+                <option value="stack_a_v2">Stack A v2</option>
+                <option value="morph">Morph ControlNet</option>
+                <option value="turnaround">Turnaround Sheet</option>
+              </select>
+            </div>
+            <div class="field wide">
+              <label for="z-model-choice">Model</label>
+              <select id="z-model-choice">
+                <option value="auto_r32">Z-Image Nunchaku r32</option>
+                <option value="auto_r128">Z-Image Nunchaku r128</option>
+                <option value="int4_r256">Z-Image Nunchaku r256</option>
+              </select>
+            </div>
+            <div class="field"><label for="width">Width</label><input id="width" type="number" min="256" max="2048" step="64" value="512"></div>
+            <div class="field"><label for="height">Height</label><input id="height" type="number" min="256" max="2048" step="64" value="512"></div>
+            <div class="field"><label for="steps">Steps</label><input id="steps" type="number" min="1" max="80" value="8"></div>
+            <div class="field"><label for="seed">Seed</label><input id="seed" type="number" value="0"></div>
+            <div class="field"><label for="lora-trigger">Trigger</label><input id="lora-trigger" maxlength="80" value="pxlstl"></div>
+            <div class="field"><label for="lora-scale">Scale</label><input id="lora-scale" type="number" min="0" max="2" step="0.05" value="1"></div>
+            <div class="field wide"><label for="run-id">Run ID</label><input id="run-id" maxlength="120" autocomplete="off"></div>
+            <div class="field"><label for="review-direction">Direction</label><select id="review-direction">
+              <option value="front">front</option>
+              <option value="front_left">front_left</option>
+              <option value="left">left</option>
+              <option value="back_left">back_left</option>
+              <option value="back">back</option>
+              <option value="back_right">back_right</option>
+              <option value="right">right</option>
+              <option value="front_right">front_right</option>
+            </select></div>
+            <div class="field"><label for="attempt-id">Attempt ID</label><input id="attempt-id" maxlength="120" autocomplete="off"></div>
+            <div class="field wide"><label for="reject-code">Reject Code</label><input id="reject-code" maxlength="80" value="needs_regen" autocomplete="off"></div>
+          </div>
+          <div class="command-row three">
+            <button id="foundry-check" type="button">Check</button>
+            <button id="foundry-review" type="button">Review</button>
+            <button id="foundry-winner" type="button">Winner</button>
+          </div>
+          <div class="command-row two">
+            <button id="foundry-accept" type="button">Accept Direction</button>
+            <button id="foundry-reject" type="button">Reject Direction</button>
+          </div>
+          <div class="command-row three">
+            <button id="foundry-batch-accept" type="button">Batch Accept</button>
+            <button id="foundry-produce" type="button">Produce</button>
+            <button id="foundry-lineage" type="button">Lineage</button>
+          </div>
+          <div class="command-row three">
+            <button id="foundry-drift" type="button">Drift</button>
+            <button id="foundry-metrics" type="button">Metrics</button>
+          </div>
+        </details>
       </section>
     </aside>
 
@@ -841,7 +953,10 @@
       selectedLoraPath: "",
       zModelTouched: false,
       statusValues: {},
+      activeRunOutputDir: "",
+      activeDirection: "",
     };
+    const generationDirections = ["front", "front_left", "left", "back_left", "back", "back_right", "right", "front_right"];
 
     function escapeHtml(value) {
       return String(value).replace(/[&<>"']/g, (char) => ({
@@ -877,6 +992,7 @@
       });
       if (!value) {
         updateStripControls();
+        updateFoundryControls();
       }
       $("status-pill").textContent = value ? label : statusLabel();
       $("status-pill").className = value ? "status-pill warn" : statusClass();
@@ -904,35 +1020,16 @@
       }).filter((item) => item.id && item.path);
     }
 
-    const loraMetadata = {
-      mks0813_pixel_art: { label: "Z-Image Turbo Pixel LoRA", trigger: "pxlstl" },
-      skyasl_pixel_artist: { label: "Pixel-artist-Z Character LoRA", trigger: "a pixel art character" },
-      tarn59_pixel_art: { label: "Pixel Art Style LoRA", trigger: "Pixel art style." }
-    };
-
-    function canonicalLoraId(id, path = "") {
-      const text = `${id || ""} ${path || ""}`.toLowerCase();
-      if (text.includes("mks0813")) return "mks0813_pixel_art";
-      if (text.includes("skyasl") || text.includes("pixel_artist")) return "skyasl_pixel_artist";
-      if (text.includes("tarn59") || text.includes("pixel_art_style")) return "tarn59_pixel_art";
-      return id || "";
-    }
-
     function loraLabel(choice) {
-      const canonical = canonicalLoraId(choice.id, choice.path);
-      if (loraMetadata[canonical]) return loraMetadata[canonical].label;
-      return String(choice.id || choice.name || "LoRA").replace(/^custom_/, "").replace(/_/g, " ");
+      return String(choice.name || choice.id || "LoRA");
     }
 
     function loraTriggerFor(id, path = "") {
-      const canonical = canonicalLoraId(id, path);
-      return loraMetadata[canonical]?.trigger || "";
-    }
-
-    function loraAvailableIds(values) {
-      const available = list(values.weight_profiles_available).filter((id) => loraMetadata[id]);
-      if (available.length) return available;
-      return Object.keys(loraMetadata);
+      const text = `${id || ""} ${path || ""}`.toLowerCase();
+      if (text.includes("mks0813")) return "pxlstl";
+      if (text.includes("skyasl") || text.includes("pixel_artist") || text.includes("pixel-artist-z")) return "a pixel art character";
+      if (text.includes("tarn59") || text.includes("pixel_art_style")) return "Pixel art style.";
+      return "";
     }
 
     function yes(value) {
@@ -958,36 +1055,22 @@
     function populateLoraChoices(values) {
       const select = $("lora-choice");
       const choices = loraChoices(values.lora_choices);
-      const choiceByCanonical = new Map(choices.map((choice) => [canonicalLoraId(choice.id, choice.path), choice]));
-      const selectedId = values.selected_lora_candidate || values.weight_profile_selected || "";
+      const selectedId = values.selected_lora_candidate || "";
       state.selectedLoraPath = values.selected_lora_path || "";
       select.innerHTML = "";
-      if (!choices.length && !loraAvailableIds(values).length) {
+      if (!choices.length) {
         const option = document.createElement("option");
         option.value = "";
-        option.textContent = "No sprite LoRA downloaded";
+        option.textContent = "No LoRAs found";
         select.appendChild(option);
         select.disabled = true;
         return;
       }
       select.disabled = false;
-      for (const candidateId of loraAvailableIds(values)) {
-        const choice = choiceByCanonical.get(candidateId);
-        const option = document.createElement("option");
-        option.value = choice?.id || candidateId;
-        option.dataset.path = choice?.path || "";
-        option.dataset.canonicalId = candidateId;
-        option.textContent = choice ? loraLabel(choice) : `${loraMetadata[candidateId]?.label || candidateId} / missing`;
-        option.disabled = !choice;
-        select.appendChild(option);
-      }
       for (const choice of choices) {
-        const canonicalId = canonicalLoraId(choice.id, choice.path);
-        if (loraMetadata[canonicalId]) continue;
         const option = document.createElement("option");
         option.value = choice.id;
         option.dataset.path = choice.path;
-        option.dataset.canonicalId = canonicalId;
         option.textContent = loraLabel(choice);
         select.appendChild(option);
       }
@@ -1006,20 +1089,19 @@
       const values = parseKeyValues(text);
       state.statusValues = values;
       const loras = list(values.downloaded_loras);
-      const spriteLoraTotal = loraAvailableIds(values).length;
-      const spriteLoraDownloaded = list(values.weight_profiles_downloaded).filter((id) => loraMetadata[canonicalLoraId(id)]).length || loras.filter((id) => loraMetadata[canonicalLoraId(id)]).length;
-      const controlReady = yes(values.controlnet_ready);
-      const depthReady = yes(values.depth_models_ready);
+      const spriteLoraDownloaded = loraChoices(values.lora_choices).length;
       const zReady = yes(values.zimage_models_ready);
+      const zRunning = yes(values.zimage_running);
+      const controlReady = yes(values.controlnet_ready);
       if (!state.zModelTouched) $("z-model-choice").value = zModelChoiceFromStatus(values);
 
       $("status-pill").textContent = statusLabel();
       $("status-pill").className = statusClass();
-      $("runtime-chip").textContent = values.health === "ok" ? "ready" : "check";
+      $("runtime-chip").textContent = zRunning ? "ready" : "starts on generate";
       $("model-chip").textContent = zModelChipText();
-      $("runtime-text").textContent = values.zimage_url ? `Z-Image ${values.zimage_url} / ${zReady ? "models ready" : "fetch models"}` : "Z-Image";
+      $("runtime-text").textContent = values.zimage_url ? `Backend ${values.zimage_url} / ${zRunning ? "running" : "will start on Generate"} / ${zReady ? "models ready" : "fetch models"}` : "Backend";
       $("selected-model-text").textContent = values.selected_lora_path ? basename(values.selected_lora_path) : (loras.join(", ") || "none");
-      $("progress-detail").textContent = `Backend ${zReady ? "ready" : "missing"} | LoRA ${spriteLoraDownloaded}/${spriteLoraTotal} | Control ${controlReady ? "ready" : "staged"} | Depth ${depthReady ? "ready" : "staged"}`;
+      $("progress-detail").textContent = `Backend ${zReady ? (zRunning ? "ready" : "will start") : "missing models"} | ControlNet ${controlReady ? "ready" : "missing"} | LoRA ${spriteLoraDownloaded} found`;
       populateLoraChoices(values);
       if (values.selected_lora_trigger) $("lora-trigger").value = values.selected_lora_trigger;
       if (values.selected_lora_scale) $("lora-scale").value = values.selected_lora_scale;
@@ -1027,6 +1109,7 @@
       const trigger = loraTriggerFor($("lora-choice").value, selectedOption?.dataset.path || "");
       if (trigger) $("lora-trigger").value = trigger;
       setProgress("Idle", $("progress-detail").textContent, 0);
+      updateFoundryControls();
     }
 
     function pathToFileUrl(path) {
@@ -1042,10 +1125,7 @@
       }
       const normalized = String(path).replace(/\\/g, "/");
       const roots = [
-        { marker: "/NymphsData/outputs/nymphs-sprite/", source: "sprite" },
-        { marker: "/NymphsData/outputs/zimage/", source: "zimage" },
-        { marker: "/Z-Image/outputs/", source: "zimage-legacy" },
-        { marker: "/NymphsModules/zimage/outputs/", source: "zimage-dev" }
+        { marker: "/NymphsData/outputs/nymphs-sprite/", source: "outputs" }
       ];
       for (const root of roots) {
         const index = normalized.indexOf(root.marker);
@@ -1094,35 +1174,61 @@
 
     function parseOutputPaths(text) {
       for (const line of String(text || "").split(/\r?\n/)) {
-        const match = line.match(/^(sprite_contact_sheet|output_[A-Za-z0-9_]+)=([^\r\n]+)$/);
-        if (match) addOutput(match[2].trim(), match[1].replace(/^output_/, ""));
+        const outputDir = line.match(/^\s*Output:\s+(.+)\s*$/);
+        if (outputDir) state.activeRunOutputDir = outputDir[1].trim();
+        const kv = line.match(/^(sprite_contact_sheet|output_[A-Za-z0-9_]+)=([^\r\n]+)$/);
+        if (kv) addOutput(kv[2].trim(), kv[1].replace(/^output_/, ""));
+        const named = line.match(/^\s*(Raw inspection|Pixel contact):\s+(.+\.(?:png|jpg|jpeg|webp))\s*$/i);
+        if (named) addOutput(named[2].trim(), named[1].toLowerCase());
+        const directionDone = line.match(/^\s*\[([a-z_]+)\]\s+generate\b.*\bOK\b/);
+        if (directionDone && state.activeRunOutputDir) {
+          const direction = directionDone[1];
+          addOutput(`${state.activeRunOutputDir}/${direction}.png`, direction);
+        }
       }
-      const base = state.statusValues.zimage_url || "http://127.0.0.1:8090";
       const jsonPaths = [...String(text || "").matchAll(/"output_path"\s*:\s*"([^"]+)"/g)]
         .map((match) => match[1].replace(/\\\//g, "/"));
       const jsonUrls = [...String(text || "").matchAll(/"url"\s*:\s*"([^"]+)"/g)]
-        .map((match) => {
-          const rawUrl = match[1].replace(/\\\//g, "/");
-          return rawUrl.startsWith("/") ? `${base}${rawUrl}` : rawUrl;
-        });
+        .map((match) => match[1].replace(/\\\//g, "/"));
       for (const [index, path] of jsonPaths.entries()) {
-        addOutput(path, "zimage", jsonUrls[index] || "");
+        addOutput(path, "foundry", jsonUrls[index] || "");
       }
       for (const rawUrl of jsonUrls.slice(jsonPaths.length)) {
-        const url = rawUrl.startsWith("/") ? `${base}${rawUrl}` : rawUrl;
-        addOutput(url, "zimage");
+        addOutput(rawUrl, "foundry");
       }
     }
 
     function parseProgress(text) {
       const line = String(text || "").trim();
       if (!line) return;
-      if (line.includes("MODEL FETCH STATUS") || line.includes("LORA FETCH STATUS")) {
+      const direction = line.match(/^\[([a-z_]+)\]\s+generate\b/i);
+      if (direction) {
+        const name = direction[1].toLowerCase();
+        const index = generationDirections.indexOf(name);
+        state.activeDirection = name;
+        const done = /\bOK\b/.test(line);
+        const failed = /\bFAIL\b/.test(line);
+        const ordinal = index >= 0 ? index + (done || failed ? 1 : 0) : 0;
+        const percent = 15 + (Math.max(0, ordinal) / generationDirections.length) * 75;
+        const label = name.replace(/_/g, " ");
+        const detail = failed ? `${label} failed` : done ? `${label} complete` : `${label} generating`;
+        setProgress(failed ? "Error" : "Generate", detail, failed ? 0 : percent);
+      } else if (line.includes("Starting backend")) {
+        setProgress("Backend", "Starting Nymphs Image / Z-Image.", 10);
+      } else if (line.includes("Backend ready") || line.includes("Backend already running")) {
+        setProgress("Backend", "Backend ready.", 15);
+      } else if (line.includes("No Z-Image LoRA weights matched")) {
+        setProgress("Error", "Selected LoRA is incompatible with this Nunchaku runtime.", 0);
+      } else if (line.includes("MODEL FETCH STATUS") || line.includes("LORA FETCH STATUS")) {
         setProgress("Fetch", line.replace(/\s+/g, " "), 45);
       } else if (line.startsWith("generate=")) {
         setProgress("Generate", line, 65);
       } else if (line.startsWith("sprite_contact_sheet=")) {
         setProgress("Done", "Contact sheet ready.", 100);
+      } else if (line.includes("Raw inspection:") || line.includes("Pixel contact:")) {
+        setProgress("Done", "Contact sheet ready.", 98);
+      } else if (line.includes("GENERATION COMPLETE")) {
+        setProgress("Done", "Foundry run ready.", 100);
       } else if (line.startsWith("batch_id=")) {
         setProgress("Batch", line, 20);
       }
@@ -1346,6 +1452,8 @@
       $("select-visible").disabled = state.selectedIndex < 0 || state.busy;
       $("select-all-visible").disabled = visible.length === 0 || state.busy;
       $("clear-selection").disabled = state.selectedOutputPaths.size === 0 || state.busy;
+      $("review-select-all").disabled = visible.length === 0 || state.busy;
+      $("review-clear").disabled = state.selectedOutputPaths.size === 0 || state.busy;
       $("move-selected").disabled = managedSelected.length === 0 || state.busy;
       $("delete-selected").disabled = managedSelected.length === 0 || state.busy;
       $("delete-folder").disabled = !currentManagedFolder() || state.busy;
@@ -1577,9 +1685,16 @@
       }
     }
 
-    function buildModuleArgs(directions, selectedSources = []) {
+    function currentPreset() {
+      return promptPresets[$("prompt-preset").value] || {};
+    }
+
+    function buildModuleArgs() {
       const zSelection = zImageSelection();
+      const preset = currentPreset();
       const args = {
+        "generation-path": value("foundry-method") || "nymphscore",
+        config: preset.sourceConfig || "pipeline/chars/goblin_scout.json",
         "subject-id": value("subject-id"),
         "lora-scale": value("lora-scale"),
         seed: value("seed"),
@@ -1588,38 +1703,100 @@
         height: value("height"),
         "sprite-size": value("sprite-size"),
         "palette-colors": value("palette-colors"),
+        "body-class": value("body-guide"),
         "nunchaku-rank": String(zSelection.nunchaku_rank),
-        "nunchaku-precision": zSelection.nunchaku_precision,
-        directions: directions.join("+")
+        "nunchaku-precision": zSelection.nunchaku_precision
       };
-      if (selectedSources.length) {
-        args["source-mode"] = "controlnet";
-        args["controlnet-scale"] = "0.55";
-      }
       addEncodedArg(args, "subject-prompt", value("subject-prompt"));
       addEncodedArg(args, "negative-prompt", value("negative-prompt"));
       addEncodedArg(args, "lora-path", state.selectedLoraPath);
       addEncodedArg(args, "lora-trigger", value("lora-trigger"));
-      addEncodedArg(args, "source-images", selectedSources.join("|"));
       return compactArgs(args);
     }
 
-    function spritePrompt(direction) {
-      return [
-        value("lora-trigger"),
-        value("subject-prompt"),
-        directionPrompts[direction] || direction,
-        "pixel art sprite",
-        "game character sprite",
-        "2D RPG",
-        "clean readable silhouette",
-        "centered full body character",
-        "isolated figure",
-        "bright green background",
-        "crisp sprite design",
-        "HD-2D inspired",
-        "single character only"
-      ].filter(Boolean).join(", ");
+    function parseRunId(text) {
+      const match = String(text || "").match(/^(?:Run|run_id):\s*([A-Za-z0-9_.:-]+)/m);
+      if (match) {
+        $("run-id").value = match[1];
+        updateFoundryControls();
+      }
+    }
+
+    function hasRunId() {
+      return Boolean(value("run-id"));
+    }
+
+    function generationReadyReason() {
+      const values = state.statusValues || {};
+      if (!yes(values.controlnet_ready)) return "Fetch ControlNet from the Nymphs Sprite details page first.";
+      if (!yes(values.zimage_installed)) return "Install Nymphs Image / Z-Image first.";
+      if (!yes(values.zimage_models_ready)) return "Fetch the Z-Image base/Nunchaku model files first.";
+      if (!$("lora-choice").value || !state.selectedLoraPath) return "Download or choose a Z-Image pixel-art LoRA first.";
+      return "";
+    }
+
+    function updateFoundryControls() {
+      const runReady = hasRunId();
+      const generationBlocker = generationReadyReason();
+      $("generate-foundry").disabled = state.busy || Boolean(generationBlocker);
+      $("generate-foundry").title = generationBlocker || "Generate a sprite set.";
+      $("preview-guides").disabled = state.busy;
+      $("preview-guides").title = "Preview the 8-way guide sheet.";
+      $("review-select-all").disabled = state.busy || state.visibleOutputs.length === 0;
+      $("review-clear").disabled = state.busy || state.selectedOutputPaths.size === 0;
+      const runButtons = [
+        "foundry-check",
+        "foundry-review",
+        "foundry-winner",
+        "foundry-accept",
+        "foundry-reject",
+        "foundry-batch-accept",
+        "foundry-produce",
+        "foundry-export",
+        "foundry-lineage",
+        "foundry-drift",
+      ];
+      for (const id of runButtons) {
+        const button = $(id);
+        button.disabled = state.busy || !runReady;
+        button.title = runReady ? "Run this Foundry action on the current run." : "Generate a run first.";
+      }
+      $("foundry-metrics").disabled = state.busy;
+      $("foundry-metrics").title = "Show Foundry metrics.";
+    }
+
+    function foundryCommandArgs(command) {
+      return compactArgs({
+        command,
+        "run-id": value("run-id"),
+        direction: value("review-direction"),
+        "attempt-id": value("attempt-id"),
+        code: value("reject-code"),
+      });
+    }
+
+    async function runFoundryCommand(command, stage = "Foundry") {
+      if (state.busy) return;
+      const runScoped = !["metrics"].includes(command);
+      if (runScoped && !hasRunId()) {
+        setProgress(stage, "Generate a run first.", 0);
+        return;
+      }
+      setProgress(stage, command, 20);
+      setBusy(true, stage);
+      try {
+        const text = await moduleAction("foundry_cli", foundryCommandArgs(command), { busy: false });
+        parseRunId(text);
+        await refreshRecentOutputs(true);
+        setProgress("Done", command, 100);
+      } catch (error) {
+        append(`ERROR: ${error.message || error}`);
+        setProgress("Error", error.message || "Foundry command failed.", 0);
+        $("status-pill").textContent = "error";
+        $("status-pill").className = "status-pill warn";
+      } finally {
+        setBusy(false);
+      }
     }
 
     function zModelChoiceFromStatus(values) {
@@ -1648,21 +1825,6 @@
       };
     }
 
-    async function generateZImageSources(directions) {
-      setProgress("Z-Image", "Generating through shared Nymphs Image runtime.", 10);
-      const before = new Set(state.outputs.map(localOutputPath).filter(Boolean));
-      const text = await moduleAction("generate_sources", buildModuleArgs(directions), { busy: false });
-      parseOutputPaths(text);
-      const generatedPaths = state.outputs
-        .map(localOutputPath)
-        .filter((path) => path && !before.has(path));
-      if (!generatedPaths.length) {
-        throw new Error("Source generation did not return local image paths for ControlNet guidance.");
-      }
-      setProgress("Done", `${generatedPaths.length} source image${generatedPaths.length === 1 ? "" : "s"} ready.`, 100);
-      return generatedPaths;
-    }
-
     function populatePromptPresets() {
       const select = $("prompt-preset");
       select.innerHTML = "";
@@ -1683,8 +1845,27 @@
       if (!preset || !preset.generationReady) return;
       if (preset.subjectId) $("subject-id").value = preset.subjectId;
       if (preset.seed) $("seed").value = preset.seed;
+      if (preset.bodyClass && $("body-guide")) $("body-guide").value = bodyGuideValue(preset.bodyClass);
       $("subject-prompt").value = preset.subject;
       $("negative-prompt").value = preset.negative;
+    }
+
+    function bodyGuideValue(value) {
+      const normalized = String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, "_");
+      const aliases = {
+        bipedal: "humanoid",
+        humanoid: "humanoid",
+        wide: "wide_squat",
+        wide_squat: "wide_squat",
+        tall: "tall_thin",
+        tall_thin: "tall_thin",
+        amorphous: "amorphous",
+        quadruped: "quadruped",
+        arthropod: "quadruped",
+        crouching_predator: "quadruped",
+        winged: "winged"
+      };
+      return aliases[normalized] || "humanoid";
     }
 
     function markPromptCustom() {
@@ -1702,9 +1883,30 @@
     }
 
     $("refresh-status").addEventListener("click", refreshStatus);
-    $("open-zimage").addEventListener("click", () => moduleAction("start_zimage").catch(() => {}));
-    $("check-runtime").addEventListener("click", () => moduleAction("check_runtime").catch(() => {}));
-    $("open-outputs").addEventListener("click", () => moduleAction("open_outputs").catch(() => {}));
+    $("start-backend").addEventListener("click", () => {
+      if (state.busy) return;
+      setBusy(true, "Backend");
+      setProgress("Backend", "Starting Nymphs Image / Z-Image.", 10);
+      moduleAction("start_backend", [], { busy: false })
+        .then((text) => {
+          append(text);
+          setProgress("Backend", "Backend ready.", 100);
+          return refreshStatus();
+        })
+        .catch((error) => {
+          append(`ERROR: ${error.message || error}`);
+          setProgress("Error", error.message || "Backend start failed.", 0);
+        })
+        .finally(() => setBusy(false));
+    });
+    $("check-runtime").addEventListener("click", () => {
+      moduleAction("status")
+        .then((text) => append(text))
+        .catch((error) => append(`ERROR: ${error.message || error}`));
+    });
+    $("open-outputs").addEventListener("click", () => {
+      moduleAction("open_outputs").catch((error) => append(`ERROR: ${error.message || error}`));
+    });
     $("strip-prev").addEventListener("click", () => stepOutput(-1));
     $("strip-next").addEventListener("click", () => stepOutput(1));
     $("choose-folder").addEventListener("click", () => {
@@ -1729,23 +1931,14 @@
       state.selectedLoraPath = option?.dataset.path || "";
       const trigger = loraTriggerFor($("lora-choice").value, state.selectedLoraPath);
       if (trigger) $("lora-trigger").value = trigger;
-      if (!$("lora-choice").value) return;
-      moduleAction("select_lora", { candidate: $("lora-choice").value }, { quiet: false })
-        .then(refreshStatus)
-        .catch(() => {});
+      updateFoundryControls();
     });
     $("z-model-choice").addEventListener("change", () => {
       state.zModelTouched = true;
       $("model-chip").textContent = zModelChipText();
     });
-    function runGeneration(action) {
+    function runGeneration() {
       if (state.busy) return;
-      const directions = Array.from(document.querySelectorAll("#directions input:checked")).map((input) => input.value);
-      if (!directions.length) {
-        append("ERROR: choose at least one direction.");
-        return;
-      }
-      const selectedSources = action === "generate_directions" ? visibleSelectedSourcePaths() : [];
       state.outputs = [];
       state.selectedIndex = -1;
       state.manualFolderName = "";
@@ -1754,21 +1947,16 @@
       renderGallery();
       $("result-image").style.display = "none";
       $("empty").hidden = false;
-      const sourcesOnly = action === "sources_only";
-      const processingSelected = selectedSources.length > 0;
-      setProgress("Generate", sourcesOnly ? "Generating source directions." : (processingSelected ? "Guiding directions with selected source images." : "Generating guided batch."), 10);
-      setBusy(true, "Generate");
+      setProgress("Generate", "Starting backend, then generating sprite set.", 10);
+      setBusy(true, "Foundry");
       (async () => {
-        let sources = selectedSources;
-        if (!sourcesOnly && !sources.length) {
-          sources = await generateZImageSources(directions);
-        } else if (sourcesOnly) {
-          await generateZImageSources(directions);
-          return;
-        }
-        const text = await moduleAction("generate_directions", buildModuleArgs(directions, sources), { busy: false });
+        const text = await moduleAction("foundry_generate", buildModuleArgs(), { busy: false });
         parseOutputPaths(text);
-        setProgress("Done", state.outputs.length ? "Batch ready." : "Finished.", 100);
+        parseRunId(text);
+        state.viewerSource = "outputs";
+        state.outputView = "recent";
+        await refreshRecentOutputs(true);
+        setProgress("Done", state.outputs.length ? "Foundry run ready." : "Finished.", 100);
       })().catch((error) => {
         append(`ERROR: ${error.message || error}`);
         setProgress("Error", error.message || "Generation failed.", 0);
@@ -1780,8 +1968,26 @@
     $("prompt-preset").addEventListener("change", () => applyPromptPreset($("prompt-preset").value));
     $("subject-prompt").addEventListener("input", markPromptCustom);
     $("negative-prompt").addEventListener("input", markPromptCustom);
-    $("generate-sources").addEventListener("click", () => runGeneration("sources_only"));
-    $("generate-process").addEventListener("click", () => runGeneration("generate_directions"));
+    $("run-id").addEventListener("input", updateFoundryControls);
+    $("body-guide").addEventListener("change", updateFoundryControls);
+    $("guide-strength").addEventListener("change", updateFoundryControls);
+    $("preview-guides").addEventListener("click", () => {
+      setProgress("Guides", "Guide sheet preview will be wired in the next stage.", 35);
+    });
+    $("review-select-all").addEventListener("click", selectAllVisibleOutputs);
+    $("review-clear").addEventListener("click", clearOutputSelection);
+    $("generate-foundry").addEventListener("click", runGeneration);
+    $("foundry-check").addEventListener("click", () => runFoundryCommand("check", "Gates"));
+    $("foundry-review").addEventListener("click", () => runFoundryCommand("review-show", "Review"));
+    $("foundry-winner").addEventListener("click", () => runFoundryCommand("winner", "Winner"));
+    $("foundry-accept").addEventListener("click", () => runFoundryCommand("review-accept", "Accept"));
+    $("foundry-reject").addEventListener("click", () => runFoundryCommand("review-reject", "Reject"));
+    $("foundry-batch-accept").addEventListener("click", () => runFoundryCommand("batch-accept", "Accept"));
+    $("foundry-produce").addEventListener("click", () => runFoundryCommand("produce", "Produce"));
+    $("foundry-export").addEventListener("click", () => runFoundryCommand("export", "Export"));
+    $("foundry-lineage").addEventListener("click", () => runFoundryCommand("lineage", "Lineage"));
+    $("foundry-drift").addEventListener("click", () => runFoundryCommand("drift", "Drift"));
+    $("foundry-metrics").addEventListener("click", () => runFoundryCommand("metrics", "Metrics"));
 
     populatePromptPresets();
     applyPromptPreset("goblin_scout");

@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T23:38:10.124280+00:00",
+  "foundry_version": "321ecee",
+  "identity": {
+    "subject_slug": "beast_bone_weaver",
+    "display_name": "Bone Weaver",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_bone_weaver_p5a_20260327_232151",
+    "seed": 818300,
+    "generated_at": "2026-03-27T23:23:04.868771+00:00",
+    "accepted_at": "2026-03-27T23:32:06.103485+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "321ecee"
+  },
+  "generation": {
+    "stack_id": "A_v2_morph",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": "controlnet-depth-sdxl-1.0.safetensors",
+    "controlnet_depth_strength": 0.55,
+    "controlnet_depth_end_percent": 0.8,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "feaf4e6600234ddfb021d8212fc35942560f74468267887e5f08af120fa87f47",
+    "normal/front.png": "201ad2830122d808307900c9e10b7c2d5cdd645e94d8f24d4f4d06cdee25e780",
+    "depth/front.png": "c0ca8427f6732f6f00c1bc6bf190b7374811146ddca7fbe1e1bb07367b45c97c",
+    "albedo/front_left.png": "eef482602f618fc7a125ddda8b069ef707e469ed75cfee2dd59d84cba6872198",
+    "normal/front_left.png": "50b906ca238f27c3abae4dfa1315e5f0eec19b48686e0bf5c38b3c19eedc000c",
+    "depth/front_left.png": "db68627dd4547cadc85b83feca8b03794be72fe9652d7fc606505e5829302212",
+    "albedo/left.png": "0e8af1dadc97acfb97db3ed8b110d8e0397dc920f81f25bd3e9cabcfb194608b",
+    "normal/left.png": "f90a37e50ea3d7e784e495ad559643c0411a08a3a80efa1538a6220b2224ad9f",
+    "depth/left.png": "b6dc57995fc9c0d4491d9b839bdd432103f8f050a6b24bfae0b058d3aadbd479",
+    "albedo/back_left.png": "c6a4f37d052c510bd4a5a510be48280ce68bb27d696c34670a3f7f2cfee694eb",
+    "normal/back_left.png": "cdc30cb183989c8d59df1f0ed538e608931cd1037e65d8f950f668d12f72c991",
+    "depth/back_left.png": "4d36cf2911b1beb0c7e2c545078e68f94dedfacc04962671cb14d21b8e63a905",
+    "albedo/back.png": "f5d84fadf606ca3c5301ec01eeda15e26a7d6dee619735c059c3c9c77d7c7c2f",
+    "normal/back.png": "a603ab7d04988d11b80d046e9ea61e1acc3c8e35ff9ecab0a5fd27fd0e1b393e",
+    "depth/back.png": "ab320e686d9f89e7a44512deed0081669315c588461c5afef2c5068a35be54c3",
+    "albedo/back_right.png": "b7efdd430d57d30ef8c5456657fbd0f2eb304c70cc50540603f2267626f584d6",
+    "normal/back_right.png": "f40eb801277658618befba8634ec2e65dcbc8c119adb9ba9d8592a9223753bc7",
+    "depth/back_right.png": "91322454e9e8e236bc12aee69bd471237e516078b1b05a7b85f51c8a55080a46",
+    "albedo/right.png": "313424e3de2eb15323f2b72addcd284ef6f3686521657b90b673b0d4ec53e9ea",
+    "normal/right.png": "1653baae2b83859341e0a97a5dc31922427a6cbd92205864fb7bc1c43bca7c07",
+    "depth/right.png": "fd3de6face8d93ed74fa20efedaa76836abc6b4c5caff3e0aaee5663f136030f",
+    "albedo/front_right.png": "d81307b185aa0b8b5037253ea2be48983c5dd455d1e7b352343382dc93babbba",
+    "normal/front_right.png": "64f68da900351e0aa0948e497409e46aaa7a4a938c78f48838ca3a385b19a861",
+    "depth/front_right.png": "c2d9c6905c70d44cb6af85451f395ac61e64f3ac84bafb6b39d461d647398423"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_bone_weaver_p5a_20260327_232151",
+    "maps_dir": "bakeoff\\beast_bone_weaver_p5a_20260327_232151_maps"
+  },
+  "notes": null
+}

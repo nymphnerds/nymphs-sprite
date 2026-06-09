@@ -1,0 +1,43 @@
+# Generated outputs
+bakeoff/
+boards/
+derived/
+
+# Database (generated, not source)
+foundry.db
+foundry/foundry.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Generated morph ref images (keep the generators, not the outputs)
+pipeline/morph_refs/*_depth/
+pipeline/morph_refs/*_edge/
+
+# Generated test outputs
+pipeline/test_pixelate_output.png
+
+# Godot editor cache
+.godot/
+
+# Godot imported assets (regenerated on open)
+game/godot/render-lab/.godot/
+
+# Imported sprite/normal/depth assets in Godot project (copied by produce pipeline)
+game/godot/render-lab/assets/
+game/godot/render-lab/sprites/
+game/godot/render-lab/captures/
+game/godot/render-lab/screenshots/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+site/.astro/
+site/dist/
+site/node_modules/

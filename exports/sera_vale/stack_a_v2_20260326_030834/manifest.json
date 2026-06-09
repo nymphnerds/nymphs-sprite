@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:45:07.422694+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "sera_vale",
+    "display_name": "Sera Vale",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "stack_a_v2_20260326_030834",
+    "seed": 505050,
+    "generated_at": "2026-03-26T04:04:34.737657+00:00",
+    "accepted_at": "2026-03-26T04:05:30.246616+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "unknown",
+    "lora": "unknown",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "150b95b3b38e987e1b1db26a77376c1a8feb87e3e5622eceaf64d13a9242bbaa",
+    "normal/front.png": "79bb047a33e1f9ae72f39e86394e822f47e700fffc9cde198159c4ac73048a65",
+    "depth/front.png": "a3f2861158805e3b035d3c24a2ea0bdde3ad739175ee9a4380a9d96d7d903293",
+    "albedo/front_left.png": "a6927bb872d2141446918cd530e40abe0751160e5bab359b596943ac9b5ddee5",
+    "normal/front_left.png": "2c601314d75962f6f024a303638d90a59e2a8ab8a4780f98eadee2998168ebb6",
+    "depth/front_left.png": "b7d2058ff7d315c4e5c07794c85593d4343031f52f7d32f2c3b7a9f767efcee1",
+    "albedo/left.png": "7da5eebe3ac194f1bd744b6b02c09824986140c34824328b1390ac4e5d9471ae",
+    "normal/left.png": "8fe6786a851d990a6c9cb6b509dea6dee470caf772f1d2c4a434449c9b513d5d",
+    "depth/left.png": "5892e7b506a7bbb59f9cc335830ae9a889809a7c7662c56636b7e053a40c7f1f",
+    "albedo/back_left.png": "84a90e02bac7053017422c2808f520b38fec82d1c8eeeb7641d9aa773500d4c4",
+    "normal/back_left.png": "e4634c42a752a5ac3875b017a1c6b5fb92f7c6ac0cc363cf8256600aeba9fef7",
+    "depth/back_left.png": "6a60f34c25ccb7983570020cdbcfa00e433242f5ec5107db39f5dcf99666ac65",
+    "albedo/back.png": "9580c744b06c21917e3bd4a3448ec40a274c1f73d8934e1843ad0d4a80cee863",
+    "normal/back.png": "e5e90311357320a5c6da645d9b42522f4b67a56d8c0d4838265f0a877955a6d2",
+    "depth/back.png": "b224a8c66b4cc50a3e4361e1b6ec8c419143025f87183163e27f19627eca071a",
+    "albedo/back_right.png": "ca660d9641cce1445cdd37718913cd17bed691a11d5a63badd3428214dced802",
+    "normal/back_right.png": "e246abe712009b817984b085184f4935e3021da9a78d3ba78472ac0324806330",
+    "depth/back_right.png": "e7e455e81447fd8e5dcd44801319fba01324c56632ff77d1e4935f52f0b30d5d",
+    "albedo/right.png": "773c6588a77f40ca571ff75b61dad43eb4f177932de0c3e52d44208db049b504",
+    "normal/right.png": "95a9225c8fd41b764049bc36bab3bbb9b9ad5cf2f87f19c441431668f2f335a4",
+    "depth/right.png": "9d3e6b1982e12223b286310897153fadc22fa0fb72e98a3c23911aa23505b198",
+    "albedo/front_right.png": "4d5868132a532aa9f0afc8ac7cb8eaa8191374047cd4dff7c50513585263e414",
+    "normal/front_right.png": "59c850a9e03f52f4eb273d3bf98c227ec90f536bb273ae4ec15d68b1c164a10e",
+    "depth/front_right.png": "4dfa343d760ed6fdcd23db9ed524615d12360e0ff8f8a3fc10ff582c2ffa4273"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\stack_a_v2_20260326_030834",
+    "maps_dir": "bakeoff\\stack_a_v2_20260326_030834_maps"
+  },
+  "notes": null
+}

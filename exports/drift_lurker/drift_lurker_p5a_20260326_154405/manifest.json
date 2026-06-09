@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:30:14.086754+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "drift_lurker",
+    "display_name": "Drift Lurker",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "drift_lurker_p5a_20260326_154405",
+    "seed": 445588,
+    "generated_at": "2026-03-26T15:45:42.054941+00:00",
+    "accepted_at": "2026-03-26T15:50:33.875093+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2_morph",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": "controlnet-depth-sdxl-1.0.safetensors",
+    "controlnet_depth_strength": 0.65,
+    "controlnet_depth_end_percent": 0.9,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "f7c408e6a4310d789822c0453f931b301c7dc92a3419e4ad5bbbe69b748d1192",
+    "normal/front.png": "700a34a8588c2176155b1d3b7f22f8992ea8f044aa84a78f0411becd585c2111",
+    "depth/front.png": "88dd9f4acaf2583fb1b2d0b72147654a15418a4b7d43486bb71c1c8ab9fe3896",
+    "albedo/front_left.png": "acf7b3d49e1e4daf828e7608d916a612816f6255531707737706cc2375c63cee",
+    "normal/front_left.png": "e893c645380776612be27d25dc89a189b71a2a6d2e53996b0ca8133d0d39a9e1",
+    "depth/front_left.png": "9196275a1f28b513f5e51349262427f56f77019980eba7bbcdf06db0919da669",
+    "albedo/left.png": "637ba866ab7e5f10cbb070a93b2bb54a18d22be61d3d2da7cda738e0152fd479",
+    "normal/left.png": "958596440c20f7fe0ceec32c610c22f8c7ad7c64b1396f4dc9e71d1e4cb4a315",
+    "depth/left.png": "7e32926a3fd99e074397209b08d5dab360137aa3af0240546efa59d2e5692933",
+    "albedo/back_left.png": "f6f545003f8e2ee6c7272db11984d5d0a5d985ee8e895d0d60973eca41072835",
+    "normal/back_left.png": "0fa67e9c4c20f8363bebb5d63b215dc6b4234840c9b3318493471b9180579e23",
+    "depth/back_left.png": "cab491208d80b1e43a495864bc26584cf03ca018c1380646508dc616715633fe",
+    "albedo/back.png": "a83813031b0c4295c1aa06c2f4d12d3128c50d622c102a86b2534cbf6d0a3cc1",
+    "normal/back.png": "d130a28be1394696cfc50a789cc5e444517646e421f0d611184bcfe788312af4",
+    "depth/back.png": "cec233b3d8922de3269ca1145f9bfebf544aa7adf63f400e8df19e1aa2c8710c",
+    "albedo/back_right.png": "e04bf3fbb7dcff5e9134d2d34c0bca54d798ebd54453711bafd0d3c864aadc29",
+    "normal/back_right.png": "bfb2d5e0f35b57af1a8979333ef14e46266914c10db5ebda5863a22304da6d2a",
+    "depth/back_right.png": "40c8d7632587f07eec5cc556549d0fe3f7f40484f3b683590a67d95155d97aba",
+    "albedo/right.png": "99b4491c291134cb5c9b17ad7d87076fd01c9253ec19e9033da1d474ffe2d80d",
+    "normal/right.png": "8e3534d052fbf0a1376108b14639c3712a8c98372d0d776c62f4f24e7132d278",
+    "depth/right.png": "53b928303fe57173d40fc7fb1c206fc8aa99282117646194b0eac7193c09f7c6",
+    "albedo/front_right.png": "d32bfcee7869fd1a8a19b8e08c67c079a77b532841b4710aad470b0ba29134ff",
+    "normal/front_right.png": "47c79e3428f9d11996a06347345ceac50a03d539a51ebe012514ded688e96901",
+    "depth/front_right.png": "928a735d77395fc9096b9f56d3b50b8b20c92a49e2f26ce69089d32e64409ad8"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\drift_lurker_p5a_20260326_154405",
+    "maps_dir": "bakeoff\\drift_lurker_p5a_20260326_154405_maps"
+  },
+  "notes": null
+}

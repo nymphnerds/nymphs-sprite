@@ -1,0 +1,16 @@
+{
+  "subject_id": "zombie_runner",
+  "display_name": "Runner",
+  "pack": "undead-patrol-01",
+  "seed": 800200,
+  "role": "fast threat",
+  "silhouette_thesis": "lean, forward, aggressive stride — reads fast and dangerous even at 48px",
+  "reject_conditions": [
+    "upright or relaxed stance",
+    "heavy or bulky build",
+    "slow shuffling posture",
+    "reads as Shambler variant"
+  ],
+  "subject_prompt": "solo, 1character, single character only, one figure, a fast runner zombie sprinting forward, lean wiry athletic undead body, aggressive forward-leaning sprint posture, arms pulled back like a sprinter, mouth wide open snarling with bared teeth, pale grey skin with dark veins visible on arms and neck, torn ragged dark tank top shredded at the sides, ripped black jogger pants, one shoe missing exposing blackened foot, fresh-looking undead not heavily decayed, wild unkempt hair blown back from speed, intense predatory forward momentum, lean silhouette not bulky, fully visible full body",
+  "negative_prompt": "multiple people, two characters, group, couple, pair, reflection, mirror, turnaround sheet, model sheet, reference sheet, split view, blurry, smooth, photorealistic, 3D render, low quality, deformed, extra limbs, text, watermark, signature, frame, border, standing still, relaxed posture, hunched shuffling, slow movement, heavy build, bulky armor, clean clothes, bright colors, vivid colors, healthy skin, living appearance, smile, weapon, shield, helmet, cape, wings, medieval fantasy, magic effects, gun, firearm, busy background, cropped, cut off, partial body"
+}

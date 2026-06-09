@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T23:38:09.875283+00:00",
+  "foundry_version": "321ecee",
+  "identity": {
+    "subject_slug": "beast_hive_keeper",
+    "display_name": "Hive Keeper",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_hive_keeper_p5a_20260327_232022",
+    "seed": 818600,
+    "generated_at": "2026-03-27T23:21:34.839261+00:00",
+    "accepted_at": "2026-03-27T23:32:05.966325+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "321ecee"
+  },
+  "generation": {
+    "stack_id": "A_v2_morph",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": "controlnet-depth-sdxl-1.0.safetensors",
+    "controlnet_depth_strength": 0.4,
+    "controlnet_depth_end_percent": 0.7,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "a886aa526064b7fdbc51896aab8f7498685468fcfe6846b95a76bfaea71d0ff3",
+    "normal/front.png": "7c938aa69c99e36a745ef96ca7870b80f02f553c87e853eb6e88d3f3fe89a356",
+    "depth/front.png": "1ba8cb397bb5e89ec5ab0c17040284b07c552ee650d9ae4aebb88cf0aea9d3e0",
+    "albedo/front_left.png": "70c84b05d88554c5ccfe66b8457c958b1ed4d997b9e5818076ab5394003728ad",
+    "normal/front_left.png": "703c9e301019f83a8c172b85a10bc471d55d7b40180e45f27ab300ba99f80ac8",
+    "depth/front_left.png": "04070b88b3f519f48a553c6f0db4f0995eab92cf35857ecbf94c047b037289b0",
+    "albedo/left.png": "5c32966c875f3d691dba11c8d8397351882ede016a10ed385978d2d5b3c77815",
+    "normal/left.png": "133d66539973248a44f04ff08c2f62f46bace174d519d958f2335ce717103188",
+    "depth/left.png": "088a75fad66833acb7123636de52234560c9dd0b5c24fe1f9d0a0b3dab3f54ca",
+    "albedo/back_left.png": "3b89537b333553718f95bd5d3588a00fdcd1adac19bb5437569cb161aedbff09",
+    "normal/back_left.png": "884c6c66dacf6346f7916571b61e8f44cf8fa4525f180cc4acaacf7a5531036b",
+    "depth/back_left.png": "2922171e88c0013a1aded806734ce867f0210c884a827e63df3a8cfa5957caf6",
+    "albedo/back.png": "b046fb5a86e8a8240ec3814046ce77999be35a7a3aae2d5a6a498aa850f957f5",
+    "normal/back.png": "78263a3fa024e48de105c3d6fd04f7b761af79958bb5a8b2ec99fc2cc56899b6",
+    "depth/back.png": "9b119cf62ebc93016333debe7c7edecc3abf595acaeb338a6169717de8b5941a",
+    "albedo/back_right.png": "163cd429a743d79e27433934dd7a0a5cd03595e49f74fbcfca4574ebc973ba54",
+    "normal/back_right.png": "ee24b66b32310297309006d3583fb27792c51ebde059116c7b3bfe48031489de",
+    "depth/back_right.png": "8db01dfdff476bd71f8c392a4f2d587c41d15d9d678b73924bcca0f05ae5286c",
+    "albedo/right.png": "439d10289699354fa480e0681183912705e7665b7fedb3f36692572786ee6e71",
+    "normal/right.png": "aaae1d77932be5471fbe621c39e6031e5909c7b46f8d6b9c07c2c3e0b5d4652b",
+    "depth/right.png": "48c80b3793405e7bc5ea7441c63528d1f0c4c149a35cb2fc48b01775a4934a5f",
+    "albedo/front_right.png": "cdb55e285a339f3e68c1f15b31bb260936249dafdf9adb2d45bebcc63d7b7237",
+    "normal/front_right.png": "733886bc5d5793a0758e4af021b88fd57a1980bfd8f7e9af28bcfefacf543276",
+    "depth/front_right.png": "1e2ef9b88895235d9137438dda0bb482bdc41b757e2456fad3a8e2edc842638a"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_hive_keeper_p5a_20260327_232022",
+    "maps_dir": "bakeoff\\beast_hive_keeper_p5a_20260327_232022_maps"
+  },
+  "notes": null
+}

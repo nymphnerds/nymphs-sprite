@@ -1,0 +1,7 @@
+{
+  "subject_id": "thal",
+  "display_name": "Thal",
+  "seed": 727272,
+  "subject_prompt": "solo, 1creature, single character only, one figure, a Keth alien named Thal, arthropod-like alien ship engineer, non-human bipedal insectoid, slightly hunched forward posture, head below shoulder line, olive-brown matte skin with dark brown chitin plates on forearms and shins, two short swept-back antennae from crown of head, compound-style large dark amber eyes, subtle mandible structures at jaw, four-fingered hands, broad thorax with narrow waist, longer arms, diagonal woven fiber tool harness from left shoulder to right hip with small pouches, bulbous amber organic patch kit at right hip, dark olive work apron from waist to mid-thigh, faded pale green bioluminescent marking on left upper arm, standing idle neutral pose, alien engineer appearance",
+  "negative_prompt": "multiple people, two characters, group, couple, pair, reflection, mirror, side by side, comparison, turnaround sheet, model sheet, reference sheet, split view, dual view, before and after, blurry, smooth, photorealistic, 3D render, low quality, deformed, extra limbs, text, watermark, signature, frame, border, human proportions, normal human face, hair, glossy wet chitin, insect wings, more than two antennae, large mandibles, weapon, military gear, bright colors, neon glow, upright military posture, armor, helmet, cape, busy background, cropped, cut off, partial body"
+}

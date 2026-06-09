@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:42:20.288790+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "thal_hazard",
+    "display_name": "Thal (Hazard Suit)",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "thal_hazard_p3_20260326_151723",
+    "seed": 727299,
+    "generated_at": "2026-03-26T15:18:42.541734+00:00",
+    "accepted_at": "2026-03-26T15:24:21.569117+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "78d159beca76d0633be66c33211bae70109aa3b4f925e15f6e203e033238fb4f",
+    "normal/front.png": "54bdf0c0a3fbd8a30047bd19150e43b0f8fa3bc710acf21cf0dc830d1db424bc",
+    "depth/front.png": "c921336b5d95b753792c509179beb8d2229c47de4b58386959370c985e02cd6f",
+    "albedo/front_left.png": "dd5cee1fdff8a62f6df429cb2a149882e80b7f565d8da0cadfc6d96866852ce9",
+    "normal/front_left.png": "05821de088d5c73785ee53d85c5b2e60fbd6ca6a0d0d9355f2b1bd1c0a187afb",
+    "depth/front_left.png": "9c076626169bd739995a962e6e3fe8d34b49456f73c3dd515e71b68de5b235ee",
+    "albedo/left.png": "f0733ddcfbc258e0a9db41fb6324215f3b04cc55ec94803838a289844da3b315",
+    "normal/left.png": "bf6c14a9ec99951358ea0b60a949aeddfe7d64f2b4b5f983fdc5563d6f4a6ac7",
+    "depth/left.png": "505de2b26d32f69b1636ff8070e665ef2b48841329eee4abe207ffbd6a7f0aab",
+    "albedo/back_left.png": "e9edf3625ee0b2e57f064ed631be878e81abbd2c688bb8ddc13f047f68931713",
+    "normal/back_left.png": "96b75faa3b7c215979ad3071885489d3922670ad28ae684a117a0b4a728c67b6",
+    "depth/back_left.png": "46fa62dee2ab4920f3a85920c7ce1b3e6e53f20c9d6033940ec5b2f3c7c6d9fd",
+    "albedo/back.png": "2703c59bee869dbeadd17833abd968031633eae65356d821feb00ace5aeddee9",
+    "normal/back.png": "bdd673c58358eefc5f3b80a57ba5ba8da8a78bceb96c426d495953cad7a8dff4",
+    "depth/back.png": "2d938a76113a5bf0a433584522c148e7c33d9cc36b0cd42491f7359fdeef7f42",
+    "albedo/back_right.png": "1f6c237b1cf9f9ee948fc071de4e4cd953e84bd76c4673debccdb8187203b4fc",
+    "normal/back_right.png": "384c8fa381d0af2f85c7665213f656ecf9769c2b8549636fd46fb81fc6ef3a73",
+    "depth/back_right.png": "6c49c496af44f83646f9023b20bfcf427306fe13d68bb4be28986148ce4d19c1",
+    "albedo/right.png": "fa94baecb48f9b2cde7df3e8d269bdef010e3e28cb3d4799365bc2dc1a9ecb6a",
+    "normal/right.png": "97c6c295a7561d72d4bb2ee1b365550229700dfe7d46eec492725e7403d29397",
+    "depth/right.png": "6aed19a02670f7d151c663b36959a67de8a0f0644292baa89387346a0968db2a",
+    "albedo/front_right.png": "faf9f0dfa822ea4a5d41f2e255a25d327303b1b22998e321351082e92ed63cae",
+    "normal/front_right.png": "3c200cfd250f66d7a4bde0efbe9b103a864f4eb12f8cba80721a6200e0846c4d",
+    "depth/front_right.png": "d24eaba35fe6da567a214b5115df223f4589f6e84163a6de36ae24f1ddc4876c",
+    "preview/contact_sheet.png": "6091fcc7d9921394add114d65c3c42653842b718ba40d897a7da728e43ca3138"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\thal_hazard_p3_20260326_151723",
+    "maps_dir": "bakeoff\\thal_hazard_p3_20260326_151723_maps"
+  },
+  "notes": null
+}

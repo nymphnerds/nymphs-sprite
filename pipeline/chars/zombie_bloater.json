@@ -1,0 +1,16 @@
+{
+  "subject_id": "zombie_bloater",
+  "display_name": "Bloater",
+  "pack": "undead-patrol-01",
+  "seed": 800500,
+  "role": "area threat",
+  "silhouette_thesis": "wide torso, swollen asymmetry — widest silhouette in the pack, unmistakable",
+  "reject_conditions": [
+    "normal human proportions",
+    "torso mass not significantly wider than other variants",
+    "symmetrical body shape",
+    "lean or athletic build"
+  ],
+  "subject_prompt": "solo, 1character, single character only, one figure, a massively bloated zombie undead, hugely swollen distended belly and torso taking up most of the silhouette, asymmetrical body with one arm larger and more swollen than the other, tight stretched pale green-grey skin with visible dark veins, torn filthy stained white undershirt stretched over enormous gut barely covering, dark stained pants split at the seams, bare swollen feet, mouth hanging open drooling dark fluid, small head relative to massive body, lumbering wide stance, the widest silhouette in the group, grotesquely inflated undead, fully visible full body",
+  "negative_prompt": "multiple people, two characters, group, couple, pair, reflection, mirror, turnaround sheet, model sheet, reference sheet, split view, blurry, smooth, photorealistic, 3D render, low quality, deformed, extra limbs, text, watermark, signature, frame, border, normal proportions, thin body, lean build, athletic, symmetrical body, clean clothes, bright colors, vivid colors, healthy skin, living appearance, smile, weapon, armor, helmet, cape, wings, medieval fantasy, magic effects, gun, firearm, busy background, cropped, cut off, partial body"
+}

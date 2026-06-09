@@ -1,0 +1,7 @@
+{
+  "subject_id": "reach_pirate",
+  "display_name": "Reach Pirate",
+  "seed": 773399,
+  "subject_prompt": "solo, 1man, single character only, one person, a Sable Reach space pirate, human male, lean wiry predatory build, relaxed confident stance with weight on one hip, dark weathered skin from void exposure, shaved head with a thin scar running from left temple to jaw, sharp pale grey eyes, wearing a dark brown long sleeveless leather duster coat open at front, dark charcoal fitted undershirt, a pitted scratched metal gorget collar around neck as trophy armor, heavy dark leather vambrace on right forearm with small sheathed blade strapped to it, dark utility belt with salvage hooks and a signal jammer pouch, dark grey-brown cargo pants tucked into tall dark boots with reinforced shin plates, thin chain with a small metal faction tag hanging from belt, standing idle neutral pose, dangerous calm pirate appearance, fully clothed",
+  "negative_prompt": "multiple people, two characters, group, couple, pair, reflection, mirror, side by side, comparison, turnaround sheet, model sheet, reference sheet, split view, dual view, before and after, blurry, smooth, photorealistic, 3D render, low quality, deformed, extra limbs, text, watermark, signature, frame, border, clean uniform, polished armor, military uniform, friendly expression, smiling, bright colors, vivid colors, cape, wings, medieval, fantasy, magic, gun, rifle, firearm, shirtless, bare chest, bulky muscular build, busy background, cropped, cut off, partial body"
+}

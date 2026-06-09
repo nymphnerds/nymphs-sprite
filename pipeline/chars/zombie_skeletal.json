@@ -1,0 +1,16 @@
+{
+  "subject_id": "zombie_skeletal",
+  "display_name": "Skeletal Zombie",
+  "pack": "undead-patrol-01",
+  "seed": 800600,
+  "role": "fragile/ancient",
+  "silhouette_thesis": "thin limbs, angular read — thinnest silhouette in the pack, bones visible",
+  "reject_conditions": [
+    "normal or bulky body mass",
+    "reads as healthy or muscular",
+    "silhouette too similar to Shambler",
+    "no visible bone structure"
+  ],
+  "subject_prompt": "solo, 1character, single character only, one figure, an ancient skeletal zombie undead, extremely thin emaciated body with visible rib cage and spine, stick-thin arms and legs with bones showing through papery dried grey skin, sunken hollow skull-like face with deep eye sockets and exposed jaw bone, wearing tattered rotting brown rags barely clinging to frame, one shoulder exposed showing collar bone and shoulder blade, bony clawed fingers, angular joints visible at elbows and knees, shuffling unsteady stance on thin legs, the thinnest most angular silhouette in the group, ancient long-dead undead, fully visible full body",
+  "negative_prompt": "multiple people, two characters, group, couple, pair, reflection, mirror, turnaround sheet, model sheet, reference sheet, split view, blurry, smooth, photorealistic, 3D render, low quality, deformed, extra limbs, text, watermark, signature, frame, border, normal body mass, bulky build, muscular, heavy, wide torso, clean clothes, bright colors, vivid colors, healthy skin, living appearance, flesh covered bones, smile, weapon, armor, helmet, cape, wings, medieval fantasy, magic effects, gun, firearm, busy background, cropped, cut off, partial body"
+}

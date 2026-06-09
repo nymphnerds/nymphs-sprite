@@ -1,0 +1,16 @@
+{
+  "subject_id": "zombie_hazmat",
+  "display_name": "Hazmat Zombie",
+  "pack": "undead-patrol-01",
+  "seed": 800400,
+  "role": "contaminated specialist",
+  "silhouette_thesis": "suit mass, round hood profile — reads as hazmat/biohazard even at 48px",
+  "reject_conditions": [
+    "no suit or protective gear visible",
+    "exposed head without hood",
+    "reads as normal civilian zombie",
+    "suit too clean or intact"
+  ],
+  "subject_prompt": "solo, 1character, single character only, one figure, a zombie wearing a torn damaged yellow hazmat suit, round hood with cracked faceplate visor fogged and splattered, bulky protective suit giving a wide rounded silhouette, suit torn open at chest exposing dark rotting flesh underneath, chemical stains and green-brown splotches on suit, thick rubber gloves one partially melted, heavy sealed boots, a broken chemical tank canister strapped to back leaking green fluid, stumbling forward stance, contaminated toxic undead, the hazmat suit defines the silhouette shape, fully visible full body",
+  "negative_prompt": "multiple people, two characters, group, couple, pair, reflection, mirror, turnaround sheet, model sheet, reference sheet, split view, blurry, smooth, photorealistic, 3D render, low quality, deformed, extra limbs, text, watermark, signature, frame, border, clean suit, intact suit, no suit, casual clothes, bright vivid colors, healthy skin, living appearance, smile, lean silhouette, exposed head, no hood, weapon, armor, helmet, cape, wings, medieval fantasy, magic effects, gun, firearm, busy background, cropped, cut off, partial body"
+}

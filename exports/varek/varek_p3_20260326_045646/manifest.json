@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:42:20.597371+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "varek",
+    "display_name": "Varek",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "varek_p3_20260326_045646",
+    "seed": 838484,
+    "generated_at": "2026-03-26T04:57:59.222932+00:00",
+    "accepted_at": "2026-03-26T05:19:29.526321+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "e1cb78b10e666093d2c4a855033a116f86395985053a9e53dd4cfdde0dae839d",
+    "normal/front.png": "74bfa72d1d3766ada7b6ce075b4b74db1ddb3b9f2ef40daa96c9b419c03b3a14",
+    "depth/front.png": "7618efccd74fddd0fb842b9577af816dba35ef12be144a49da47e12dd363dfe1",
+    "albedo/front_left.png": "0f5e0057bf0a14fa0a45b7b9e21938a6e429e434b31354da80fadcead3690631",
+    "normal/front_left.png": "209932a7405a117322a0281084fa3478135ba21589e9e26caaec77b5b95e19d9",
+    "depth/front_left.png": "9e41e1e7c8da87542fc1904f0ef61146a29da129cb4b83c56a2b62be5575eab7",
+    "albedo/left.png": "7d0b48fa799af2e5873368413cd68b3fe4141e92c5212f39817a9cbbd01c9685",
+    "normal/left.png": "d6bbc530fc43847a510087822ec3fbe2ae551a2c432bf6ad823e79b97e5f01fe",
+    "depth/left.png": "4e7bddd77fb6ec6a996176df9426095d6efc5746e2accab2c975d01fd461f545",
+    "albedo/back_left.png": "a89be5c9bbd6dd874ba50680e468b963d77965d9353f6aabcdae8a2225f39dc1",
+    "normal/back_left.png": "a5617cf937e34c5ab73fc5af4daec2570b96a33ab0ac334b3ab8cd283972cb4f",
+    "depth/back_left.png": "b30e8c515bdd9d7ba07d671f4e380e7dfa8299a12bdae8dbce70d01a1ed94e5d",
+    "albedo/back.png": "c6a80b665717334b38413d1125a0ea0adc2a9b0bc7c4b3f4527786e0ba39b074",
+    "normal/back.png": "7c82931ff1e5677333f0d349663c8b68ed3e20f3cd8179d2faf4c0bf5ad0fe15",
+    "depth/back.png": "edfde5c9e0834d7cbcd7d0c08ce778ab50d92642564321e1421f23bbbd83d59c",
+    "albedo/back_right.png": "ddf2e2d6fe5361479db5418cf4e5c81df18ef7aa72c8a36421f3e6bab3afdccf",
+    "normal/back_right.png": "c71355d4a9dc38fbb3b17b7d747f5cbcff01cbab6748d82e54f4b40a210f2660",
+    "depth/back_right.png": "52fb8a6a2b76192a3c0f0705c1aa779c3cebf9e66872454809878b97573323a6",
+    "albedo/right.png": "0ba62b77033f26930dcb76e39043788dfc49cf69223c1f59e3702885b3cbc56a",
+    "normal/right.png": "155d6dd7fe7113b2e0339cde914825e7ea533a65473a6ad8d2fc82739024df24",
+    "depth/right.png": "d100196814743c1b2047ebe7706aadaf64f0a5073bd431c879844626898f869d",
+    "albedo/front_right.png": "d276c2a3288829b59edc5156573d3d622336ab271866390a929fba49e127ec1e",
+    "normal/front_right.png": "bdbec53554e4cf20fdb8769a6bfc108ec063d20157033de44a83dcf3647b4b1a",
+    "depth/front_right.png": "9638b2c9674a9c786b75dc4d7f6ab40ff1cb953178e1779175c83c01bdec3b74",
+    "preview/contact_sheet.png": "96147fa5e5229418f088066238049c9246d0cf8edf82a26d788c5bbb90f59358"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\varek_p3_20260326_045646",
+    "maps_dir": "bakeoff\\varek_p3_20260326_045646_maps"
+  },
+  "notes": null
+}

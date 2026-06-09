@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T23:38:09.124694+00:00",
+  "foundry_version": "321ecee",
+  "identity": {
+    "subject_slug": "beast_teeth_collector",
+    "display_name": "Teeth Collector",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_teeth_collector_p3_20260327_213101",
+    "seed": 819500,
+    "generated_at": "2026-03-27T21:32:05.257365+00:00",
+    "accepted_at": "2026-03-27T23:32:05.559269+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "321ecee"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "eb8bd27b3f73314c1842d71ebdd045097d8093751f0ebe5802e0d24ca77c0c77",
+    "normal/front.png": "e795509da4ea2f6288e7cfc103f5f805d16af5e3c018e8288751f607739c4862",
+    "depth/front.png": "31017fd6fbef879b143daeabe263b1b9470be74aaecd8e35f030bd676f3f192e",
+    "albedo/front_left.png": "03bc992e05c0566039273a2b7ad75b4a26a973c4c72534b61956b94de6b9b73a",
+    "normal/front_left.png": "7c86b97967c6a21124adaa33b22b1c6602bdcf536f7de7a84f2863a650725a14",
+    "depth/front_left.png": "1f67f5d139134ee985c82308414473e5401eaf22a762f4e9abef78513a99cee4",
+    "albedo/left.png": "7159a3332e7c42a49f2e4aaf92637c26b33b8957d974699ff3239e5e72c6dd2d",
+    "normal/left.png": "e335ebeb8d782a0da9fb26d57d40e2b1aeb36bcc4b979082bfd858986d883cfe",
+    "depth/left.png": "38767a8820a3f4df2d4e246089b2e814f86a8728c06e78f90a6c6e7f5c2f8f41",
+    "albedo/back_left.png": "02639d23a5e8850242c7b9a7031c64aa518389fcc079320b9f880816f5eed478",
+    "normal/back_left.png": "0ac9f0fa342401a1a21faf9c155f1da6bd7735bc6cd08726756452594270d417",
+    "depth/back_left.png": "ab19d4357c40bed1df8d209a59a2322e0748e946b9892fdac901a9fe8e9b4918",
+    "albedo/back.png": "9c1ca2d651a384fc136358e6d8444ed5f5823e6ecc0a78a12e51f49e5cad8b46",
+    "normal/back.png": "39406c8b76ea57112c224e82952a935aec9c915efe08495d9ff960928fba122a",
+    "depth/back.png": "e8c3f03d4e6018d2c3a8e816a0516f69e4265ffa85bb3a77f76e26b7048a4032",
+    "albedo/back_right.png": "0f2d4d14fb7193666e8ab7609b3291d9d4983185281db2c2019bbbf939505903",
+    "normal/back_right.png": "fe77be33578b00e9ed14eabb9ec26e67b6851c6de2d3142e74ba9c47a1ab1d46",
+    "depth/back_right.png": "8e8ffde6649680f025c75b26f0190e753b8cfb7940d867feeaa79aa5206cf06d",
+    "albedo/right.png": "b60f5b311e99dc6c24c21b9f688f20a18dbc42a8bd10399a6e7cde2a42bebf0a",
+    "normal/right.png": "6c4798f14628fa3368602782ffdfced087183ffe928c9b5649294be90c8ef87c",
+    "depth/right.png": "fc2af56fa81369036aeb7b15efe1b8e46e12d95ae6d33ed850c160ef0eb1fbe7",
+    "albedo/front_right.png": "1c8b527ab3c341471d0a426bd71ff00c3478e53474b4929fdb0e3b1e9a6fbf70",
+    "normal/front_right.png": "9a04b713ff2694dd2cba837b6ad46af4fd8410632b459b1dcab32a800d3bc35b",
+    "depth/front_right.png": "abe642cd9c1802a3f07b3c736a0096e0923551815bf9b344a4224773f15b9641",
+    "preview/contact_sheet.png": "7ffba8581aa2b558f2c788a0657f3b2984b4e77daf3832c33de7c3a652d92ef1"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_teeth_collector_p3_20260327_213101",
+    "maps_dir": "bakeoff\\beast_teeth_collector_p3_20260327_213101_maps"
+  },
+  "notes": null
+}

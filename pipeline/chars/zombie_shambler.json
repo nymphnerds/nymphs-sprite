@@ -1,0 +1,16 @@
+{
+  "subject_id": "zombie_shambler",
+  "display_name": "Shambler",
+  "pack": "undead-patrol-01",
+  "seed": 800100,
+  "role": "baseline undead",
+  "silhouette_thesis": "hunched, slow, broken posture — the default zombie read at 48px",
+  "reject_conditions": [
+    "upright military posture",
+    "fast or athletic stance",
+    "clean clothing",
+    "reads as living human"
+  ],
+  "subject_prompt": "solo, 1character, single character only, one figure, a shambling zombie undead creature, hunched broken posture, head tilted to one side, dragging one leg, arms hanging loose and limp, torn dirty grey-green shirt with dark stains, ripped dark pants exposing decayed skin on one knee, pale grey-green rotting skin, sunken hollow eye sockets with faint glow, jaw slightly open slack expression, exposed ribs visible through torn shirt on left side, matted filthy dark hair, barefoot with blackened cracked feet, slow lurching stance, classic shambling undead, fully visible full body",
+  "negative_prompt": "multiple people, two characters, group, couple, pair, reflection, mirror, turnaround sheet, model sheet, reference sheet, split view, blurry, smooth, photorealistic, 3D render, low quality, deformed, extra limbs, text, watermark, signature, frame, border, clean clothes, bright colors, vivid colors, athletic build, upright posture, running, fast movement, healthy skin, living appearance, smile, weapon, armor, helmet, cape, wings, medieval fantasy, magic effects, gun, firearm, busy background, cropped, cut off, partial body"
+}

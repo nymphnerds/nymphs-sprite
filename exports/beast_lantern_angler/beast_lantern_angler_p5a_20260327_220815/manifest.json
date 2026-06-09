@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T22:29:16.145974+00:00",
+  "foundry_version": "90ef703",
+  "identity": {
+    "subject_slug": "beast_lantern_angler",
+    "display_name": "Lantern Angler",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_lantern_angler_p5a_20260327_220815",
+    "seed": 818400,
+    "generated_at": "2026-03-27T22:09:28.248052+00:00",
+    "accepted_at": "2026-03-27T22:24:22.455477+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "90ef703"
+  },
+  "generation": {
+    "stack_id": "A_v2_morph",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": "controlnet-depth-sdxl-1.0.safetensors",
+    "controlnet_depth_strength": 0.4,
+    "controlnet_depth_end_percent": 0.7,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "4c5b41a44d5fd34b1f19b64af43eaccce80bb8596c9f55a4179c0fbe53465103",
+    "normal/front.png": "d71cc4a9be6f20f7bcf524ff0ed5542d19afeb3d2c97ae30c4f7658dbe8c2220",
+    "depth/front.png": "9a6a5ca2a289d79c9c31044046dc289f2a34e871db5e645f444e21ba42326c45",
+    "albedo/front_left.png": "04a0925f065990d1edbcf8c9ea74eb6251ada79928cdb91bc006085a7570a5a2",
+    "normal/front_left.png": "8a908c3c9fee2b1cc43f557ded06fbbbc75711008e080df1d1964b7aa6295a22",
+    "depth/front_left.png": "a9f835e6935b54b1ad227057545bdae502f953d514d0577bc0a9301e03c29cd7",
+    "albedo/left.png": "7ac6cbfc3dba6a304b9ba1c10fe83bf76200598099b105fda5c21a23b37db6a9",
+    "normal/left.png": "4150e3bdc80da28df961783cdd856c11389b36b2f56e53af76fbbdf404b8d966",
+    "depth/left.png": "a2427634109f5308a66bd41d6e9b4d2ba801754d051953ca48f3992d623e9d03",
+    "albedo/back_left.png": "da7a43a81a74269b955b6d1992ece363376e62de9a691260be60beb13f0fb34e",
+    "normal/back_left.png": "afd919a9a2d28f00de55ede2d7d8bf48901596ae5437ebc0fa7bbfdea67c8eee",
+    "depth/back_left.png": "d72f363c09988c36de661baf1939b443ba3b26d082aec21d436244a7fed62f93",
+    "albedo/back.png": "61c1e61dafbd9d16b922842ddedd6eb179a3b55c39d5b1b1faa19bf0691fcf91",
+    "normal/back.png": "33c15347f3876d675c5850da19b81eac6ab39975b0f3055a369dbcf92c3657b3",
+    "depth/back.png": "48b240ca4d99dc4407dfcc84a1f1575a51719f26d1fc99c2cd1768e4dba25894",
+    "albedo/back_right.png": "17d9c263fd3af5c3407d0966356b825d68cc061a48d4c28252ef9e626621989e",
+    "normal/back_right.png": "a478091d0afb4a048616a31ecdc296d6a6526ff65778a3a2a1a747ec0163a3a2",
+    "depth/back_right.png": "2c3d731224a88edde05d60132a6debd7aec8356fe9e70590c9c70d5b99d5b34b",
+    "albedo/right.png": "6703688fc589392101ea3788e27aa89def74cde7b9234b0b1f6f4f876c9262db",
+    "normal/right.png": "5b3942a33b6f6cb1e200305b6a5c13612fb7c4ddca3b77d345d7346936be4824",
+    "depth/right.png": "6914b1779e775ac18721ceb822aa609d2733880a456e6e1c79c22a20d260faac",
+    "albedo/front_right.png": "8070daaad28499060121a661245a2722d19abb1405e1abbdc4c12f6dd31439e2",
+    "normal/front_right.png": "286d042f26ce7a61ccc2918e7d23ac00d0ba19553359d08747cbdfb920cc4f44",
+    "depth/front_right.png": "a904b12bd5118fb1828725b090485d35806ef7dd039d9b8cc0f0da64698c8a88"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_lantern_angler_p5a_20260327_220815",
+    "maps_dir": "bakeoff\\beast_lantern_angler_p5a_20260327_220815_maps"
+  },
+  "notes": null
+}

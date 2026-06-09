@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:41:25.075762+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "compact_patrol",
+    "display_name": "Compact Patrol Officer",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "compact_patrol_p3_20260326_071546",
+    "seed": 224466,
+    "generated_at": "2026-03-26T07:16:41.306053+00:00",
+    "accepted_at": "2026-03-26T07:18:01.041038+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "277600e48a89119ea183a1f171d93e12f86f2a8f06e8230a71c2490b8664c8e6",
+    "normal/front.png": "ff5a4b6e6b24de26cc7cf3b416cd08726a33d796a0779cefe841f5fa91784090",
+    "depth/front.png": "aab71d62ad2391f8cdc1490897c3ece6bedca4d29d130b555083c0358fde43ba",
+    "albedo/front_left.png": "7db8ddb62aef42af0dfee0d96dd7624f6e5c0c07d3aae771d5ef5a57b44d5899",
+    "normal/front_left.png": "d070b28d2f2deca465c83e3913772f44b4d55bdd0bca44f320ffffbbca3b0703",
+    "depth/front_left.png": "70f3d33a084fbb4062f90b54881953f8f3f597d1c8c22cf2c66895eac238fb2a",
+    "albedo/left.png": "eface208269785098548975132d6236fa01868eedc8bc4360d8178c77bec6897",
+    "normal/left.png": "3172a68fba8480ac4e8304cb981b30c895791b1050e00fda9fc3bb624062a7a2",
+    "depth/left.png": "8d40f0d64be2096e49ea13594d2feb55d705bee11d1f75340b1be7ab615e5373",
+    "albedo/back_left.png": "8a322fa3b89605dab5217048cebf9d7dddeb6fe20ab244c522e8fc3369bd81a4",
+    "normal/back_left.png": "c179d3932dcffe7449fd54693e6b47f29a0b3305034e78dcf871058566d195d8",
+    "depth/back_left.png": "b968252d3552b6870f6de162ab45209515395b7d659b5da2ea449c79bd8ce5df",
+    "albedo/back.png": "62d07b8c2f663e303ad0e63120a2707f342b739c93172e7bbaff3813b06ddc3d",
+    "normal/back.png": "692a3aebf34563c40e759cc9ccb78412b4f218fb44c00dc9c34517949fdd18e1",
+    "depth/back.png": "15a32059a29f07ae818d650fee546749bf082abd49aaaf695d78636281c25c01",
+    "albedo/back_right.png": "2664a7fa97f1f8b9e46687493fc464c2dd005fdf466403c78e5548d4a66acfb6",
+    "normal/back_right.png": "c59794611e568b66214ba486bf7cadc7b02f899bed976dbb16c7a563b7be2449",
+    "depth/back_right.png": "4187c2efa4f23c22cf61faf9b2b9909d060d9d7b4d65fedcc10b55e128ff3c14",
+    "albedo/right.png": "3492cbf02dbe88416b87af213789b25f67a10b43ddba26d943a53adbbde51fff",
+    "normal/right.png": "d3bde0e1d411366b9bf59df15ef66fce51667b3660c723e4d0d30c53e562f3a4",
+    "depth/right.png": "55bb610ff692651e9d2b1171ce93416b450eb2264b47b86d9aca35643131d08c",
+    "albedo/front_right.png": "b3d5219e054319e4d4e4a7a7a1e4885d51554e2b01151bf72e135ce6bc4244ec",
+    "normal/front_right.png": "06ae03d85975bd30bf9fe1bcc41e38f9a6ac2930f7b6a9a75803fa1e1065369a",
+    "depth/front_right.png": "9a31b83e509501438040dd032d0b51bcfdb387d6c911e1cf43cfe23745f7e1c3",
+    "preview/contact_sheet.png": "24eb8cb14e66c33a73f82b520fd40a5163546767397f74bf8a4bc4a59b77ae08"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\compact_patrol_p3_20260326_071546",
+    "maps_dir": "bakeoff\\compact_patrol_p3_20260326_071546_maps"
+  },
+  "notes": null
+}

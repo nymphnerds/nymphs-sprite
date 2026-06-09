@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:42:18.215422+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "keth_healer_drone",
+    "display_name": "Keth Healer-Drone",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "keth_healer_drone_p5a_20260326_072410",
+    "seed": 667733,
+    "generated_at": "2026-03-26T07:25:29.425289+00:00",
+    "accepted_at": "2026-03-26T07:26:49.559507+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2_morph",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": "controlnet-depth-sdxl-1.0.safetensors",
+    "controlnet_depth_strength": 0.55,
+    "controlnet_depth_end_percent": 0.8,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "b51380daa0d28787e63294cd89de1bcef35cbf061f88bbd1a3e6f9aebb8f5cac",
+    "normal/front.png": "5ea340a8e1b0cf89338e0a13ed638bbd9617db4008851a64f02b69d013360bab",
+    "depth/front.png": "005c2d1acfb31163ed8fd34449953b1b35176dc29bddf73bfcb51a894646c5de",
+    "albedo/front_left.png": "9b0f7be5cc9f3b6c66d400d773ab17f860b16b22cf48da9cafcb947f858eb12f",
+    "normal/front_left.png": "f25766b8cb3e39fa57917b21ff91a366d74e993da05e034cf1e8308c8ad7dbd1",
+    "depth/front_left.png": "8571bd34e7f41184e9f957498194926f4d20a320ac46396abe9dce3b60d6271f",
+    "albedo/left.png": "189c7faa8f97a3c4dc305e6692cf01becf73a71e91d342b4519b43461abb008f",
+    "normal/left.png": "1db4b2c2dee690c48392d8c378ca50bb71401508cbb6cfba489c4d2af863966f",
+    "depth/left.png": "981bd06773289de62c6748de67579e1ea5b4da7319d9f82f36964ba138014b21",
+    "albedo/back_left.png": "f809318055517c5d50264d62844fd1a357d9c508566aa53a627326df460b3d77",
+    "normal/back_left.png": "bf211477e2e08d316f18059cf81da78ab1c41cdc2e3d33362d90b7171bcc7303",
+    "depth/back_left.png": "44238a8e7c46d034d7af99d4649fc9743b69d70901fa3aea7bde426e03126d78",
+    "albedo/back.png": "11a03805c455f42ba800f34d5309ae9bb274ce144a25c7a08a49a3508d9e2541",
+    "normal/back.png": "4fdb4b1f1e8b47423a9f5ab9c91ba218c40894bc6973bbac1d19ae8d4cf66c81",
+    "depth/back.png": "95c7b9d862fb732f8a50cbf859706c4a929e86dc52512445ed9d455495f17c6b",
+    "albedo/back_right.png": "44257576a0b2f26709b13a683b8a7ef67968568139e1ffc81f5ee868758acb9b",
+    "normal/back_right.png": "f9332cadf383d686348607228efb477d7b35ab9a56f3a4cceb9f3188601b5575",
+    "depth/back_right.png": "23f1ff4fcd0cced67f62c4119e12de64f019d0780706c5f0fd45b5c7326fd353",
+    "albedo/right.png": "0c3e3c38a11d3e300106862843b8d4468e4b0e68f6dee4284eb21adbb10180b7",
+    "normal/right.png": "31a769db714fff0a31eff916525b5e877892f9513a0f0e3fe84b868047c5e5a7",
+    "depth/right.png": "c66a748a3af600b5821950569b01949abe01f1c9c7c58fff2551bec849fe9c35",
+    "albedo/front_right.png": "6fb47bcf6f5bb6a5180607dcbdbe3d642c3770d48e02c1028af64f3fea2b8cca",
+    "normal/front_right.png": "aac026edbd7c6505dfb672635efa08f8fe66f83ff9cc7edf3ab34a5b12bff47e",
+    "depth/front_right.png": "8da7be4d2761483d12dc5340d2a5efef4e89b11352476a361ccae79312e6de94",
+    "preview/contact_sheet.png": "49e0117cf40fda03c7480c7bff940ca0fc1081f69553793aa327f2f2a9e2a60d"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\keth_healer_drone_p5a_20260326_072410",
+    "maps_dir": "bakeoff\\keth_healer_drone_p5a_20260326_072410_maps"
+  },
+  "notes": null
+}

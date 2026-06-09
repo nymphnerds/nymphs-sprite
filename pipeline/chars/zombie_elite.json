@@ -1,0 +1,16 @@
+{
+  "subject_id": "zombie_elite",
+  "display_name": "Elite Zombie",
+  "pack": "undead-patrol-01",
+  "seed": 800800,
+  "role": "commander/brute",
+  "silhouette_thesis": "tall, imposing, upgraded mass — the biggest threat in the pack, boss-read",
+  "reject_conditions": [
+    "average height or build",
+    "reads as just another zombie",
+    "no distinguishing feature that signals 'elite'",
+    "silhouette not taller/wider than Shambler"
+  ],
+  "subject_prompt": "solo, 1character, single character only, one figure, an elite brute zombie undead, unusually tall and heavily muscled imposing figure towering over normal height, broad powerful shoulders, dark grey-black skin tougher looking than normal zombies, wearing torn remnants of a dark military tactical vest stretched across massive chest, one huge fist clenched showing oversized knuckles, heavy jaw with exposed teeth in a permanent snarl, glowing red-orange eyes distinguishing it from lesser undead, thick neck with visible dark pulsing veins, heavy stomping stance with wide planted feet, torn dark cargo pants reinforced at the thighs, the tallest and most imposing silhouette in the pack, boss-tier undead threat, fully visible full body",
+  "negative_prompt": "multiple people, two characters, group, couple, pair, reflection, mirror, turnaround sheet, model sheet, reference sheet, split view, blurry, smooth, photorealistic, 3D render, low quality, deformed, extra limbs, text, watermark, signature, frame, border, average build, small, short, thin, normal proportions, clean clothes, bright colors, vivid colors, healthy skin, living appearance, smile, normal eyes, weapon in hand, shield, cape, wings, medieval fantasy, magic effects, gun, firearm, busy background, cropped, cut off, partial body"
+}

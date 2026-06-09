@@ -1,0 +1,16 @@
+{
+  "subject_id": "zombie_worker",
+  "display_name": "Worker Zombie",
+  "pack": "undead-patrol-01",
+  "seed": 800700,
+  "role": "industrial/civilian texture",
+  "silhouette_thesis": "uniform, tool-belt, readable gear — tells a story of who this person was",
+  "reject_conditions": [
+    "no visible work gear or uniform",
+    "reads as generic civilian with no occupation markers",
+    "silhouette identical to Shambler",
+    "too heavily armored (drifts into Riot)"
+  ],
+  "subject_prompt": "solo, 1character, single character only, one figure, a zombie construction worker undead, medium build wearing torn dirty orange hi-vis safety vest over dark work shirt, visible tool belt around waist with dangling wrench and hammer, worn dirty brown work boots with steel toe caps, a cracked yellow hard hat tilted askew on head, work gloves one missing exposing rotting grey hand, pale grey-green rotting skin with dark stains, slack jaw expression, one arm hanging at wrong angle clearly broken, the work uniform and tool belt define the silhouette and tell a civilian story, shambling forward stance, fully visible full body",
+  "negative_prompt": "multiple people, two characters, group, couple, pair, reflection, mirror, turnaround sheet, model sheet, reference sheet, split view, blurry, smooth, photorealistic, 3D render, low quality, deformed, extra limbs, text, watermark, signature, frame, border, no uniform, casual clothes, no tools, clean clothes, bright vivid colors, healthy skin, living appearance, smile, military gear, heavy armor, riot gear, lean athletic, cape, wings, medieval fantasy, magic effects, gun, firearm, busy background, cropped, cut off, partial body"
+}

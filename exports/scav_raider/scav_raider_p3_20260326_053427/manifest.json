@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:42:19.462608+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "scav_raider",
+    "display_name": "Scav Raider",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "scav_raider_p3_20260326_053427",
+    "seed": 661122,
+    "generated_at": "2026-03-26T05:35:22.991692+00:00",
+    "accepted_at": "2026-03-26T05:40:36.132615+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "1d32a89903ad3ede54d75f1b6a57a76a36cb79e7808b012afa74e2302c1adcbc",
+    "normal/front.png": "0caa4b6d91b51efae2ef7258191728c13262c8e9381a00699a9076f77e7d39c6",
+    "depth/front.png": "794b68233673626cb19b9164064b636aa03811d8fda2dc65fc7cfb6f21331469",
+    "albedo/front_left.png": "8fe4d60e222a01cfce4482a5635cd453f14db1e3f2e751033f5d6b32ba6110c5",
+    "normal/front_left.png": "7d729fabb43567c5b94ef31ffd15af40fbe47002b7622f6fbb104b52e953770b",
+    "depth/front_left.png": "058c9341e5066833cb680626b154f841401008e65c339811fe0169c162d2d1a5",
+    "albedo/left.png": "c5e10ce067fcabf3718dbbffbd1eedda52aca7701a3dc032d528f3c029a2166e",
+    "normal/left.png": "97277992b461281298db459e23a1a76501b74230be1ba2c04b07dd348c5371a2",
+    "depth/left.png": "5ea7e71a529c4857fd71a215c42255df8c4dd724519bae681b41a10e5f598648",
+    "albedo/back_left.png": "4e7e2136d0c51cf8b47f2c388aa4874c93dea6d0866ebdde9df2c27b839b562f",
+    "normal/back_left.png": "e38defb8ea9cfb98c64aceebda17dd41538276702ce219c8b2d42763569426bd",
+    "depth/back_left.png": "8e217d4c59249f759c73f83194b9ea61cdd5b8ef63cb0f23fc8352edf778bcc4",
+    "albedo/back.png": "9d1ae10da3ac13ec27d55278087d528111adf66c6939087ce7b1cd3d75447f5d",
+    "normal/back.png": "9c746fcea1f2571f6c7f49bd073a48a009208f368f25d82b6010da1e4ddc0da5",
+    "depth/back.png": "4dc2f876296382c4b850532763ca8dcd4792795d3fd84178cb89367895f2776e",
+    "albedo/back_right.png": "a7a4fd1afe2975e8b1dd0f3d0270079683ac1d5b955d5fe947ade4a7d180cf5f",
+    "normal/back_right.png": "7a8913d7c4bc6365ddac2d8edf7b9f5f2b3b661882d147195e6ab207f4a35bbb",
+    "depth/back_right.png": "b4a46bd45e311905a8bab93c136a0f0029e8ac7db1257cd9c9b373c64df71394",
+    "albedo/right.png": "21087194e7d0bf6a2ed3dac3ec0e502e91389400b1a667692d9101e4322de777",
+    "normal/right.png": "c04ebd820b93614cad939952b8d2d380180491ad8dfa351510479995dd2ccfde",
+    "depth/right.png": "3412caa3888b9cadef80d77ad603037b2e29728f32a874b024cc6f7c44fd2c30",
+    "albedo/front_right.png": "fdd968323feb8fc569413051ac6050b7ac42f929e0547e5dc384f18d2ab21a2a",
+    "normal/front_right.png": "313be83fd92820a1074064ffa8981f942142349773bd7871c84d39e0d7e20602",
+    "depth/front_right.png": "b5c2b2bedf3ee2885ebf0bd844eb37feb6bef7d88fb73fd383f2b24e7d60d0db",
+    "preview/contact_sheet.png": "d4f3db42d7778e7e12c3f09128302f9252f63dda9391061b56fe19c782e5eb5f"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\scav_raider_p3_20260326_053427",
+    "maps_dir": "bakeoff\\scav_raider_p3_20260326_053427_maps"
+  },
+  "notes": null
+}

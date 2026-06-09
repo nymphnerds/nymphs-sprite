@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T23:38:09.620331+00:00",
+  "foundry_version": "321ecee",
+  "identity": {
+    "subject_slug": "beast_wyvern",
+    "display_name": "Wyvern",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_wyvern_p5a_20260327_231740",
+    "seed": 819400,
+    "generated_at": "2026-03-27T23:20:02.523013+00:00",
+    "accepted_at": "2026-03-27T23:32:05.823634+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "321ecee"
+  },
+  "generation": {
+    "stack_id": "A_v2_morph_dual",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": "controlnet-depth-sdxl-1.0.safetensors",
+    "controlnet_depth_strength": 0.55,
+    "controlnet_depth_end_percent": 0.9,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "5b4f09116bf88ae3808beb78c0cd4c5fff4be67e0617e3c98e07d844627c2fa8",
+    "normal/front.png": "19fece0f470d1c45e1c4e8220c60b3ce1891656f9eb3b76b130140c05c522300",
+    "depth/front.png": "0609c9bcdddbb7f926e08279cce91462653122ddf2ef11c5c5e7e2ae022c4dd3",
+    "albedo/front_left.png": "7558ce9f0c71d8bee1fdd9032e02f2228810adac1d302d2f9fb0843a758a6bc3",
+    "normal/front_left.png": "d7b59c5d242d502b20a89243e033e3576e4f93487a423e1a9ee1e04a0259dd95",
+    "depth/front_left.png": "9229d2ffe3e1394611530ad987d519d79ad8e7e311093161fdd6219e07f5d9bf",
+    "albedo/left.png": "8476432547a75f069fb006a0b61464ba6078a0a7744cfbaf7c1cec303363ba2a",
+    "normal/left.png": "fcfa5ec270f33347080a8c48998c9663505b3813db79a94f69c30d2698c88482",
+    "depth/left.png": "8d089ffa49b84cbfd3c92e38183352ba482fdf7f3996068f375bd1f12c7cd92e",
+    "albedo/back_left.png": "4b816a9708ba78edc8f469001dccf04ff47c77f5e7dddb84e680581a7f34923e",
+    "normal/back_left.png": "cf989c9dc4c10230ac7fcc65c0774adaafa381a1b1730655547a1290469b82a4",
+    "depth/back_left.png": "132819da3d9bd334cf65f17b0ee0ef279a80bf76835f69ea2bdecbaf60dfdcef",
+    "albedo/back.png": "88f97e9113f85c465279c899b072945ec30c11d2c50709cacdec761b3e23161f",
+    "normal/back.png": "ab2d64fba4daecf149be026c273b2436d288d430480bc1e64b39b0e87df51c55",
+    "depth/back.png": "32602ea6c83be8afa050485243c456baf4e657476fdbf13b5a31791aeb90be31",
+    "albedo/back_right.png": "07657d89fc5fe5175c00ca3b85bfa64a4df033be8e50f312915c8f9d413ac481",
+    "normal/back_right.png": "9888f742791027681de794f10d3abe4c429d88b6124a8a72d060bf20ebc6158c",
+    "depth/back_right.png": "7089719dd67af27ff94dec43697427c3fa2ad4b3e1b5b765e1adbcd77b3870ae",
+    "albedo/right.png": "ebbdb776f19b5e2d2a8221c5ee8b6eb385131ace93b4e03a90a153e2c3fef419",
+    "normal/right.png": "c780ac166a471bfe0338b7b307fdbcf973a35aa2da5ce50a3707b47ff99daa53",
+    "depth/right.png": "fd26194839caf06c154429a3314938817c98137e2050ca6df1cc66d41cb090d1",
+    "albedo/front_right.png": "0bd87c97e73abc12f73fdbe6beb743b3a0584a67360691f33219dc52a105c07a",
+    "normal/front_right.png": "b7a0e66eb10cc3edf0863743aa379a83b063ac5b32c7f45c2e6694db68438584",
+    "depth/front_right.png": "2adc623100bfe10eab51d9897d82ac269c35e14f4365bf81682f7540b6e0cad0"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_wyvern_p5a_20260327_231740",
+    "maps_dir": "bakeoff\\beast_wyvern_p5a_20260327_231740_maps"
+  },
+  "notes": null
+}

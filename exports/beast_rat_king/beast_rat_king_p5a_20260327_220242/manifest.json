@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T22:29:15.914118+00:00",
+  "foundry_version": "90ef703",
+  "identity": {
+    "subject_slug": "beast_rat_king",
+    "display_name": "Rat King",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_rat_king_p5a_20260327_220242",
+    "seed": 818100,
+    "generated_at": "2026-03-27T22:04:07.326997+00:00",
+    "accepted_at": "2026-03-27T22:24:22.325983+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "90ef703"
+  },
+  "generation": {
+    "stack_id": "A_v2_morph",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": "controlnet-depth-sdxl-1.0.safetensors",
+    "controlnet_depth_strength": 0.35,
+    "controlnet_depth_end_percent": 0.65,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "72ad1081254b3080a67e7f480fa329120fecdfa138a677a67ca8c9de1f5a8f10",
+    "normal/front.png": "00b068dbe5a77b08fb7dddf7e4dff932afe543dc5bd88e0fca9ab3d001775c56",
+    "depth/front.png": "1b7c5f859c935f1176ff7aa9ecf86793e1a8deb3913999c91e828a89320c0226",
+    "albedo/front_left.png": "52cd2de193d9a534a27626ae5f22e0b546b2330244518e425da0525d8ef2fa8e",
+    "normal/front_left.png": "3b937749e694dc52e5646af0801a35f095788d3b7b573fb74962b718356b4525",
+    "depth/front_left.png": "4e2ca970f537f6bcf65a23f94495d439066d90b7f45d22f777e79a55a483b500",
+    "albedo/left.png": "4405304590a1ad399509b99e3d9a8b545a49475c08463fc4e860ab88b3aff6cc",
+    "normal/left.png": "5f68523a6c0ba78632554b1a93006b3c04c8b68feab720edf65eb7a6de0a70fe",
+    "depth/left.png": "4d3f734297394d725fd8e729af60ae015427e540c3dac7f9d836c4676c081799",
+    "albedo/back_left.png": "2935c9d795010323a2fcf70273d2fb85be5af7e938cc605f45f0361bc683821d",
+    "normal/back_left.png": "9db222a9e0fbee13e126b8fb6c298e004012c1f9bcb2a89cd2b3bd749c4c91a6",
+    "depth/back_left.png": "52b3df3e9664455e04a1cc9d17ca61454c82e76e1406047b2c4ad24ab2de80d0",
+    "albedo/back.png": "56f7952d7c3960dc398833d16d7cdf0bae3f6b35a5df0634c4c33bb3d1f00e41",
+    "normal/back.png": "9b3c27f7c682dba2ddd4ffb85669e065296912c4e2de4385b286b37b33f917e0",
+    "depth/back.png": "cdc5eca661b96bff8adec28ef45a8738e6823a1ea4b125c6e4f9f257ee55d3e0",
+    "albedo/back_right.png": "077700922fb01354040569ddcbd2f8607579a1d59a10f07478a0f4eddb163fa9",
+    "normal/back_right.png": "06e8c5e23b4777997507dfc65dabfc7e600208cbe811e90075e5c04ad451067c",
+    "depth/back_right.png": "01dfa3201dd79f62e8c9854235e6321842b3f5660ba7156ab7588038841af1ca",
+    "albedo/right.png": "01da9566dfd5efe621c1eae4ec0649ddfc3c3dc77189b6e22c7b4f2868f187c5",
+    "normal/right.png": "7763f9584745a977c4d075450aa3824c3a68dec092a9583aa0a2bd98ebca38a5",
+    "depth/right.png": "68655b6ce8fc7ce8c830fc3cb394950a84ccdcecf412f052b63667b1e9622d57",
+    "albedo/front_right.png": "ae64f5ff4af79dd59f3a2b8efc4731925a3fbc747caa0b82606a5ee649881523",
+    "normal/front_right.png": "617e023d9c78ed049ba41215719c0d23a817fa7a100e784bb18ea7dc5fd58c6b",
+    "depth/front_right.png": "dfd0b4583a2b98497faba185b1abf35c49a323be4e467248402cc5f75293b7ad"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_rat_king_p5a_20260327_220242",
+    "maps_dir": "bakeoff\\beast_rat_king_p5a_20260327_220242_maps"
+  },
+  "notes": null
+}

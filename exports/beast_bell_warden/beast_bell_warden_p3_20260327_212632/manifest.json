@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T23:38:07.683180+00:00",
+  "foundry_version": "321ecee",
+  "identity": {
+    "subject_slug": "beast_bell_warden",
+    "display_name": "Bell Warden",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_bell_warden_p3_20260327_212632",
+    "seed": 819200,
+    "generated_at": "2026-03-27T21:27:39.558061+00:00",
+    "accepted_at": "2026-03-27T23:32:04.871387+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "321ecee"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "90d3f8dd2912132747d7c0a6249f182f0b02f979f882c75e8226661d47481ff1",
+    "normal/front.png": "6e8343b0b2f25a25ca019244b8aed30f8a46ec404d984299b6be1dda7c2655c3",
+    "depth/front.png": "c247187ab7094142bca2a7e84b132ade70d8467cabbe323a5f8085ff89c81844",
+    "albedo/front_left.png": "c246210176e2c13cd650ea433d86aa66f53b9c01d8b21a13d5dd16c8d6616073",
+    "normal/front_left.png": "7378ead05f8888c1938ca0159bd94e3da519e8ede701e43ba99d7fbc437ce732",
+    "depth/front_left.png": "40369e18fa00ceac580e443e1d9a9e178cbd6b72fe2f349cf18038437dd48b59",
+    "albedo/left.png": "cf821eb46ec7a95f927f10c00b77d7f8a6a55922fa6f4a86330c54dfa5a3da46",
+    "normal/left.png": "2486a1ec239b6cb4dbd250e1fbc6f0bb9c608804bb13d66d7dff14993036333a",
+    "depth/left.png": "637bff469d886618033f42466b41533fa51664b109f8fc2cf54c94d5de3ded77",
+    "albedo/back_left.png": "2f846fd0d05cdc16fad3c62ca2e1847473dc0f7dc76fa8877723f508ea02bc6b",
+    "normal/back_left.png": "585c0e849e1c88ffe6bd68330ed36743e392b86e450c27e286fbf86cb151cbc8",
+    "depth/back_left.png": "4e34ac43ad0e22724dfb4f14cc33e074faddeecc7a088749a0a8d880afe4fba1",
+    "albedo/back.png": "5352b7742fc011d96be8cd7c0885f0a3def2e95fb448d9049231588f6d7b75b7",
+    "normal/back.png": "2796fd09d9caa1de38b12a2cd5f33402b61c64aeabe3c8c93220f81b2416ba0a",
+    "depth/back.png": "921d2af021281bf3f1e602b89ddef0da2abe82371e96bf5578172870808bf30c",
+    "albedo/back_right.png": "27419e8c1011a485f02038492ed2aa178be97102f5638ca97bab3aaa90ae99c7",
+    "normal/back_right.png": "c385177cf5272d0b296b45318f61e956c4fa46696ee09cc8e2cdbe7bab69e771",
+    "depth/back_right.png": "e87d7c1787348d3e1a3a9e26b0ead9f475e17b73dcec7fbaad45d751f0ec7b1c",
+    "albedo/right.png": "a12e825e7bdd6ea9b5bc8424ae5c7920b37338fe8c01ebaf887c092dc8b28ac2",
+    "normal/right.png": "1dd8a2bfd997a6dbeff458a719ea40cefb93fad961a749f9dae388f65a2589e8",
+    "depth/right.png": "24cb9cc9169434283427dd7e15c6de17541c5bb0c1c68310faa2b0efd60957af",
+    "albedo/front_right.png": "f34bbb9b1e65791b0f11e286f2beb3efe0f9c732c18b851df15d9a83cf83c8e7",
+    "normal/front_right.png": "4f37a522eeb701cd12ae0cd54580cc77b4f421d8dc61a03ebde3c75dc0f515a7",
+    "depth/front_right.png": "55a971a0758c7e09b88cb9dce06ec9aa1aa6269d93ce13aaf61ba34f29c83bfc",
+    "preview/contact_sheet.png": "e07b26dbfcebbf5d9392192bb22e7279942cf35f15429870606ca61d092899aa"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_bell_warden_p3_20260327_212632",
+    "maps_dir": "bakeoff\\beast_bell_warden_p3_20260327_212632_maps"
+  },
+  "notes": null
+}

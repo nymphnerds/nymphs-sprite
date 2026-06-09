@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T16:42:19.742838+00:00",
+  "foundry_version": "09139b7",
+  "identity": {
+    "subject_slug": "skitter_drone",
+    "display_name": "Skitter Drone",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "skitter_drone_p5a_20260326_060825",
+    "seed": 881144,
+    "generated_at": "2026-03-26T06:09:43.749478+00:00",
+    "accepted_at": "2026-03-26T06:45:49.845515+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "09139b7"
+  },
+  "generation": {
+    "stack_id": "A_v2_morph",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "e2a378090768b51e0cb86b3865c0bc25ee22dd7a3b0c8e9032d2c08f4901e7df",
+    "normal/front.png": "26464ac189b1e00b31a08921ca275ce4883ec7f55007fe4276b649c8ba5a02aa",
+    "depth/front.png": "7af5164b842494bbfc5bfdcd184279630cc8cbb7b63d3cfda85dbdf0df7492b7",
+    "albedo/front_left.png": "6e78b7b481da96a37b45586d8f422af45df2b9b73a1f3a340ed22140b1cc71b0",
+    "normal/front_left.png": "c11c61a3cc92fe1499cf416594e3b9964190362efeccc7201f2d48b2b7a88c73",
+    "depth/front_left.png": "20d87bea2e976c8ec4b761de706433ff4c6e9da64916f344c1381f6aaa7b992e",
+    "albedo/left.png": "0a92641a200eb3bba144b305bb6ec8757e3ac124cd0ee0a2a51957c2d81f6b29",
+    "normal/left.png": "4e3609ff819e707d9a890f17c53b14354f03faf2ac417e065fe4bebe900ce2c9",
+    "depth/left.png": "bedd853d437ab705725501f49245325b765b053e7dc83ebe823c6c74c4fe9d56",
+    "albedo/back_left.png": "ba303708e31633ad2db3bdd0c3fccfbc70eb173445d1ea9cef8f2bc635c6e0ec",
+    "normal/back_left.png": "7b161143642a745cc594c83ead5caa381a118439d28f1ff9b708a27286455db9",
+    "depth/back_left.png": "2b62c22629d9541a2294163c858877d88ceef348d0b6ee25c6188e784d3c2a89",
+    "albedo/back.png": "5771e911c3d0b0c179ad256ed732d663ca91cee58d6d5ff47fe49d8fd5b080bb",
+    "normal/back.png": "cef2c24d2228d527462b163174f0f25670ec36faa5885b5621df804ba207fadb",
+    "depth/back.png": "2c32c22db1cfc3bd4d9265f59ad6cf75bb1c5fa9b5d89a1df03bff86e7b60146",
+    "albedo/back_right.png": "1e804c35bde52ead7a74b9f73d36b91301400493da7c3835be3e453759050674",
+    "normal/back_right.png": "8bd465f183204cd79796cac5793eb063df96d4d22d6cfd9c0a105cbe7b6d8b27",
+    "depth/back_right.png": "834235c760669bc561aafc718fae47145caa1fae21da400769502d5abac2d619",
+    "albedo/right.png": "04b1f3e0f3d16741cac4b4a93b3597c02dc35e3c9124a1ac1944c7844fddc4a4",
+    "normal/right.png": "3543879343338cec5cf013ed43ba53f99e69f9a3dd7077a5c3611c0fe6fce0a0",
+    "depth/right.png": "9ff99c7060eb61ac702190ca5acaf9e561e5e6134463848e55dbef26169c9d87",
+    "albedo/front_right.png": "7c2dbc99931fa2f35a80a722afd66eaff8ebe54dc75456c403dbb40335e6aad7",
+    "normal/front_right.png": "62276b986476c43705d67e6f4559e4386bc4ca1550c1cadb113263fedfb40eec",
+    "depth/front_right.png": "01022902028f454f52ea315c331d4daae5de299840a4c9bd77972fe70395413f"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\skitter_drone_p5a_20260326_060825",
+    "maps_dir": "bakeoff\\skitter_drone_p5a_20260326_060825_maps"
+  },
+  "notes": null
+}

@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-27T22:38:44.106472+00:00",
+  "foundry_version": "90ef703",
+  "identity": {
+    "subject_slug": "beast_spore_mother",
+    "display_name": "Spore Mother",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "beast_spore_mother_p5a_20260327_221155",
+    "seed": 819300,
+    "generated_at": "2026-03-27T22:13:08.424114+00:00",
+    "accepted_at": "2026-03-27T22:24:22.702529+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "90ef703"
+  },
+  "generation": {
+    "stack_id": "A_v2_morph",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": "controlnet-depth-sdxl-1.0.safetensors",
+    "controlnet_depth_strength": 0.35,
+    "controlnet_depth_end_percent": 0.65,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "0b5cac18fd403f3b958cddccf52bfed66da95f80b1081dd2de504d69ead5c580",
+    "normal/front.png": "b27e97b311cd59f7fd62c9fe179fb4ec16729d12450ef763e215e723afec7c57",
+    "depth/front.png": "266cd2f444ca6af10cbd790f69f19611b9520fdecc5c3509612c34785b048209",
+    "albedo/front_left.png": "f14f89f9da2d93614cb383681ab84cf934e9badf907d8c3280d7cd15adc9fb8b",
+    "normal/front_left.png": "80cbd966b1e6b1168ea58f1bd1dc27df93f918932e2edc9ee0d28110b6395170",
+    "depth/front_left.png": "eff75080d085adb099c04c6330587448a42660be14b26e6618d237a769578704",
+    "albedo/left.png": "eadc6268c7d946eeea6ec0a638d36e5bb2f1a201f9437a69939bb3243776b145",
+    "normal/left.png": "de7a9537b526f6fed89cf82d267e27ac5c873c96c3eb0dddfc4d028e82fbfb26",
+    "depth/left.png": "24ea0f134868fd73bf070bc0c5d6576ebb715f01d8f985e53e2e7a121f30fbf8",
+    "albedo/back_left.png": "f8d57a0871fc171962e1db5eccdfb1f177ce31ba074ab0af72ab53dc3b30f487",
+    "normal/back_left.png": "2d7b398fc52e7fe0a9b9a03dd77f04a9838727f3d2e9b3746ffc04168dac7403",
+    "depth/back_left.png": "62206141e24ca6f18bbf406765e03a8ae0b8ad4d016241e1e40b9fd93a69c149",
+    "albedo/back.png": "32b85893d4a58cbf5e90e3522a84e360b2d533c6b781fbff8ccd80341f6fecb0",
+    "normal/back.png": "81395eaad93af156485b1e1cb937c03071799c90b557f0be43e21e5ea4302763",
+    "depth/back.png": "dd64d64b4ed5d18324903626f87fa72bc16118c75daaaa2cfec36569fee56654",
+    "albedo/back_right.png": "6d258d6e1c33e0fd558c529c95284b93b0edb9289ecfb273f658fe79bb2cfd2b",
+    "normal/back_right.png": "8832bb2dba4c98281ae848e507affdc9bd47f636eee1348894863a388e60f01a",
+    "depth/back_right.png": "e167c117b7a8cf393d45bec97be51488882e08cf9c55abf6a77f4ef8612c9457",
+    "albedo/right.png": "b26f5571d0113532359786fab7dee0f19c823e7e5cd6390537a11e2e8f9b05e3",
+    "normal/right.png": "216a0c47529679c66feb2a344b233d3457dac87f2db90745b9280dc90da2e523",
+    "depth/right.png": "cf9efc23e0a19ac5f54c8d6058f8f0016e8257c6449d5ba82d0487be7ef2cd7c",
+    "albedo/front_right.png": "8971c67bac8510f1440576fd43861e70bd77d8910536c6d87bf9cd856893f16a",
+    "normal/front_right.png": "6c55a1f96ac223a0e70cf7bc959c03cdddb0fda17cf927b0d7ca64000e545bf8",
+    "depth/front_right.png": "1bcb5d9a430931f823eab73643fc171da47fe4f61c88f575149a4ce8dfd61e59"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\beast_spore_mother_p5a_20260327_221155",
+    "maps_dir": "bakeoff\\beast_spore_mother_p5a_20260327_221155_maps"
+  },
+  "notes": null
+}

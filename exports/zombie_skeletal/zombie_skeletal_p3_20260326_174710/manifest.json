@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0.0",
+  "exported_at": "2026-03-26T17:51:43.284314+00:00",
+  "foundry_version": "baededa",
+  "identity": {
+    "subject_slug": "zombie_skeletal",
+    "display_name": "Skeletal Zombie",
+    "body_family": "bipedal"
+  },
+  "provenance": {
+    "run_id": "zombie_skeletal_p3_20260326_174710",
+    "seed": 800600,
+    "generated_at": "2026-03-26T17:48:02.753398+00:00",
+    "accepted_at": "2026-03-26T17:51:26.986314+00:00",
+    "regen_count": 0,
+    "reject_count": 0,
+    "git_hash": "baededa"
+  },
+  "generation": {
+    "stack_id": "A_v2",
+    "checkpoint": "juggernautXL_ragnarokBy.safetensors",
+    "lora": "pixel-art-xl @ 0.85",
+    "controlnet_depth": null,
+    "controlnet_depth_strength": null,
+    "controlnet_depth_end_percent": null,
+    "controlnet_edge": null,
+    "controlnet_edge_strength": null
+  },
+  "render_contract": {
+    "width": 48,
+    "height": 48,
+    "direction_order": [
+      "front",
+      "front_left",
+      "left",
+      "back_left",
+      "back",
+      "back_right",
+      "right",
+      "front_right"
+    ],
+    "pivot": "center_bottom",
+    "transparency": true
+  },
+  "files": {
+    "albedo/front.png": "9b04a3ee702b50bd918c4712045ee2e06aed2ad63492880cd0aeea8737cf6ee1",
+    "normal/front.png": "e6c9dc9ca05f8680677f81d314149826735973aa511fd2cb4f5c3c145bc9ba41",
+    "depth/front.png": "df62ea11c2d7b39be58c7b2c402ccc231bd1f39de8753ac51556722dfbf3776b",
+    "albedo/front_left.png": "c9fe3a9f1f56514ac681696b5225c89451c0fd79a744ddfbfbf28644c5874207",
+    "normal/front_left.png": "899af03abf0f23a7ebdbfefaed117eb7f2157d8cf8632a03ec61d92eb4d48446",
+    "depth/front_left.png": "86001b2b3524fa45298102f2bede19f7276a3eb9c50572ceaae539f448beb3f7",
+    "albedo/left.png": "43ce98795d8eb077fc2425d94d90811f9cd04f062bd52126adea011ba5a7bfbc",
+    "normal/left.png": "aea6a453a82893375739c8cc39baa21f6f17a7cd9c8976a860f802b9e2338bac",
+    "depth/left.png": "e817d5f72c3abcbaf8dac7f30843a82c74b9f571c9ae0c152435696363fc33b0",
+    "albedo/back_left.png": "02f5399f05b449658c70f8e52ec08fec5dc040fbd3165c11d8df6530576d281a",
+    "normal/back_left.png": "6a1adca48471d94f341a5c81392133c15f38e534bef0bbc7d7d06dfcacb87073",
+    "depth/back_left.png": "34d524a658a1907520dc9da874b40b12c46afba3806b0d0df8ccab44101015c7",
+    "albedo/back.png": "b715fc78e8ed6363ced688e76d910aa5d3474cd67178ad2d846b3f54af4c7b53",
+    "normal/back.png": "89bb6b41659b2c85392bb2a9823b1e32e7745a36f51b6f7ffd1cb859f75ce210",
+    "depth/back.png": "23176146f4b6b863cf964f97de5bd4669348a6ed542d4dbbf4ccae1289d6c064",
+    "albedo/back_right.png": "014377ed937770797de40c881104c76d84dfebed17c6c1523b0fa91c427cc00d",
+    "normal/back_right.png": "d65716ec2108e54cb5aba02c630978241c1ce1c70e8ae38a9d21eb4ca383ed4b",
+    "depth/back_right.png": "7677484dabe653e168d5ea88f9b7bd9fe60f840c4f2c17d23aa2e28a45fc9488",
+    "albedo/right.png": "ef5a0150fae576e75b63797091d2a545c5e908470628614bd3bee16b729a1ca4",
+    "normal/right.png": "90b203ca970a6ed321482e7a6c87bd8d567b04be12faf408d37c8c30e678425f",
+    "depth/right.png": "3287302d1508c618bda963172a31dcb5072b47154e34df637e493b69eedfb7b7",
+    "albedo/front_right.png": "795f562c90c530b16da071ee62211836b02759c5dac2accdc236336e819f41b9",
+    "normal/front_right.png": "204c65695951ed1b33f5669452131a10531caa6a2cadb4bccdca472b1ca3082b",
+    "depth/front_right.png": "16ec84dbd3939f2bddffd4d338f224d12ce291ccea6da16bd2b0f5949b7f4e81",
+    "preview/contact_sheet.png": "112bd85de56c932b39b2d739fb45165ce02a64d3d799cd9b012946b9506fc389"
+  },
+  "source": {
+    "bakeoff_dir": "bakeoff\\zombie_skeletal_p3_20260326_174710",
+    "maps_dir": "bakeoff\\zombie_skeletal_p3_20260326_174710_maps"
+  },
+  "notes": null
+}
