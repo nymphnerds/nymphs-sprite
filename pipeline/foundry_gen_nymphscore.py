@@ -323,7 +323,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     run_id = f"{subject_id}_nymphscore_{ts}"
     out_dir = Path.home() / "NymphsData" / "outputs" / "nymphs-sprite" / subject_id
-    backend_dir = Path.home() / "NymphsData" / "tmp" / "nymphs-sprite" / run_id / "backend"
+    backend_dir = Path.home() / "NymphsData" / "outputs" / "nymphs-sprite" / "_backend" / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
     backend_dir.mkdir(parents=True, exist_ok=True)
     all_direction_names = {name for name, _ in DIRECTIONS_8 + DIRECTIONS_16}
