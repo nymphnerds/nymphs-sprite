@@ -92,10 +92,13 @@ OpenPose is the first-class path. Expanding Pose Lab hot-swaps the main preview
 area into a large rig editor with the direction strip underneath. Select a
 direction in the strip, adjust the stick rig, and create a guide sheet. The
 current direction keeps its own pose, so front, left, back, and 16-way
-in-between slots can be tuned independently. IK mode solves wrists and ankles
-through elbows and knees; reset, mirror, and copy-all keep the panel fast. FK /
-Length mode moves joints directly, so the current direction can have stretched
-or shortened limb proportions before switching back to IK.
+in-between slots can be tuned independently. Pose IK preserves limb proportions
+while you drag wrists, ankles, knees, elbows, hips, shoulders, pelvis, or neck;
+reset, mirror, and copy-all keep the panel fast. Edit Lengths moves joints
+directly, so the current direction can have stretched or shortened limb
+proportions before switching back to IK. Holding `Shift` while dragging
+temporarily edits lengths/free-moves the point without switching the mode
+selector.
 
 The non-OpenPose guide types may call the Nymphs Image / Gemini Flash route for
 rough research candidates, but the reliable pose path does not depend on Gemini.

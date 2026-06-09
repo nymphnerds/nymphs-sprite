@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "1.2.13",
+  "version": "1.2.14",
   "description": "Nymphs-native guided 8/16-direction game sprite generation, Pose Lab guide candidates, review, lifecycle, and export.",
   "category": "image",
   "kind": "sprite",

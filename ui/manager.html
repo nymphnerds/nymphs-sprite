@@ -907,12 +907,12 @@
             <div class="field">
               <label for="pose-edit-mode">Mode</label>
               <select id="pose-edit-mode">
-                <option value="ik">IK</option>
-                <option value="fk">FK / Length</option>
+                <option value="ik">Pose IK</option>
+                <option value="fk">Edit Lengths</option>
               </select>
             </div>
           </div>
-          <p class="flow-note">The rig editor opens in the main preview area while Pose Lab is expanded.</p>
+          <p class="flow-note">Pose IK keeps limb lengths. Edit Lengths moves points directly for proportions.</p>
           <div class="command-row three">
             <button id="pose-reset" type="button">Reset</button>
             <button id="pose-mirror" type="button">Mirror</button>
@@ -1950,6 +1950,28 @@
       left_ankle: ["left_hip", "left_knee", "left_ankle"],
       right_ankle: ["right_hip", "right_knee", "right_ankle"]
     };
+    const poseRootChains = {
+      left_shoulder: ["left_shoulder", "left_elbow", "left_wrist"],
+      right_shoulder: ["right_shoulder", "right_elbow", "right_wrist"],
+      left_hip: ["left_hip", "left_knee", "left_ankle"],
+      right_hip: ["right_hip", "right_knee", "right_ankle"]
+    };
+    const poseMidChains = {
+      left_elbow: ["left_shoulder", "left_elbow", "left_wrist"],
+      right_elbow: ["right_shoulder", "right_elbow", "right_wrist"],
+      left_knee: ["left_hip", "left_knee", "left_ankle"],
+      right_knee: ["right_hip", "right_knee", "right_ankle"]
+    };
+    const poseTranslateGroups = {
+      neck: ["neck", "head", "left_shoulder", "left_elbow", "left_wrist", "right_shoulder", "right_elbow", "right_wrist"],
+      pelvis: ["pelvis", "left_hip", "left_knee", "left_ankle", "right_hip", "right_knee", "right_ankle"]
+    };
+    const poseChainBends = {
+      left_wrist: 1,
+      right_wrist: -1,
+      left_ankle: 1,
+      right_ankle: -1
+    };
 
     function poseDirectionList() {
       if (value("guide-direction-count") === "16") {
@@ -2058,7 +2080,7 @@
       return Math.hypot(a[0] - b[0], a[1] - b[1]);
     }
 
-    function solveTwoBone(root, mid, end, target) {
+    function solveTwoBone(root, mid, end, target, preferredBend = 1) {
       const lenA = Math.max(1, distance(root, mid));
       const lenB = Math.max(1, distance(mid, end));
       let dx = target[0] - root[0];
@@ -2074,7 +2096,8 @@
       const clamped = Math.max(minReach, Math.min(maxReach, d));
       const ux = dx / d;
       const uy = dy / d;
-      const bend = Math.sign((mid[0] - root[0]) * (end[1] - root[1]) - (mid[1] - root[1]) * (end[0] - root[0])) || 1;
+      const currentBend = (mid[0] - root[0]) * (end[1] - root[1]) - (mid[1] - root[1]) * (end[0] - root[0]);
+      const bend = Math.abs(currentBend) > 8 ? Math.sign(currentBend) : preferredBend;
       const a = (lenA * lenA - lenB * lenB + clamped * clamped) / (2 * clamped);
       const h = Math.sqrt(Math.max(0, lenA * lenA - a * a));
       const base = [root[0] + ux * a, root[1] + uy * a];
@@ -2083,15 +2106,50 @@
       return [clampPosePoint(solvedMid), clampPosePoint(solvedEnd)];
     }
 
-    function setPoseJoint(joint, point) {
+    function translatePoseJoints(pose, names, delta) {
+      for (const name of names) {
+        if (!pose[name]) continue;
+        pose[name] = clampPosePoint([pose[name][0] + delta[0], pose[name][1] + delta[1]]);
+      }
+    }
+
+    function movePoseMidJoint(pose, rootName, midName, endName, target) {
+      const root = pose[rootName];
+      const mid = pose[midName];
+      const end = pose[endName];
+      const upperLength = Math.max(1, distance(root, mid));
+      const lowerOffset = [end[0] - mid[0], end[1] - mid[1]];
+      let dx = target[0] - root[0];
+      let dy = target[1] - root[1];
+      let d = Math.hypot(dx, dy);
+      if (d < 0.001) {
+        dx = mid[0] - root[0];
+        dy = mid[1] - root[1];
+        d = Math.hypot(dx, dy) || 1;
+      }
+      const solvedMid = clampPosePoint([root[0] + dx / d * upperLength, root[1] + dy / d * upperLength]);
+      pose[midName] = solvedMid;
+      pose[endName] = clampPosePoint([solvedMid[0] + lowerOffset[0], solvedMid[1] + lowerOffset[1]]);
+    }
+
+    function setPoseJoint(joint, point, direct = false) {
       const pose = currentPose();
       const target = clampPosePoint([point[0], point[1]]);
       const chain = poseChains[joint];
-      if (chain && value("pose-edit-mode") === "ik") {
+      if (chain && value("pose-edit-mode") === "ik" && !direct) {
         const [rootName, midName, endName] = chain;
-        const [mid, end] = solveTwoBone(pose[rootName], pose[midName], pose[endName], target);
+        const [mid, end] = solveTwoBone(pose[rootName], pose[midName], pose[endName], target, poseChainBends[joint] || 1);
         pose[midName] = mid;
         pose[endName] = end;
+      } else if (poseRootChains[joint] && value("pose-edit-mode") === "ik" && !direct) {
+        const delta = [target[0] - pose[joint][0], target[1] - pose[joint][1]];
+        translatePoseJoints(pose, poseRootChains[joint], delta);
+      } else if (poseMidChains[joint] && value("pose-edit-mode") === "ik" && !direct) {
+        const [rootName, midName, endName] = poseMidChains[joint];
+        movePoseMidJoint(pose, rootName, midName, endName, target);
+      } else if (poseTranslateGroups[joint] && value("pose-edit-mode") === "ik" && !direct) {
+        const delta = [target[0] - pose[joint][0], target[1] - pose[joint][1]];
+        translatePoseJoints(pose, poseTranslateGroups[joint], delta);
       } else {
         pose[joint] = target;
       }
@@ -2611,12 +2669,12 @@
     $("pose-editor").addEventListener("pointermove", (event) => {
       if (!state.poseDragging) return;
       event.preventDefault();
-      setPoseJoint(state.poseDragging, svgPosePoint(event));
+      setPoseJoint(state.poseDragging, svgPosePoint(event), event.shiftKey);
     });
     $("pose-editor").addEventListener("pointerup", (event) => {
       if (!state.poseDragging) return;
       event.preventDefault();
-      setPoseJoint(state.poseDragging, svgPosePoint(event));
+      setPoseJoint(state.poseDragging, svgPosePoint(event), event.shiftKey);
       state.poseDragging = "";
     });
     $("pose-editor").addEventListener("pointerleave", () => {

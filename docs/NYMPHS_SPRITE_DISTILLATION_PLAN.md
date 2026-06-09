@@ -57,7 +57,7 @@ clear reason to inspect files directly.
 Current published module version:
 
 ```text
-Nymphs Sprite 1.2.13
+Nymphs Sprite 1.2.14
 ```
 
 Current module identity:
@@ -323,9 +323,12 @@ Gemini or Z-Image to invent an OpenPose map. The UI owns a small editable rig:
 - direction strip sits directly underneath the rig editor
 - each direction saves its own joint positions
 - drag colored points to move joints
-- IK mode solves wrists/ankles through elbows/knees
-- FK / Length mode moves the selected point directly, which lets that direction
-  change bone lengths/proportions before switching back to IK
+- Pose IK mode keeps limb proportions while dragging wrists, ankles, knees,
+  elbows, hips, shoulders, pelvis, or neck
+- Edit Lengths mode moves the selected point directly, which lets that
+  direction change bone lengths/proportions before switching back to IK
+- Shift-drag is a quiet shortcut for temporarily editing lengths/free-moving
+  the selected point without switching the mode selector
 - Reset restores the active direction
 - Mirror mirrors the active direction
 - Copy All copies the active pose into every direction slot
@@ -584,7 +587,7 @@ Test in small slices.
 
 ## Immediate Next Implementation Order
 
-1. Test/update installed Nymphs Sprite `1.2.13` in the `NymphsCore` test WSL.
+1. Test/update installed Nymphs Sprite `1.2.14` in the `NymphsCore` test WSL.
 2. Confirm status panel and LoRA dropdown are fixed after restart/update.
 3. Open Pose Lab, move points in one direction, switch slots, and confirm the
    slot state is retained.
@@ -620,7 +623,7 @@ Expected current status signs:
 
 ```text
 id=nymphs-sprite
-version=1.2.13 or newer
+version=1.2.14 or newer
 controlnet_ready=true
 models_ready=true
 lora_choices=...
