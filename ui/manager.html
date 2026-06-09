@@ -1092,7 +1092,8 @@
       $("status-pill").textContent = statusLabel();
       $("status-pill").className = statusClass();
       $("runtime-chip").textContent = zRunning ? "ready" : "starts on generate";
-      $("model-chip").textContent = zModelChipText();
+      const modelChip = $("model-chip");
+      if (modelChip) modelChip.textContent = zModelChipText();
       $("runtime-text").textContent = values.zimage_url ? `Backend ${values.zimage_url} / ${zRunning ? "running" : "will start on Generate"} / ${zReady ? "models ready" : "fetch models"}` : "Backend";
       $("selected-model-text").textContent = values.selected_lora_path ? basename(values.selected_lora_path) : (loras.join(", ") || "none");
       $("progress-detail").textContent = `Backend ${zReady ? (zRunning ? "ready" : "will start") : "missing models"} | ControlNet ${controlReady ? "ready" : "missing"} | LoRA ${spriteLoraDownloaded} found`;
@@ -1868,16 +1869,18 @@
 
     async function refreshStatus() {
       try {
-        const text = await moduleAction("status", {}, { quiet: true, busy: false });
+        const response = await fetch("/api/status", { cache: "no-store" });
+        if (!response.ok) throw new Error(`status ${response.status}`);
+        const text = await response.text();
         renderStatus(text);
         await refreshRecentOutputs(true);
-      } catch {
+      } catch (localError) {
         try {
-          const response = await fetch("/api/status", { cache: "no-store" });
-          if (!response.ok) throw new Error(`status ${response.status}`);
-          renderStatus(await response.text());
+          const text = await moduleAction("status", {}, { quiet: true, busy: false });
+          renderStatus(text);
           await refreshRecentOutputs(true);
-        } catch {
+        } catch (bridgeError) {
+          append(`STATUS ERROR: ${localError.message || localError}; ${bridgeError.message || bridgeError}`);
           setProgress("Status", "Could not read module status.", 0);
         }
       }
