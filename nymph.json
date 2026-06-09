@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "1.2.9",
+  "version": "1.2.10",
   "description": "Nymphs-native guided 8-direction game sprite generation, review, lifecycle, and export.",
   "category": "image",
   "kind": "sprite",
@@ -46,6 +46,7 @@
     "open_nymph_ui": "scripts/sprite_foundry_open_ui.sh",
     "stop": "scripts/sprite_foundry_stop_ui.sh",
     "stop_ui": "scripts/sprite_foundry_stop_ui.sh",
+    "kill": "scripts/sprite_foundry_stop_ui.sh",
     "foundry_cli": "scripts/sprite_foundry_cli.sh",
     "foundry_status": "scripts/sprite_foundry_foundry_status.sh",
     "foundry_generate": "scripts/sprite_foundry_generate.sh",
@@ -61,6 +62,7 @@
     "open_nymph_ui",
     "stop",
     "stop_ui",
+    "kill",
     "foundry_cli",
     "foundry_status",
     "foundry_generate",
@@ -112,32 +114,32 @@
             "options": [
               {
                 "label": "Complete Nymphs Sprite Starter Stack",
-                "value": "sprite_foundry_starter_stack",
+                "value": "nymphs_sprite_starter_stack",
                 "description": "Fetch Z-Image INT4 r32, ControlNet 2.1, and mks0813/z-image-turbo-pixel-art-lora"
               },
               {
                 "label": "Z-Image ControlNet 2.1",
-                "value": "sprite_foundry_controlnet_2_1",
+                "value": "nymphs_sprite_controlnet_2_1",
                 "description": "Required by Nymphs Sprite direction control"
               },
               {
                 "label": "All Nymphs Sprite LoRAs",
-                "value": "sprite_foundry_all_loras",
+                "value": "nymphs_sprite_all_loras",
                 "description": "Fetch all bundled Z-Image pixel-art LoRA choices into the shared LoRA folder"
               },
               {
                 "label": "mks0813/z-image-turbo-pixel-art-lora",
-                "value": "sprite_foundry_lora_mks0813_pixel_art",
+                "value": "nymphs_sprite_lora_mks0813_pixel_art",
                 "description": "Recommended first Nymphs Sprite LoRA; trigger: pxlstl"
               },
               {
                 "label": "SkyAsl/Pixel-artist-Z",
-                "value": "sprite_foundry_lora_skyasl_pixel_artist",
+                "value": "nymphs_sprite_lora_skyasl_pixel_artist",
                 "description": "Alternative pixel-art LoRA"
               },
               {
                 "label": "tarn59/pixel_art_style_lora_z_image_turbo",
-                "value": "sprite_foundry_lora_tarn59_pixel_art",
+                "value": "nymphs_sprite_lora_tarn59_pixel_art",
                 "description": "Alternative pixel-art style LoRA"
               }
             ]
@@ -169,6 +171,13 @@
         "label": "Open Outputs",
         "entrypoint": "open_outputs",
         "result": "open_directory",
+        "visibility": "installed"
+      },
+      {
+        "id": "kill",
+        "label": "Kill",
+        "entrypoint": "kill",
+        "result": "show_output",
         "visibility": "installed"
       },
       {

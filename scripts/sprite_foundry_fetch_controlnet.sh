@@ -190,48 +190,48 @@ PY
 
 fetch_mks0813() {
   fetch_lora \
-    "sprite_foundry_lora_mks0813_pixel_art" \
+    "${SPRITE_FOUNDRY_LORA_MKS0813_PROFILE}" \
     "mks0813/z-image-turbo-pixel-art-lora" \
     "z-image-turbo-pixel-art-lora.safetensors"
 }
 
 fetch_skyasl() {
   fetch_lora \
-    "sprite_foundry_lora_skyasl_pixel_artist" \
+    "${SPRITE_FOUNDRY_LORA_SKYASL_PROFILE}" \
     "SkyAsl/Pixel-artist-Z" \
     "adapter_model.safetensors"
 }
 
 fetch_tarn59() {
   fetch_lora \
-    "sprite_foundry_lora_tarn59_pixel_art" \
+    "${SPRITE_FOUNDRY_LORA_TARN59_PROFILE}" \
     "tarn59/pixel_art_style_lora_z_image_turbo" \
     "pixel_art_style_z_image_turbo.safetensors"
 }
 
 case "${selected_model}" in
-  sprite_foundry_starter_stack|starter|complete|complete_sprite_foundry_stack)
+  nymphs_sprite_starter_stack|sprite_foundry_starter_stack|starter|complete|complete_sprite_foundry_stack)
     echo "Nymphs Sprite starter stack fetch"
     fetch_zimage_profile int4_r32
     fetch_zimage_profile zimage_controlnet_2_1
     fetch_mks0813
     ;;
-  sprite_foundry_all_loras|all_loras|all-loras)
+  nymphs_sprite_all_loras|sprite_foundry_all_loras|all_loras|all-loras)
     fetch_mks0813
     fetch_skyasl
     fetch_tarn59
     ;;
-  zimage_controlnet_2_1|sprite_foundry_controlnet_2_1|sprite_foundry_controlnet|sprite-foundry-controlnet)
+  nymphs_sprite_controlnet_2_1|zimage_controlnet_2_1|sprite_foundry_controlnet_2_1|sprite_foundry_controlnet|sprite-foundry-controlnet)
     echo "Nymphs Sprite ControlNet fetch"
     fetch_zimage_profile zimage_controlnet_2_1
     ;;
-  sprite_foundry_lora_mks0813_pixel_art|mks0813_pixel_art|zimage_turbo_pixel_lora)
+  nymphs_sprite_lora_mks0813_pixel_art|sprite_foundry_lora_mks0813_pixel_art|mks0813_pixel_art|zimage_turbo_pixel_lora)
     fetch_mks0813
     ;;
-  sprite_foundry_lora_skyasl_pixel_artist|skyasl_pixel_artist|pixel_artist_z)
+  nymphs_sprite_lora_skyasl_pixel_artist|sprite_foundry_lora_skyasl_pixel_artist|skyasl_pixel_artist|pixel_artist_z)
     fetch_skyasl
     ;;
-  sprite_foundry_lora_tarn59_pixel_art|tarn59_pixel_art|pixel_art_style_lora)
+  nymphs_sprite_lora_tarn59_pixel_art|sprite_foundry_lora_tarn59_pixel_art|tarn59_pixel_art|pixel_art_style_lora)
     fetch_tarn59
     ;;
   *)

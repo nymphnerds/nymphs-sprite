@@ -177,9 +177,9 @@
     .brand {
       display: flex;
       align-items: baseline;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 10px;
-      padding-bottom: 11px;
+      padding-bottom: 7px;
     }
 
     .brand-lockup {
@@ -707,18 +707,12 @@
 <body>
   <main class="app">
     <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-lockup">
-          <div class="brand-mark">NS</div>
-          <div class="brand-name">Nymphs Sprite</div>
-        </div>
-        <div id="status-pill" class="status-pill warn">checking</div>
-      </div>
+      <div class="brand"><div id="status-pill" class="status-pill warn">checking</div></div>
 
       <section class="section">
         <div class="section-title"><span>Runtime</span><span id="runtime-chip">Backend</span></div>
         <div class="command-row three no-top">
-          <button id="start-backend" type="button">Start Backend</button>
+          <button id="start-backend" type="button">Start</button>
           <button id="refresh-status" type="button">Refresh</button>
           <button id="check-runtime" type="button">Check</button>
         </div>
@@ -1878,7 +1872,14 @@
         renderStatus(text);
         await refreshRecentOutputs(true);
       } catch {
-        setProgress("Status", "Could not read module status.", 0);
+        try {
+          const response = await fetch("/api/status", { cache: "no-store" });
+          if (!response.ok) throw new Error(`status ${response.status}`);
+          renderStatus(await response.text());
+          await refreshRecentOutputs(true);
+        } catch {
+          setProgress("Status", "Could not read module status.", 0);
+        }
       }
     }
 

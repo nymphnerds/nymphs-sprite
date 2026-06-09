@@ -14,7 +14,7 @@ state="available"
 health="unavailable"
 detail="${SPRITE_FOUNDRY_MODULE_NAME} is not installed."
 controlnet_ready=false
-weight_profiles_available="sprite_foundry_controlnet_2_1,sprite_foundry_lora_mks0813_pixel_art,sprite_foundry_lora_skyasl_pixel_artist,sprite_foundry_lora_tarn59_pixel_art"
+weight_profiles_available="${SPRITE_FOUNDRY_CONTROLNET_PROFILE},${SPRITE_FOUNDRY_LORA_MKS0813_PROFILE},${SPRITE_FOUNDRY_LORA_SKYASL_PROFILE},${SPRITE_FOUNDRY_LORA_TARN59_PROFILE}"
 weight_profiles_downloaded="none"
 weight_profiles_missing="${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"
 models_ready=false
@@ -54,20 +54,36 @@ from pathlib import Path
 lora_root = Path(sys.argv[1]).expanduser()
 candidates = {
     "mks0813--z-image-turbo-pixel-art-lora": {
+        "profile": "nymphs_sprite_lora_mks0813_pixel_art",
         "repo_dir": "mks0813--z-image-turbo-pixel-art-lora",
         "repo_file": "z-image-turbo-pixel-art-lora.safetensors",
+        "local_files": [
+            "mks0813_pixel_art/mks0813_pixel_art.safetensors",
+            "mks0813--z-image-turbo-pixel-lora/epoch-1.safetensors",
+            "mks0813_pixel_art.safetensors",
+        ],
         "trigger": "pxlstl",
         "scale": "1",
     },
     "SkyAsl--Pixel-artist-Z": {
+        "profile": "nymphs_sprite_lora_skyasl_pixel_artist",
         "repo_dir": "SkyAsl--Pixel-artist-Z",
         "repo_file": "adapter_model.safetensors",
+        "local_files": [
+            "skyasl_pixel_artist/skyasl_pixel_artist.safetensors",
+            "skyasl_pixel_artist.safetensors",
+        ],
         "trigger": "a pixel art character",
         "scale": "1",
     },
     "tarn59--pixel_art_style_lora_z_image_turbo": {
+        "profile": "nymphs_sprite_lora_tarn59_pixel_art",
         "repo_dir": "tarn59--pixel_art_style_lora_z_image_turbo",
         "repo_file": "pixel_art_style_z_image_turbo.safetensors",
+        "local_files": [
+            "tarn59_pixel_art/tarn59_pixel_art.safetensors",
+            "tarn59_pixel_art.safetensors",
+        ],
         "trigger": "Pixel art style.",
         "scale": "1",
     },
@@ -85,7 +101,9 @@ def choice_name(path: Path) -> str:
     return path.name
 
 def candidate_paths(candidate: dict[str, str]) -> list[Path]:
-    return [lora_root / candidate["repo_dir"] / candidate["repo_file"]]
+    paths = [lora_root / candidate["repo_dir"] / candidate["repo_file"]]
+    paths.extend(lora_root / relative for relative in candidate.get("local_files", []))
+    return paths
 
 downloaded: list[str] = []
 choices: list[str] = []
@@ -94,6 +112,7 @@ selected_path = ""
 selected_id = ""
 selected_trigger = ""
 selected_scale = ""
+downloaded_profiles: list[str] = []
 
 for candidate_id, item in candidates.items():
     found = None
@@ -104,10 +123,11 @@ for candidate_id, item in candidates.items():
     if found:
         resolved = found.resolve()
         downloaded.append(candidate_id)
-        choices.append(f"{candidate_id}|{candidate_id}|{resolved}")
+        downloaded_profiles.append(item["profile"])
+        choices.append(f"{item['profile']}|{candidate_id}|{resolved}")
         seen.add(resolved)
         if not selected_path:
-            selected_id = candidate_id
+            selected_id = item["profile"]
             selected_path = str(resolved)
             selected_trigger = item["trigger"]
             selected_scale = item["scale"]
@@ -126,6 +146,7 @@ if lora_root.is_dir():
             selected_path = str(resolved)
 
 emit("downloaded_loras", ",".join(downloaded))
+emit("downloaded_lora_profiles", ",".join(downloaded_profiles))
 emit("lora_choices", ",".join(choices))
 emit("selected_lora_candidate", selected_id)
 emit("selected_lora_path", selected_path)
@@ -137,6 +158,7 @@ PY
 while IFS='=' read -r key value; do
   case "${key}" in
     downloaded_loras) downloaded_loras="${value}" ;;
+    downloaded_lora_profiles) downloaded_lora_profiles="${value}" ;;
     lora_choices) lora_choices="${value}" ;;
     selected_lora_candidate) [[ "${value}" != "none" ]] && selected_lora_candidate="${value}" ;;
     selected_lora_path) [[ "${value}" != "none" ]] && selected_lora_path="${value}" ;;
@@ -152,17 +174,17 @@ if [[ "${controlnet_ready}" == "true" ]]; then
 else
   missing_fetch_profiles+=("${SPRITE_FOUNDRY_CONTROLNET_PROFILE}")
 fi
-case ",${downloaded_loras}," in
-  *,mks0813--z-image-turbo-pixel-art-lora,*) downloaded_fetch_profiles+=(sprite_foundry_lora_mks0813_pixel_art) ;;
-  *) missing_fetch_profiles+=(sprite_foundry_lora_mks0813_pixel_art) ;;
+case ",${downloaded_lora_profiles:-none}," in
+  *,"${SPRITE_FOUNDRY_LORA_MKS0813_PROFILE}",*) downloaded_fetch_profiles+=("${SPRITE_FOUNDRY_LORA_MKS0813_PROFILE}") ;;
+  *) missing_fetch_profiles+=("${SPRITE_FOUNDRY_LORA_MKS0813_PROFILE}") ;;
 esac
-case ",${downloaded_loras}," in
-  *,SkyAsl--Pixel-artist-Z,*) downloaded_fetch_profiles+=(sprite_foundry_lora_skyasl_pixel_artist) ;;
-  *) missing_fetch_profiles+=(sprite_foundry_lora_skyasl_pixel_artist) ;;
+case ",${downloaded_lora_profiles:-none}," in
+  *,"${SPRITE_FOUNDRY_LORA_SKYASL_PROFILE}",*) downloaded_fetch_profiles+=("${SPRITE_FOUNDRY_LORA_SKYASL_PROFILE}") ;;
+  *) missing_fetch_profiles+=("${SPRITE_FOUNDRY_LORA_SKYASL_PROFILE}") ;;
 esac
-case ",${downloaded_loras}," in
-  *,tarn59--pixel_art_style_lora_z_image_turbo,*) downloaded_fetch_profiles+=(sprite_foundry_lora_tarn59_pixel_art) ;;
-  *) missing_fetch_profiles+=(sprite_foundry_lora_tarn59_pixel_art) ;;
+case ",${downloaded_lora_profiles:-none}," in
+  *,"${SPRITE_FOUNDRY_LORA_TARN59_PROFILE}",*) downloaded_fetch_profiles+=("${SPRITE_FOUNDRY_LORA_TARN59_PROFILE}") ;;
+  *) missing_fetch_profiles+=("${SPRITE_FOUNDRY_LORA_TARN59_PROFILE}") ;;
 esac
 if [[ ${#downloaded_fetch_profiles[@]} -gt 0 ]]; then
   weight_profiles_downloaded="$(IFS=,; printf '%s' "${downloaded_fetch_profiles[*]}")"
@@ -280,7 +302,7 @@ printf 'controlnet_ready=%s\n' "${controlnet_ready}"
 printf 'controlnet_profile=%s\n' "${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"
 printf 'controlnet_weight=%s/%s\n' "${SPRITE_FOUNDRY_CONTROLNET_REPO}" "${SPRITE_FOUNDRY_CONTROLNET_FILE}"
 printf 'models_ready=%s\n' "${models_ready}"
-printf 'weight_profile_selected=%s\n' "sprite_foundry_starter_stack"
+printf 'weight_profile_selected=%s\n' "${SPRITE_FOUNDRY_STARTER_PROFILE}"
 printf 'weight_profiles_available=%s\n' "${weight_profiles_available}"
 printf 'weight_profiles_downloaded=%s\n' "${weight_profiles_downloaded}"
 printf 'weight_profiles_missing=%s\n' "${weight_profiles_missing}"

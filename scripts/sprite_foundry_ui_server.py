@@ -7,6 +7,7 @@ import mimetypes
 import os
 import re
 import shutil
+import subprocess
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, quote, unquote, urlparse
@@ -75,6 +76,9 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
         if path == "/active_task":
             self._send_json({"status": "idle", "stage": "Idle", "detail": "Waiting for Foundry run.", "progress_percent": 0})
             return
+        if path == "/api/status":
+            self._send_status_text()
+            return
         if path.startswith("/ui/"):
             self._send_static(self.server.ui_dir, path.removeprefix("/ui/"))
             return
@@ -131,6 +135,40 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
 
     def _send_json_error(self, status: int, detail: str) -> None:
         self._send_json({"detail": detail}, status=status)
+
+    def _send_text(self, text: str, status: int = 200) -> None:
+        body = text.encode("utf-8", errors="replace")
+        self.send_response(status)
+        self.send_header("Content-Type", "text/plain; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        try:
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+
+    def _send_status_text(self) -> None:
+        script = self.server.root / "scripts" / "sprite_foundry_status.sh"
+        if not script.is_file():
+            self._send_text("detail=Status script was not found.\n", status=404)
+            return
+        env = os.environ.copy()
+        env.setdefault("SPRITE_FOUNDRY_INSTALL_DIR", str(self.server.root))
+        try:
+            result = subprocess.run(
+                [str(script)],
+                cwd=str(self.server.root),
+                env=env,
+                text=True,
+                capture_output=True,
+                timeout=12,
+                check=False,
+            )
+        except Exception as exc:
+            self._send_text(f"detail=Could not run status script: {exc}\n", status=500)
+            return
+        text = result.stdout or result.stderr or "detail=Status script produced no output.\n"
+        self._send_text(text, status=200 if result.returncode == 0 else 500)
 
     def _metadata_for(self, path: Path) -> dict:
         metadata_path = path.with_suffix(".json")
