@@ -589,7 +589,8 @@ Test in small slices.
 
 ## Immediate Next Implementation Order
 
-1. Test/update installed Nymphs Sprite `1.2.14` in the `NymphsCore` test WSL.
+1. Test/update installed Nymphs Sprite `1.2.18` or newer in the `NymphsCore`
+   test WSL.
 2. Confirm status panel and LoRA dropdown are fixed after restart/update.
 3. Open Pose Lab, move points in one direction, switch slots, and confirm the
    slot state is retained.
@@ -625,13 +626,85 @@ Expected current status signs:
 
 ```text
 id=nymphs-sprite
-version=1.2.14 or newer
+version=1.2.18 or newer
 controlnet_ready=true
 models_ready=true
 lora_choices=...
 selected_lora_path=...
 zimage_installed=true
 ```
+
+## Resume Checkpoint: 2026-06-09
+
+Current source-of-truth repos:
+
+- Module: `nymphnerds/nymphs-sprite`
+- Dev registry: `nymphnerds/nymphs-registry`
+- Reference-only old module: local `sprite-foundry` on the dev WSL
+
+Latest pushed module state:
+
+- Nymphs Sprite `1.2.18`
+- Commit: `b74723b Make Pose Lab direction slots live JSON`
+- Registry commit: `82c7133 Publish Nymphs Sprite 1.2.18`
+
+What changed in the latest working idea:
+
+- Pose Lab is now the single ControlNet prep system.
+- Opening Pose Lab hot-swaps the main preview into the rig editor.
+- The normal bottom preview strip becomes the live 8/16 direction-slot strip.
+- Each strip slot renders from live JSON pose data, not from stored PNG files.
+- Clicking a slot selects that direction for editing in the main rig editor.
+- The checkbox on a slot marks whether that direction should be included when
+  committing refs.
+- `Commit Refs` writes one `pose_set.json` containing all editable slots and
+  the selected direction list.
+- Persistent Pose Lab PNG piles are intentionally gone. ControlNet PNG maps
+  should be generated later only as temporary/on-demand handoff files.
+
+Known untested / risky areas:
+
+- The live 8/16 strip needs user testing after updating the installed test WSL.
+- The current humanoid 8/16 default poses are procedural guesses, not proven
+  sprite-quality baselines.
+- The 16-way in-between poses may feel off because perspective, near/far limb
+  placement, and shoulder/hip compression are only approximate.
+- ControlNet handoff is not wired yet, so we do not know the exact generated
+  sprite behavior from these refs.
+- The best OpenPose strength/default settings for Z-Image Turbo ControlNet
+  Union still need empirical testing.
+
+Next best pickup steps:
+
+1. Update/install Nymphs Sprite `1.2.18+` on the `NymphsCore` test WSL.
+2. Open Pose Lab and confirm the bottom strip immediately shows all 8 slots.
+3. Switch to 16 directions and confirm all 16 live JSON slots appear.
+4. Click several strip slots and confirm the main editor changes direction.
+5. Move a joint in one slot, switch away, switch back, and confirm it persists.
+6. Check/uncheck a few slots, commit refs, and inspect `pose_set.json`.
+7. Research/build a better **Humanoid Neutral 8** baseline:
+   - bottom-aligned feet
+   - aligned head/shoulder/hip/foot heights
+   - readable sprite silhouette
+   - stable front/back/side/diagonal turn
+8. Derive **Humanoid Neutral 16** from the proven 8-way set, with gentle
+   in-between rotations instead of dramatic new poses.
+9. Add a temporary renderer that turns selected JSON slots into OpenPose PNGs
+   only for ControlNet handoff.
+10. Run one no-guide vs OpenPose-guide test direction through Z-Image ControlNet.
+
+Useful research conclusions so far:
+
+- ControlNet wants a structural control map: OpenPose skeleton, edge map, depth
+  map, etc. The prompt supplies content/style; the control map supplies layout.
+- For OpenPose, body keypoints control pose and placement while mostly ignoring
+  clothing and style details.
+- If a hand-authored OpenPose skeleton map is already provided, the generation
+  side should treat it as the control image and avoid trying to re-detect the
+  pose from it.
+- Sprite turnarounds should prioritize consistent alignment across views:
+  head, shoulders, hips, and feet should not drift casually between directions.
+- A boring, excellent neutral set is more valuable than lots of clever presets.
 
 ## Do Not Forget
 
