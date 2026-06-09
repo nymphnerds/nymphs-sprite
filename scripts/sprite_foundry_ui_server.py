@@ -18,6 +18,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, quote, unquote, urlparse
 
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp"}
+POSE_SET_FILENAME = "pose_set.json"
 
 
 class SpriteFoundryUiServer(ThreadingHTTPServer):
@@ -229,7 +230,9 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
             if not root.is_dir():
                 continue
             for path in root.rglob("*"):
-                if not path.is_file() or path.suffix.lower() not in IMAGE_SUFFIXES:
+                if not path.is_file():
+                    continue
+                if path.suffix.lower() not in IMAGE_SUFFIXES and path.name != POSE_SET_FILENAME:
                     continue
                 try:
                     resolved = path.resolve()
@@ -260,8 +263,8 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
             raise ValueError("Output path is invalid.") from exc
         if not candidate.is_file():
             raise ValueError("Output was not found.")
-        if candidate.suffix.lower() not in IMAGE_SUFFIXES:
-            raise ValueError("Output is not an image.")
+        if candidate.suffix.lower() not in IMAGE_SUFFIXES and candidate.name != POSE_SET_FILENAME:
+            raise ValueError("Output is not a managed output.")
         return root, candidate, rel
 
     def _resolve_output_ref(self, item) -> tuple[str, Path, Path, str]:
@@ -290,7 +293,7 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
                     rel = candidate.relative_to(root).as_posix()
                 except ValueError:
                     continue
-                if candidate.is_file() and candidate.suffix.lower() in IMAGE_SUFFIXES:
+                if candidate.is_file() and (candidate.suffix.lower() in IMAGE_SUFFIXES or candidate.name == POSE_SET_FILENAME):
                     return candidate_source_id, root, candidate, rel
         raise ValueError("Output was not found.")
 
@@ -746,6 +749,7 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
             "batch_id": batch_id,
             "batch_label": "Pose Lab Ref Set",
             "batch_type": "sprite_direction_ref_set",
+            "item_label": f"{subject_id} Pose Set",
             "subject_id": subject_id,
             "body_type": body_type,
             "control_type": "pose_skeleton",
@@ -756,54 +760,17 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
             "guide_strength": str(payload.get("guide_strength") or "normal"),
             "sprite_prompt_context": str(payload.get("subject_prompt") or ""),
             "created_at": created_at,
+            "render_policy": "render_png_refs_on_demand",
             "assets": [],
         }
-        records = []
-        for index, name in enumerate(selected_directions, start=1):
-            pixels = bytearray(width * height * 3)
-            box = (0, 0, width, height)
-            slot = pose_directions.get(name) if isinstance(pose_directions, dict) else None
-            joints = slot.get("joints") if isinstance(slot, dict) else None
-            if not self._draw_openpose_pose(pixels, width, height, box, joints, pose_canvas_size):
-                self._draw_openpose_rig(pixels, width, height, box, self._direction_yaw(name))
-            target = self._output_collision_path(target_dir / f"{body_type}-openpose-{index:02d}-{name}.png")
-            self._write_rgb_png(target, width, height, pixels)
-            metadata = {
-                "provider": "Nymphs Sprite",
-                "mode": "pose_lab_direction_ref",
-                "batch_id": batch_id,
-                "batch_label": "Pose Lab Ref Preset",
-                "batch_type": "sprite_direction_ref",
-                "item_label": f"{name.replace('_', ' ').title()} OpenPose Ref",
-                "item_index": index,
-                "item_total": len(selected_directions),
-                "subject_id": subject_id,
-                "body_type": body_type,
-                "control_type": "pose_skeleton",
-                "direction_count": direction_count,
-                "direction": name,
-                "selected_directions": selected_directions,
-                "directions": directions,
-                "pose_data": pose_data,
-                "pose_set_path": "pose_set.json",
-                "guide_strength": str(payload.get("guide_strength") or "normal"),
-                "sprite_prompt_context": str(payload.get("subject_prompt") or ""),
-                "created_at": created_at,
-            }
-            target.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
-            pose_set_manifest["assets"].append({
-                "direction": name,
-                "image": target.name,
-                "metadata": target.with_suffix(".json").name,
-            })
-            rel = target.relative_to(self.server.output_root).as_posix()
-            record = self._output_record(target, rel)
-            record["source"] = "outputs"
-            record["url"] = f"/outputs/outputs/{quote(rel, safe='/')}"
-            record["folder"] = f"outputs/{record['folder']}".rstrip("/")
-            records.append(record)
-        (target_dir / "pose_set.json").write_text(json.dumps(pose_set_manifest, indent=2), encoding="utf-8")
-        self._send_json({"status": "ok", "prompt": "Generated deterministic local OpenPose direction refs.", "outputs": records})
+        target = target_dir / POSE_SET_FILENAME
+        target.write_text(json.dumps(pose_set_manifest, indent=2), encoding="utf-8")
+        rel = target.relative_to(self.server.output_root).as_posix()
+        record = self._output_record(target, rel)
+        record["source"] = "outputs"
+        record["url"] = f"/outputs/outputs/{quote(rel, safe='/')}"
+        record["folder"] = f"outputs/{record['folder']}".rstrip("/")
+        self._send_json({"status": "ok", "prompt": "Saved editable Pose Lab JSON set.", "outputs": [record]})
 
     def _send_output_file(self, relative: str) -> None:
         try:

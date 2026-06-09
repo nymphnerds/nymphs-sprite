@@ -271,8 +271,8 @@ used for generation. The simple version comes first:
 
 1. Choose body type.
 2. Choose 8 or 16 directions.
-3. Commit candidate direction refs.
-4. Preview/select likely winners in the normal preview strip.
+3. Edit the live direction slots in the normal preview strip.
+4. Select the direction slots to include.
 5. Generate the sprite set using those guides once ControlNet wiring is live.
 
 Body types:
@@ -309,7 +309,7 @@ clean reusable refs, not to become a large second product.
 Keep this simple:
 
 ```text
-Pose Lab settings -> edit one pose slot -> commit refs -> select/refine/export
+Pose Lab settings -> edit live direction slots -> select slots -> commit JSON refs
 ```
 
 The default OpenPose Skeleton path is local and deterministic. It does not ask
@@ -318,8 +318,9 @@ another image model to invent an OpenPose map. The UI owns a small editable rig:
 - one page
 - opens in the main preview area as a large pose workbench
 - one active direction at a time
-- direction strip changes the active slot
-- direction strip sits directly underneath the rig editor
+- the normal preview strip becomes the 8/16 live direction-slot selector
+- clicking a slot changes the active editor slot
+- checking a slot marks it for commit/generation
 - each direction saves its own joint positions
 - drag colored points to move joints
 - Move Points is the default mode and moves only the selected joint
@@ -329,9 +330,11 @@ another image model to invent an OpenPose map. The UI owns a small editable rig:
 - Copy All copies the active pose into every direction slot
 
 When `Commit Refs` is pressed, Nymphs Sprite stores the editable pose set as
-`pose_set.json`. The backend also renders each direction slot into a
-black-background OpenPose-style PNG for preview and ControlNet handoff. The PNGs
-are generated artifacts, not the source of truth.
+`pose_set.json`. The JSON contains all direction slots and the selected
+direction list. The browser renders live strip thumbnails directly from the
+JSON. Black-background OpenPose PNG maps should be rendered only on demand when
+the generation backend needs ControlNet inputs; they are temporary handoff
+artifacts, not the source of truth.
 
 Committed sets live in Nymphs Sprite-owned outputs:
 
@@ -350,10 +353,14 @@ visible in the simple working UI right now. Future ref types:
 
 Ref management should remain lightweight for now:
 
-- committed refs appear in the normal gallery/preview strip
+- live Pose Lab slots appear in the normal gallery/preview strip while Pose Lab
+  is open
+- committed refs appear as one JSON pose-set card
 - `View Refs` jumps to the newest committed Pose Lab folder
-- clicking a ref thumbnail reloads the saved pose set into the editor
-- checking refs selects them for future generation wiring or contact sheet export
+- clicking a committed pose-set thumbnail reloads the saved pose set into the
+  editor
+- checking live direction slots selects them for future generation wiring or
+  contact sheet export
 - do not build a large ref database yet
 - do not add a premade pose preset library until the rig editor feels excellent
 
@@ -547,10 +554,12 @@ Test in small slices.
 - Choose each body type.
 - Select 8 or 16 directions.
 - Move points in one direction slot.
-- Switch directions and confirm each slot keeps its own pose.
-- Commit OpenPose direction refs.
-- Confirm the edited slot appears in the saved ref.
-- Confirm guide files are deterministic and visible.
+- Switch directions from the live preview strip and confirm each slot keeps its
+  own pose.
+- Check/uncheck slots and commit OpenPose JSON refs.
+- Confirm `pose_set.json` contains all edited slots plus the selected direction
+  list.
+- Confirm no persistent PNG pile is created during Pose Lab commit.
 - Confirm the user can understand that guides become ControlNet refs.
 
 ### Slice 5: ControlNet Wiring
@@ -584,8 +593,8 @@ Test in small slices.
 2. Confirm status panel and LoRA dropdown are fixed after restart/update.
 3. Open Pose Lab, move points in one direction, switch slots, and confirm the
    slot state is retained.
-4. Generate Pose Lab OpenPose Skeleton refs and confirm the edited slot appears
-   in the saved direction ref.
+4. Commit Pose Lab OpenPose Skeleton refs and confirm the edited slot appears
+   in `pose_set.json`.
 5. Generate a Canny/Line candidate only as a secondary research check.
 6. Generate a tiny current-path 8-way set to validate output ownership.
 7. Try one 16-way run only after the 8-way path is stable.

@@ -373,19 +373,17 @@
     }
 
     .stage-pose-lab {
-      width: min(100%, 860px);
-      height: 100%;
-      max-width: calc(100% - 24px);
-      max-height: 100%;
+      position: absolute;
+      inset: 10px 12px;
       display: none;
-      grid-template-rows: minmax(0, 1fr) auto;
-      gap: 10px;
+      grid-template-rows: minmax(0, 1fr);
+      gap: 0;
       align-items: center;
       justify-items: center;
-      position: relative;
       z-index: 3;
       box-sizing: border-box;
-      padding: 10px 0;
+      min-width: 0;
+      min-height: 0;
     }
 
     .image-shell.pose-mode .stage-pose-lab {
@@ -662,6 +660,17 @@
     }
     .thumb.selected span { color: var(--green); }
 
+    .thumb.pose-slot {
+      grid-template-rows: 70px auto;
+      border-color: rgba(41, 230, 218, 0.22);
+    }
+    .thumb.pose-slot img {
+      height: 70px;
+    }
+    .thumb.pose-slot.checked {
+      border-color: var(--green);
+    }
+
     .thumb-check {
       position: absolute;
       top: 7px;
@@ -748,6 +757,8 @@
       height: 100%;
       max-width: 100%;
       max-height: 100%;
+      min-width: 0;
+      min-height: 0;
       margin: 0;
       border-color: rgba(221, 111, 224, 0.72);
       box-shadow:
@@ -787,10 +798,11 @@
     }
 
     .stage-pose-lab .pose-dir-strip {
-      width: 100%;
-      margin: 0;
-      grid-template-columns: repeat(8, minmax(0, 1fr));
-      align-self: end;
+      display: none;
+    }
+
+    .stage-pose-lab .pose-dir-strip.sixteen {
+      grid-template-columns: repeat(16, minmax(42px, 1fr));
     }
     .pose-dir-strip button {
       height: 24px;
@@ -810,6 +822,10 @@
       height: 28px;
       min-height: 28px;
       font-size: 9px;
+    }
+
+    .stage-pose-lab .pose-dir-strip.sixteen button {
+      font-size: 8px;
     }
 
     @media (max-width: 600px) {
@@ -1287,6 +1303,8 @@
     }
 
     function previewUrl(output) {
+      if (output?.metadata?.mode === "pose_lab_slot") return poseSlotPreviewDataUrl(output.metadata.direction);
+      if (output?.metadata?.mode === "pose_lab_set") return poseSetPreviewDataUrl(output.metadata);
       if (!output?.url) return "";
       if (String(output.url).startsWith("blob:")) return output.url;
       const stamp = output.created ? String(Math.round(Number(output.created) * 1000)) : "";
@@ -1452,6 +1470,7 @@
     }
 
     function stripOutputs() {
+      if (isPoseLabOpen()) return poseSlotOutputs();
       const outputs = sortedViewerOutputs();
       syncOutputViewOptions(outputs);
       if (state.outputView === "recent") return outputs;
@@ -1466,7 +1485,66 @@
       return outputs;
     }
 
+    function isPoseLabOpen() {
+      return Boolean($("pose-lab-panel")?.open);
+    }
+
+    function syncPoseSlotViewOptions(outputs) {
+      const select = $("output-folder");
+      select.innerHTML = "";
+      const option = document.createElement("option");
+      option.value = "pose-slots";
+      option.textContent = `Pose slots (${outputs.length})`;
+      select.appendChild(option);
+      select.value = "pose-slots";
+      select.disabled = true;
+    }
+
+    function poseSlotOutputs() {
+      ensurePoseLab();
+      const outputs = poseDirectionList().map((direction) => ({
+        path: `pose:${direction}`,
+        relative_path: `pose:${direction}`,
+        label: poseDirectionLabel(direction),
+        url: "",
+        managed: false,
+        created: 0,
+        folder: "Pose Lab",
+        metadata: { mode: "pose_lab_slot", direction }
+      }));
+      syncPoseSlotViewOptions(outputs);
+      return outputs;
+    }
+
+    function poseSlotKeys() {
+      return poseDirectionList().map((direction) => `pose:${direction}`);
+    }
+
+    function selectAllPoseSlots() {
+      for (const key of poseSlotKeys()) state.selectedOutputPaths.add(key);
+    }
+
+    function selectedPoseDirections() {
+      const selected = poseDirectionList().filter((direction) => state.selectedOutputPaths.has(`pose:${direction}`));
+      return selected.length ? selected : poseDirectionList();
+    }
+
+    function syncPoseSelectedIndex() {
+      const index = poseDirectionList().indexOf(state.poseDirection);
+      state.selectedIndex = index >= 0 ? index : 0;
+    }
+
+    function refreshPoseSlotThumbs() {
+      if (!isPoseLabOpen()) return;
+      document.querySelectorAll(".thumb.pose-slot").forEach((node) => {
+        const direction = node.dataset.direction;
+        const image = node.querySelector("img");
+        if (direction && image) image.src = poseSlotPreviewDataUrl(direction);
+      });
+    }
+
     function currentOutputViewLabel() {
+      if (isPoseLabOpen()) return "Pose Slots";
       if (state.outputView === "recent") {
         if (state.viewerSource === "batch") return "Current batch";
         if (state.viewerSource === "manual") return state.manualFolderName || "Chosen Folder";
@@ -1528,8 +1606,9 @@
       for (const [index, item] of state.visibleOutputs.entries()) {
         const key = outputKey(item);
         const node = document.createElement("div");
-        node.className = `thumb ${index === state.selectedIndex ? "selected" : ""} ${state.selectedOutputPaths.has(key) ? "checked" : ""}`;
+        node.className = `thumb ${item.metadata?.mode === "pose_lab_slot" ? "pose-slot" : ""} ${index === state.selectedIndex ? "selected" : ""} ${state.selectedOutputPaths.has(key) ? "checked" : ""}`;
         node.dataset.key = key;
+        if (item.metadata?.direction) node.dataset.direction = item.metadata.direction;
         node.innerHTML = `
           <label class="thumb-check" title="Select output"><input type="checkbox" ${state.selectedOutputPaths.has(key) ? "checked" : ""}></label>
           <img src="${escapeHtml(previewUrl(item))}" alt="">
@@ -1555,7 +1634,7 @@
       return {
         path: rawPath || url || `output:${index}`,
         relative_path: item.relative_path || rawPath,
-        label: item.item_label || item.name || basename(rawPath || url) || `image-${index + 1}`,
+        label: item.item_label || item.batch_label || item.name || basename(rawPath || url) || `output-${index + 1}`,
         url,
         managed: true,
         source: item.source || "",
@@ -1605,6 +1684,12 @@
       const item = visible[index];
       if (!item) return;
       state.selectedIndex = index;
+      if (item.metadata?.mode === "pose_lab_slot") {
+        state.poseDirection = item.metadata.direction;
+        $("pose-edit-direction").value = state.poseDirection;
+        renderPoseLabEditor();
+        syncPoseLabStage();
+      }
       const image = $("result-image");
       image.src = previewUrl(item);
       image.style.display = "block";
@@ -2058,6 +2143,56 @@
       right_ankle: -1
     };
 
+    function poseSetPreviewDataUrl(metadata) {
+      const poseData = metadata?.pose_data || {};
+      const directions = poseData.directions || {};
+      const selected = metadata?.selected_directions || Object.keys(directions);
+      const names = selected.length ? selected.slice(0, 16) : Object.keys(directions).slice(0, 16);
+      if (!names.length) return "";
+      const cols = names.length > 8 ? 8 : Math.min(4, names.length);
+      const rows = Math.ceil(names.length / cols);
+      const cell = 64;
+      const width = cols * cell;
+      const height = rows * cell;
+      const parts = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#020403"/>`];
+      for (const [index, direction] of names.entries()) {
+        const slot = directions[direction];
+        if (!slot?.joints) continue;
+        const x = (index % cols) * cell;
+        const y = Math.floor(index / cols) * cell;
+        parts.push(poseSvgMarkup(slot.joints, x, y, cell));
+      }
+      parts.push("</svg>");
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(parts.join(""))}`;
+    }
+
+    function poseSlotPreviewDataUrl(direction) {
+      const pose = state.posePointers?.[direction] || defaultPose(direction);
+      const parts = [
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">',
+        '<rect width="96" height="96" fill="#020403"/>',
+        poseSvgMarkup(pose, 0, 0, 96),
+        '</svg>'
+      ];
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(parts.join(""))}`;
+    }
+
+    function poseSvgMarkup(pose, x, y, size) {
+      const scale = size / 256;
+      let markup = "";
+      for (const [a, b, color] of poseSegments) {
+        if (!pose[a] || !pose[b]) continue;
+        markup += `<line x1="${x + pose[a][0] * scale}" y1="${y + pose[a][1] * scale}" x2="${x + pose[b][0] * scale}" y2="${y + pose[b][1] * scale}" stroke="${color}" stroke-width="${Math.max(1.4, size * 0.035)}" stroke-linecap="round"/>`;
+      }
+      for (const [index, name] of poseJointNames.entries()) {
+        const point = pose[name];
+        if (!point) continue;
+        const fill = index % 3 === 0 ? "#ff00d2" : "#f5ff00";
+        markup += `<circle cx="${x + point[0] * scale}" cy="${y + point[1] * scale}" r="${Math.max(1.6, size * 0.035)}" fill="${fill}"/>`;
+      }
+      return markup;
+    }
+
     function poseDirectionList() {
       if (value("guide-direction-count") === "16") {
         return [
@@ -2277,6 +2412,7 @@
         pose[joint] = target;
       }
       renderPoseLabEditor();
+      refreshPoseSlotThumbs();
     }
 
     function svgPosePoint(event) {
@@ -2323,7 +2459,12 @@
       shell.classList.toggle("pose-mode", open);
       stage.hidden = !open;
       if (open) {
+        if (!poseDirectionList().some((direction) => state.selectedOutputPaths.has(`pose:${direction}`))) {
+          selectAllPoseSlots();
+        }
+        syncPoseSelectedIndex();
         renderPoseLabEditor();
+        renderGallery();
         $("output-label").textContent = `Pose Lab / ${poseDirectionLabel(state.poseDirection)}`;
       } else {
         const item = (state.visibleOutputs || [])[state.selectedIndex];
@@ -2334,8 +2475,10 @@
     function renderPoseDirectionStrip() {
       const strip = $("pose-dir-strip");
       if (!strip) return;
+      const directions = poseDirectionList();
+      strip.classList.toggle("sixteen", directions.length === 16);
       strip.innerHTML = "";
-      for (const direction of poseDirectionList()) {
+      for (const direction of directions) {
         const button = document.createElement("button");
         button.type = "button";
         button.textContent = poseDirectionLabel(direction);
@@ -2359,8 +2502,12 @@
     function resetPoseLabSlots() {
       const directions = poseDirectionList();
       state.posePointers = {};
+      for (const key of [...state.selectedOutputPaths]) {
+        if (String(key).startsWith("pose:")) state.selectedOutputPaths.delete(key);
+      }
       state.poseDirection = directions.includes(state.poseDirection) ? state.poseDirection : directions[0];
       for (const direction of directions) state.posePointers[direction] = defaultPose(direction);
+      selectAllPoseSlots();
       renderPoseLabEditor();
       syncPoseLabStage();
     }
@@ -2399,6 +2546,7 @@
       return {
         canvas_size: 256,
         active_direction: state.poseDirection,
+        selected_directions: selectedPoseDirections(),
         directions
       };
     }
