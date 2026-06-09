@@ -881,11 +881,11 @@
           </div>
         </div>
         <div class="command-row">
-          <button id="preview-guides" type="button">Open Editor</button>
+          <button id="preview-guides" type="button">Open Pose Lab</button>
         </div>
         <details class="pose-lab" id="pose-lab-panel">
-          <summary>Rig Controls</summary>
-          <p class="flow-note">Edit one direction at a time, switch slots in the main preview strip, then commit clean OpenPose refs.</p>
+          <summary>Pose Controls</summary>
+          <p class="flow-note">Use the large preview canvas to edit one direction at a time, then commit clean OpenPose refs.</p>
           <div class="grid">
             <div class="field">
               <label for="pose-edit-mode">Mode</label>
@@ -2428,7 +2428,7 @@
       $("generate-foundry").disabled = state.busy || Boolean(generationBlocker);
       $("generate-foundry").title = generationBlocker || "Generate a sprite set.";
       $("preview-guides").disabled = state.busy;
-      $("preview-guides").title = "Open the main-stage Pose Lab editor.";
+      $("preview-guides").title = "Open the Pose Lab canvas in the main preview area.";
       $("commit-pose-guide").disabled = state.busy;
       $("commit-pose-guide").title = "Commit the current Pose Lab slots as reusable ControlNet refs.";
       $("view-guide-candidates").disabled = state.busy;
@@ -2720,7 +2720,7 @@
     $("preview-guides").addEventListener("click", () => {
       $("pose-lab-panel").open = true;
       syncPoseLabStage();
-      setProgress("Pose Lab", "Move points, switch direction slots, then commit direction refs.", 35);
+      setProgress("Pose Lab", "Move points in the canvas, switch direction slots, then commit refs.", 35);
     });
     $("commit-pose-guide").addEventListener("click", commitPoseRefs);
     $("view-guide-candidates").addEventListener("click", viewGuideCandidates);
