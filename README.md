@@ -22,7 +22,8 @@ Nymphs Sprite generates directional sprite attempts through the local Nymphs
 Image / Z-Image backend, keeps review state for each direction, and exports
 accepted results as structured game assets.
 
-The first working target is a dependable 8-direction flow:
+The first working target is a dependable 8-direction flow, with 16 directions
+available for experiments when the extra coverage is worth the extra runtime:
 
 - Define a character prompt, subject id, sprite size, seed, LoRA, and style.
 - Generate one attempt per direction with the Nymphs Image backend.
@@ -30,9 +31,9 @@ The first working target is a dependable 8-direction flow:
 - Regenerate weak directions without throwing away the whole set.
 - Export accepted sprites from this module's own output folders.
 
-The next major upgrade is a ControlNet guide panel: simple body guides, pose
-refs, and eventually hand-editable stick/sketch poses that make direction and
-pose control much less random.
+The next major upgrade is full ControlNet guide wiring. The UI now includes a
+small Pose Lab for creating deterministic OpenPose guide candidates locally,
+with each direction saved as its own editable pose slot.
 
 ## Module Boundaries
 
@@ -79,9 +80,34 @@ Choose or write the character prompt, subject id, and negative prompt.
 
 ### Guide
 
-Choose the body/pose guide strategy. Today this is mostly a planning surface.
-Soon it should generate previewable ControlNet reference sheets for each
-direction.
+Choose body type, guide strength, and 8 or 16 directions. Pose Lab can create
+candidate ControlNet refs:
+
+- OpenPose Skeleton, generated locally from editable per-direction slots
+- Canny / Line
+- Scribble
+- Depth Mass
+
+OpenPose is the first-class path. Expanding Pose Lab hot-swaps the main preview
+area into a large rig editor with the direction strip underneath. Select a
+direction in the strip, adjust the stick rig, and create a guide sheet. The
+current direction keeps its own pose, so front, left, back, and 16-way
+in-between slots can be tuned independently. IK mode solves wrists and ankles
+through elbows and knees; reset, mirror, and copy-all keep the panel fast. FK /
+Length mode moves joints directly, so the current direction can have stretched
+or shortened limb proportions before switching back to IK.
+
+The non-OpenPose guide types may call the Nymphs Image / Gemini Flash route for
+rough research candidates, but the reliable pose path does not depend on Gemini.
+
+Generated guide candidates stay under:
+
+```text
+$HOME/NymphsData/outputs/nymphs-sprite/guides/candidates/
+```
+
+They appear in the same preview strip/gallery so the best candidates can be
+selected without a separate guide manager.
 
 ### Style
 
@@ -102,12 +128,16 @@ right
 front_right
 ```
 
-16-direction support is planned once 8-direction quality is dependable.
+16-direction generation is available from the Guide direction selector, but 8
+directions should remain the default test path until quality is dependable.
 
 ### Review
 
 Inspect attempts, accept strong directions, reject weak directions, and
 regenerate only what needs another pass.
+
+The gallery should stay scoped to the newest run or guide folder after
+generation. `Recent` is useful as a fallback, but it gets noisy fast.
 
 ### Export
 
@@ -166,7 +196,6 @@ After install, test from top to bottom:
 
 Near-term:
 
-- Wire guide preview generation to actual saved guide sheets.
 - Pass per-direction ControlNet refs into the Z-Image backend.
 - Add a compact audition strip inspired by Nymphs Image.
 - Make review/regenerate the main workflow instead of an advanced lifecycle
@@ -174,8 +203,8 @@ Near-term:
 
 Next:
 
-- Pose panel for stick/sketch/body guide editing.
-- 16-direction option.
+- Expand Pose Lab beyond OpenPose into sketch/body guide editing.
+- Promote proven guide sheets into a tiny curated preset set.
 - Godot-ready export packaging.
 - Normal and depth post-process outputs.
 - Stronger sprite manifest contract for game projects.

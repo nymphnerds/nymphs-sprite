@@ -29,7 +29,7 @@ FOUNDRY_ROOT = Path(__file__).parent.parent
 DEFAULT_NYMPHSCORE_URL = "http://127.0.0.1:8090"
 DEFAULT_MODEL_ID = "Tongyi-MAI/Z-Image-Turbo"
 
-DIRECTIONS = [
+DIRECTIONS_8 = [
     ("front", "facing the viewer, front view, looking at camera"),
     ("front_left", "facing front-left, 3/4 view from the left, looking slightly left"),
     ("left", "facing left, left side profile view"),
@@ -39,6 +39,25 @@ DIRECTIONS = [
     ("right", "facing right, right side profile view"),
     ("front_right", "facing front-right, 3/4 view from the right, looking slightly right"),
 ]
+DIRECTIONS_16 = [
+    ("front", "facing the viewer, front view, looking at camera"),
+    ("front_front_left", "facing slightly front-left, subtle 1/16 turn from front"),
+    ("front_left", "facing front-left, 3/4 view from the left, looking slightly left"),
+    ("left_front_left", "facing between front-left and left side profile"),
+    ("left", "facing left, left side profile view"),
+    ("left_back_left", "facing between left side profile and back-left"),
+    ("back_left", "facing back-left, 3/4 rear view from the left"),
+    ("back_back_left", "facing slightly back-left, subtle 1/16 turn from back"),
+    ("back", "facing away from viewer, rear view, back of character"),
+    ("back_back_right", "facing slightly back-right, subtle 1/16 turn from back"),
+    ("back_right", "facing back-right, 3/4 rear view from the right"),
+    ("right_back_right", "facing between right side profile and back-right"),
+    ("right", "facing right, right side profile view"),
+    ("right_front_right", "facing between front-right and right side profile"),
+    ("front_right", "facing front-right, 3/4 view from the right, looking slightly right"),
+    ("front_front_right", "facing slightly front-right, subtle 1/16 turn from front"),
+]
+DIRECTIONS = DIRECTIONS_8
 
 STYLE_SUFFIX = (
     "pixel art sprite, game character sprite, 2D RPG, clean readable silhouette, "
@@ -166,6 +185,7 @@ def make_contact_sheets(
     raw_paths: dict[str, Path],
     pixel_paths: dict[str, Path],
     *,
+    directions: list[tuple[str, str]],
     display_name: str,
     stack: str,
     sprite_size: int,
@@ -179,20 +199,20 @@ def make_contact_sheets(
     text = (210, 210, 220)
     grid = (50, 50, 60)
     bg = (24, 24, 32)
-    directions = [name for name, _ in DIRECTIONS]
+    direction_names = [name for name, _ in directions]
 
-    raw_w = label_w + len(directions) * (raw_cell_size + pad * 2) + 20
+    raw_w = label_w + len(direction_names) * (raw_cell_size + pad * 2) + 20
     raw_h = 10 + 24 + header_h + raw_cell_size + pad * 2 + 78
     raw_sheet = Image.new("RGB", (raw_w, raw_h), bg)
     draw = ImageDraw.Draw(raw_sheet)
     ox, oy = 10, 10
     draw.text((ox, oy), f"RAW SOURCE INSPECTION -- {display_name} -- {stack}", fill=(200, 120, 120), font=font(15))
     oy += 24
-    for col, name in enumerate(directions):
+    for col, name in enumerate(direction_names):
         draw.text((ox + label_w + col * (raw_cell_size + pad * 2) + pad, oy + 2), name.replace("_", "\n"), fill=text, font=font(11))
     oy += header_h
     draw.text((ox + 2, oy + raw_cell_size // 2 - 8), "Raw", fill=(200, 120, 120), font=font(13))
-    for col, name in enumerate(directions):
+    for col, name in enumerate(direction_names):
         cx = ox + label_w + col * (raw_cell_size + pad * 2) + pad
         cy = oy + pad
         if name in raw_paths:
@@ -204,17 +224,17 @@ def make_contact_sheets(
     raw_path = out_dir / "raw_inspection.png"
     raw_sheet.save(raw_path)
 
-    pixel_w = 80 + len(directions) * (preview_cell_size + pad * 2) + 20
+    pixel_w = 80 + len(direction_names) * (preview_cell_size + pad * 2) + 20
     pixel_h = 10 + 24 + header_h + preview_cell_size + pad * 2 + 78
     pixel_sheet = Image.new("RGB", (pixel_w, pixel_h), bg)
     draw = ImageDraw.Draw(pixel_sheet)
     ox, oy = 10, 10
     draw.text((ox, oy), f"{display_name} -- {stack} ({sprite_size}x{sprite_size})", fill=(120, 200, 120), font=font(15))
     oy += 24
-    for col, name in enumerate(directions):
+    for col, name in enumerate(direction_names):
         draw.text((ox + 80 + col * (preview_cell_size + pad * 2) + pad, oy + 2), name.replace("_", "\n"), fill=text, font=font(11))
     oy += header_h
-    for col, name in enumerate(directions):
+    for col, name in enumerate(direction_names):
         cx = ox + 80 + col * (preview_cell_size + pad * 2) + pad
         cy = oy + pad
         if name in pixel_paths:
@@ -276,13 +296,22 @@ def build_payload(
     }
 
 
+def selected_directions(args: argparse.Namespace) -> list[tuple[str, str]]:
+    if int(args.direction_count) == 16:
+        return DIRECTIONS_16
+    return DIRECTIONS_8
+
+
 def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> str:
     if args.sprite_size < 24 or args.sprite_size > 512:
         raise SystemExit("--sprite-size must be between 24 and 512")
     if args.palette_colors < 0:
         raise SystemExit("--palette-colors must be zero or greater")
+    if args.direction_count not in (8, 16):
+        raise SystemExit("--direction-count must be 8 or 16")
 
     ensure_subject(config)
+    directions = selected_directions(args)
 
     subject_id = config["subject_id"]
     display_name = config.get("display_name") or subject_id
@@ -297,7 +326,8 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     backend_dir = Path.home() / "NymphsData" / "tmp" / "nymphs-sprite" / run_id / "backend"
     out_dir.mkdir(parents=True, exist_ok=True)
     backend_dir.mkdir(parents=True, exist_ok=True)
-    for direction_name, _ in DIRECTIONS:
+    all_direction_names = {name for name, _ in DIRECTIONS_8 + DIRECTIONS_16}
+    for direction_name in all_direction_names:
         for suffix in (".png", "_raw.png", "_raw.json"):
             (out_dir / f"{direction_name}{suffix}").unlink(missing_ok=True)
     for filename in ("raw_inspection.png", "contact_sheet.png", "recipe.json", "manifest.json"):
@@ -308,6 +338,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     print(f"Run: {run_id}  Seed: {seed}")
     print(f"Output: {out_dir}")
     print(f"Nymphs Image: {args.nymphscore_url}")
+    print(f"Directions: {len(directions)}")
     print(f"{'=' * 60}\n")
 
     raw_paths: dict[str, Path] = {}
@@ -316,7 +347,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     responses: dict[str, Any] = {}
     direction_seeds: dict[str, int] = {}
 
-    for index, (direction_name, direction_prompt) in enumerate(DIRECTIONS, start=1):
+    for index, (direction_name, direction_prompt) in enumerate(directions, start=1):
         item_seed = seed + (index - 1) * args.seed_step
         print(f"  [{direction_name}] generate seed={item_seed}...", end=" ", flush=True)
         payload = build_payload(
@@ -326,7 +357,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
             direction_name=direction_name,
             direction_prompt=direction_prompt,
             index=index,
-            direction_count=len(DIRECTIONS),
+            direction_count=len(directions),
             config=config,
             lora_path=lora_path,
             seed=item_seed,
@@ -382,6 +413,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     raw_sheet, pixel_sheet = make_contact_sheets(
         raw_paths,
         pixel_paths,
+        directions=directions,
         display_name=display_name,
         stack="NymphScore_ZImage",
         sprite_size=args.sprite_size,
@@ -404,6 +436,8 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
         "pixelate": args.sprite_size,
         "seed": seed,
         "seed_step": args.seed_step,
+        "direction_count": len(directions),
+        "directions": [name for name, _ in directions],
         "subject_prompt": config["subject_prompt"],
         "negative": config.get("negative_prompt") or "",
         "nymphscore_url": args.nymphscore_url,
@@ -428,7 +462,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
         encoding="utf-8",
     )
 
-    print(f"\n  Generated {len(generated_dirs)}/8 directions")
+    print(f"\n  Generated {len(generated_dirs)}/{len(directions)} directions")
     print("\n--- Registering in foundry ---")
     foundry_cmd(
         "register-run",
@@ -486,6 +520,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lora-scale", type=float, default=0.85)
     parser.add_argument("--seed", type=int)
     parser.add_argument("--seed-step", type=int, default=1)
+    parser.add_argument("--direction-count", type=int, default=8, choices=[8, 16])
     parser.add_argument("--width", type=int, default=1024)
     parser.add_argument("--height", type=int, default=1024)
     parser.add_argument("--steps", type=int, default=9)

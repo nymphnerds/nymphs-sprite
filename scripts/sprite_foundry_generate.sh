@@ -18,6 +18,7 @@ lora_trigger=""
 lora_scale=""
 nunchaku_rank=""
 nunchaku_precision=""
+direction_count="8"
 body_class=""
 depth_refs=""
 edge_refs=""
@@ -88,6 +89,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --nunchaku-precision)
       nunchaku_precision="$2"
+      shift 2
+      ;;
+    --direction-count)
+      direction_count="$2"
       shift 2
       ;;
     --subject-id)
@@ -210,6 +215,7 @@ case "${generation_path}" in
   nymphscore)
     sprite_foundry_start_zimage_backend
     cmd=("${python_bin}" -m foundry.cli generate-nymphscore --config "${config}" --nymphscore-url "${SPRITE_FOUNDRY_ZIMAGE_URL}" --sprite-size "${sprite_size}" --steps "${steps}")
+    cmd+=(--direction-count "${direction_count}")
     if [[ -n "${seed}" ]]; then
       cmd+=(--seed "${seed}")
     fi

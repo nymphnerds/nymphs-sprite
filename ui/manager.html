@@ -366,6 +366,33 @@
       z-index: 2;
     }
 
+    .image-shell.pose-mode {
+      background:
+        radial-gradient(circle at 50% 58%, rgba(41, 230, 218, 0.08), transparent 42%),
+        #020403;
+    }
+
+    .stage-pose-lab {
+      width: min(72vh, 74vw, 760px);
+      max-width: calc(100% - 24px);
+      display: none;
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      justify-items: center;
+      position: relative;
+      z-index: 3;
+    }
+
+    .image-shell.pose-mode .stage-pose-lab {
+      display: grid;
+    }
+
+    .image-shell.pose-mode #result-image,
+    .image-shell.pose-mode #empty {
+      display: none !important;
+    }
+
     .empty {
       display: grid;
       gap: 8px;
@@ -693,6 +720,89 @@
     }
     summary::-webkit-details-marker { display: none; }
     summary::before { content: "// "; color: var(--green); }
+    .pose-lab {
+      border-top-color: rgba(0, 240, 255, 0.35);
+      margin-top: 10px;
+    }
+    .pose-lab summary {
+      color: var(--green);
+    }
+    .pose-lab summary::before {
+      color: var(--cyan);
+    }
+    .pose-editor-wrap {
+      border: 1px solid rgba(33, 71, 74, 0.72);
+      border-radius: 6px;
+      background: #000;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      margin: 7px 0;
+    }
+
+    .stage-pose-lab .pose-editor-wrap {
+      width: 100%;
+      margin: 0;
+      border-color: rgba(221, 111, 224, 0.72);
+      box-shadow:
+        0 0 0 1px rgba(41, 230, 218, 0.12),
+        0 18px 55px rgba(0, 0, 0, 0.42);
+    }
+    .pose-editor {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      user-select: none;
+    }
+    .pose-editor line {
+      stroke-linecap: round;
+      pointer-events: none;
+    }
+    .pose-editor circle {
+      cursor: grab;
+      stroke: #041212;
+      stroke-width: 1.5;
+    }
+    .pose-editor circle:active {
+      cursor: grabbing;
+    }
+    .pose-editor .floor-line {
+      stroke: rgba(142, 234, 75, 0.38);
+      stroke-width: 1;
+      stroke-dasharray: 3 5;
+      pointer-events: none;
+    }
+    .pose-dir-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 4px;
+      margin: 6px 0 7px;
+    }
+
+    .stage-pose-lab .pose-dir-strip {
+      width: 100%;
+      margin: 0;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+    }
+    .pose-dir-strip button {
+      height: 24px;
+      min-height: 24px;
+      padding: 1px 3px;
+      font-size: 8px;
+      color: var(--muted);
+    }
+    .pose-dir-strip button.active {
+      border-color: rgba(221, 111, 224, 0.95);
+      color: #ffd7ff;
+      background: rgba(221, 111, 224, 0.13);
+      box-shadow: inset 0 0 0 1px rgba(221, 111, 224, 0.35);
+    }
+
+    .stage-pose-lab .pose-dir-strip button {
+      height: 28px;
+      min-height: 28px;
+      font-size: 9px;
+    }
 
     @media (max-width: 600px) {
       body { overflow: auto; }
@@ -762,10 +872,60 @@
               <option value="strong">Strong</option>
             </select>
           </div>
+          <div class="field wide">
+            <label for="guide-direction-count">Directions</label>
+            <select id="guide-direction-count">
+              <option value="8">8 Directions</option>
+              <option value="16">16 Directions</option>
+            </select>
+          </div>
         </div>
         <div class="command-row">
           <button id="preview-guides" type="button">Preview Guide Sheet</button>
         </div>
+        <details class="pose-lab" id="pose-lab-panel">
+          <summary>Pose Lab</summary>
+          <p class="flow-note">Generate candidate ControlNet refs, then keep only the guides that behave. OpenPose is local; sketch-style guides can use Gemini.</p>
+          <div class="grid">
+            <div class="field wide">
+              <label for="pose-control-type">Control Type</label>
+              <select id="pose-control-type">
+                <option value="pose_skeleton">OpenPose Skeleton</option>
+                <option value="silhouette_line">Canny / Line</option>
+                <option value="scribble">Scribble</option>
+                <option value="depth_mass">Depth Mass</option>
+              </select>
+            </div>
+            <div class="field wide">
+              <label for="pose-lab-brief">Guide Brief</label>
+              <textarea id="pose-lab-brief" spellcheck="false" maxlength="520">clean reusable ControlNet guide refs for this body type; strong readable silhouette; consistent centered scale; no character detail</textarea>
+            </div>
+            <div class="field">
+              <label for="pose-edit-direction">Direction</label>
+              <select id="pose-edit-direction"></select>
+            </div>
+            <div class="field">
+              <label for="pose-edit-mode">Mode</label>
+              <select id="pose-edit-mode">
+                <option value="ik">IK</option>
+                <option value="fk">FK / Length</option>
+              </select>
+            </div>
+          </div>
+          <p class="flow-note">The rig editor opens in the main preview area while Pose Lab is expanded.</p>
+          <div class="command-row three">
+            <button id="pose-reset" type="button">Reset</button>
+            <button id="pose-mirror" type="button">Mirror</button>
+            <button id="pose-copy-all" type="button">Copy All</button>
+          </div>
+          <div class="command-row two">
+            <button id="create-gemini-guide" type="button">Create Guide</button>
+            <button id="view-guide-candidates" type="button">View Guides</button>
+          </div>
+          <div class="command-row">
+            <button id="pose-lab-copy-prompt" type="button">Copy Prompt</button>
+          </div>
+        </details>
       </section>
 
       <section class="section">
@@ -858,6 +1018,12 @@
         <div class="image-shell">
           <img id="result-image" alt="Generated sprite preview">
           <div class="empty" id="empty">No output</div>
+          <div class="stage-pose-lab" id="stage-pose-lab" hidden>
+            <div class="pose-editor-wrap">
+              <svg id="pose-editor" class="pose-editor" viewBox="0 0 256 256" role="img" aria-label="Pose Lab rig editor"></svg>
+            </div>
+            <div id="pose-dir-strip" class="pose-dir-strip" aria-label="Pose directions"></div>
+          </div>
         </div>
       </section>
       <section class="progress">
@@ -949,6 +1115,9 @@
       statusValues: {},
       activeRunOutputDir: "",
       activeDirection: "",
+      poseDirection: "front",
+      poseDragging: null,
+      posePointers: {},
     };
     const generationDirections = ["front", "front_left", "left", "back_left", "back", "back_right", "right", "front_right"];
 
@@ -1321,6 +1490,39 @@
       if (state.outputView.startsWith("date:")) return state.outputView.slice(5);
       if (state.outputView.startsWith("folder:")) return folderLabel(state.outputView.slice(7));
       return "Outputs";
+    }
+
+    function newestFolderMatching(prefix) {
+      const newestByFolder = new Map();
+      for (const output of state.outputs || []) {
+        const folder = outputFolder(output);
+        if (!folder.startsWith(prefix)) continue;
+        newestByFolder.set(folder, Math.max(newestByFolder.get(folder) || 0, outputCreatedMs(output)));
+      }
+      return [...newestByFolder.entries()]
+        .sort((a, b) => b[1] - a[1] || b[0].localeCompare(a[0]))[0]?.[0] || "";
+    }
+
+    function safeSubjectFolderPrefix() {
+      const subject = (value("subject-id") || "sprite_subject")
+        .replace(/[^A-Za-z0-9_]+/g, "_")
+        .replace(/^_+|_+$/g, "")
+        .slice(0, 80) || "sprite_subject";
+      return `outputs/${subject}`;
+    }
+
+    async function viewGuideCandidates() {
+      state.viewerSource = "outputs";
+      await refreshRecentOutputs(false);
+      const guideFolder = newestFolderMatching("outputs/guides/candidates/");
+      if (guideFolder) {
+        state.outputView = `folder:${guideFolder}`;
+        renderGallery();
+        if (state.visibleOutputs[0]) showOutput(0);
+        setProgress("Guides", "Showing latest guide candidates.", 100);
+      } else {
+        setProgress("Guides", "No guide candidates yet. Use Pose Lab first.", 0);
+      }
     }
 
     function renderGallery() {
@@ -1699,6 +1901,7 @@
         "sprite-size": value("sprite-size"),
         "palette-colors": value("palette-colors"),
         "body-class": value("body-guide"),
+        "direction-count": value("guide-direction-count") || "8",
         "nunchaku-rank": String(zSelection.nunchaku_rank),
         "nunchaku-precision": zSelection.nunchaku_precision
       };
@@ -1707,6 +1910,400 @@
       addEncodedArg(args, "lora-path", state.selectedLoraPath);
       addEncodedArg(args, "lora-trigger", value("lora-trigger"));
       return compactArgs(args);
+    }
+
+    const poseJointNames = [
+      "head", "neck", "spine", "pelvis",
+      "left_shoulder", "left_elbow", "left_wrist",
+      "right_shoulder", "right_elbow", "right_wrist",
+      "left_hip", "left_knee", "left_ankle",
+      "right_hip", "right_knee", "right_ankle"
+    ];
+    const poseSegments = [
+      ["head", "neck", "#ff00be"],
+      ["neck", "spine", "#00d2e6"],
+      ["spine", "pelvis", "#00d2e6"],
+      ["neck", "left_shoulder", "#ff9c00"],
+      ["left_shoulder", "left_elbow", "#ff9c00"],
+      ["left_elbow", "left_wrist", "#ff9c00"],
+      ["neck", "right_shoulder", "#00dc41"],
+      ["right_shoulder", "right_elbow", "#00dc41"],
+      ["right_elbow", "right_wrist", "#00dc41"],
+      ["pelvis", "left_hip", "#00be7d"],
+      ["left_hip", "left_knee", "#00be7d"],
+      ["left_knee", "left_ankle", "#00be7d"],
+      ["pelvis", "right_hip", "#0050e6"],
+      ["right_hip", "right_knee", "#0050e6"],
+      ["right_knee", "right_ankle", "#0050e6"]
+    ];
+    const poseMirrorPairs = [
+      ["left_shoulder", "right_shoulder"],
+      ["left_elbow", "right_elbow"],
+      ["left_wrist", "right_wrist"],
+      ["left_hip", "right_hip"],
+      ["left_knee", "right_knee"],
+      ["left_ankle", "right_ankle"]
+    ];
+    const poseChains = {
+      left_wrist: ["left_shoulder", "left_elbow", "left_wrist"],
+      right_wrist: ["right_shoulder", "right_elbow", "right_wrist"],
+      left_ankle: ["left_hip", "left_knee", "left_ankle"],
+      right_ankle: ["right_hip", "right_knee", "right_ankle"]
+    };
+
+    function poseDirectionList() {
+      if (value("guide-direction-count") === "16") {
+        return [
+          "front", "front_front_left", "front_left", "left_front_left",
+          "left", "left_back_left", "back_left", "back_back_left",
+          "back", "back_back_right", "back_right", "right_back_right",
+          "right", "right_front_right", "front_right", "front_front_right"
+        ];
+      }
+      return ["front", "front_left", "left", "back_left", "back", "back_right", "right", "front_right"];
+    }
+
+    function poseYaw(direction) {
+      const degrees = {
+        front: 0,
+        front_front_left: -22.5,
+        front_left: -45,
+        left_front_left: -67.5,
+        left: -90,
+        left_back_left: -112.5,
+        back_left: -135,
+        back_back_left: -157.5,
+        back: 180,
+        back_back_right: 157.5,
+        back_right: 135,
+        right_back_right: 112.5,
+        right: 90,
+        right_front_right: 67.5,
+        front_right: 45,
+        front_front_right: 22.5
+      };
+      return (degrees[direction] || 0) * Math.PI / 180;
+    }
+
+    function defaultPose(direction = "front") {
+      const yaw = poseYaw(direction);
+      const side = Math.abs(Math.sin(yaw));
+      const facing = Math.sin(yaw);
+      const shoulder = 38 - side * 22;
+      const hip = 23 - side * 12;
+      const depth = facing * 8;
+      const center = 128;
+      const pose = {
+        head: [center + facing * 6, 38],
+        neck: [center + depth * 0.4, 66],
+        spine: [center, 103],
+        pelvis: [center - depth * 0.2, 132],
+      };
+      pose.left_shoulder = [pose.neck[0] - shoulder, 70];
+      pose.right_shoulder = [pose.neck[0] + shoulder, 70];
+      pose.left_hip = [pose.pelvis[0] - hip, 132];
+      pose.right_hip = [pose.pelvis[0] + hip, 132];
+      pose.left_elbow = [pose.left_shoulder[0] - 18 - side * 10, 118];
+      pose.right_elbow = [pose.right_shoulder[0] + 18 + side * 10, 118];
+      pose.left_wrist = [pose.left_elbow[0] - 12 - side * 8, 169];
+      pose.right_wrist = [pose.right_elbow[0] + 12 + side * 8, 169];
+      pose.left_knee = [pose.left_hip[0] - 8 - side * 9, 190];
+      pose.right_knee = [pose.right_hip[0] + 8 + side * 9, 190];
+      pose.left_ankle = [pose.left_knee[0] - 8, 239];
+      pose.right_ankle = [pose.right_knee[0] + 8, 239];
+      if (side > 0.82) {
+        const compress = facing * 9;
+        for (const [left, right] of poseMirrorPairs) {
+          const base = left.includes("shoulder") ? pose.neck[0] : pose.pelvis[0];
+          pose[left][0] = base - compress;
+          pose[right][0] = base + compress;
+        }
+      }
+      return JSON.parse(JSON.stringify(pose));
+    }
+
+    function ensurePoseLab() {
+      const directions = poseDirectionList();
+      if (!directions.includes(state.poseDirection)) state.poseDirection = directions[0];
+      for (const direction of directions) {
+        if (!state.posePointers[direction]) state.posePointers[direction] = defaultPose(direction);
+      }
+      const select = $("pose-edit-direction");
+      if (select) {
+        const previous = select.value || state.poseDirection;
+        select.innerHTML = "";
+        for (const direction of directions) {
+          const option = document.createElement("option");
+          option.value = direction;
+          option.textContent = direction.replaceAll("_", " ");
+          select.appendChild(option);
+        }
+        state.poseDirection = directions.includes(previous) ? previous : state.poseDirection;
+        select.value = state.poseDirection;
+      }
+    }
+
+    function currentPose() {
+      ensurePoseLab();
+      return state.posePointers[state.poseDirection];
+    }
+
+    function clampPosePoint(point) {
+      point[0] = Math.max(8, Math.min(248, point[0]));
+      point[1] = Math.max(8, Math.min(248, point[1]));
+      return point;
+    }
+
+    function distance(a, b) {
+      return Math.hypot(a[0] - b[0], a[1] - b[1]);
+    }
+
+    function solveTwoBone(root, mid, end, target) {
+      const lenA = Math.max(1, distance(root, mid));
+      const lenB = Math.max(1, distance(mid, end));
+      let dx = target[0] - root[0];
+      let dy = target[1] - root[1];
+      let d = Math.hypot(dx, dy);
+      if (d < 0.001) {
+        dx = 0.001;
+        dy = 0;
+        d = 0.001;
+      }
+      const maxReach = lenA + lenB - 0.01;
+      const minReach = Math.abs(lenA - lenB) + 0.01;
+      const clamped = Math.max(minReach, Math.min(maxReach, d));
+      const ux = dx / d;
+      const uy = dy / d;
+      const bend = Math.sign((mid[0] - root[0]) * (end[1] - root[1]) - (mid[1] - root[1]) * (end[0] - root[0])) || 1;
+      const a = (lenA * lenA - lenB * lenB + clamped * clamped) / (2 * clamped);
+      const h = Math.sqrt(Math.max(0, lenA * lenA - a * a));
+      const base = [root[0] + ux * a, root[1] + uy * a];
+      const solvedMid = [base[0] + -uy * h * bend, base[1] + ux * h * bend];
+      const solvedEnd = [root[0] + ux * clamped, root[1] + uy * clamped];
+      return [clampPosePoint(solvedMid), clampPosePoint(solvedEnd)];
+    }
+
+    function setPoseJoint(joint, point) {
+      const pose = currentPose();
+      const target = clampPosePoint([point[0], point[1]]);
+      const chain = poseChains[joint];
+      if (chain && value("pose-edit-mode") === "ik") {
+        const [rootName, midName, endName] = chain;
+        const [mid, end] = solveTwoBone(pose[rootName], pose[midName], pose[endName], target);
+        pose[midName] = mid;
+        pose[endName] = end;
+      } else {
+        pose[joint] = target;
+      }
+      renderPoseLabEditor();
+    }
+
+    function svgPosePoint(event) {
+      const svg = $("pose-editor");
+      const point = svg.createSVGPoint();
+      point.x = event.clientX;
+      point.y = event.clientY;
+      const transformed = point.matrixTransform(svg.getScreenCTM().inverse());
+      return [transformed.x, transformed.y];
+    }
+
+    function renderPoseLabEditor() {
+      ensurePoseLab();
+      const svg = $("pose-editor");
+      if (!svg) return;
+      const pose = currentPose();
+      let markup = '<rect width="256" height="256" fill="#000"/><line class="floor-line" x1="8" y1="239" x2="248" y2="239"/>';
+      for (const [a, b, color] of poseSegments) {
+        if (!pose[a] || !pose[b]) continue;
+        markup += `<line x1="${pose[a][0].toFixed(2)}" y1="${pose[a][1].toFixed(2)}" x2="${pose[b][0].toFixed(2)}" y2="${pose[b][1].toFixed(2)}" stroke="${color}" stroke-width="5"/>`;
+      }
+      for (const [index, name] of poseJointNames.entries()) {
+        const point = pose[name];
+        if (!point) continue;
+        const fill = index % 3 === 0 ? "#ff00d2" : "#f5ff00";
+        markup += `<circle data-joint="${name}" cx="${point[0].toFixed(2)}" cy="${point[1].toFixed(2)}" r="6" fill="${fill}"><title>${name.replaceAll("_", " ")}</title></circle>`;
+      }
+      svg.innerHTML = markup;
+      svg.querySelectorAll("circle[data-joint]").forEach((circle) => {
+        circle.addEventListener("pointerdown", (event) => {
+          event.preventDefault();
+          state.poseDragging = circle.dataset.joint;
+          circle.setPointerCapture?.(event.pointerId);
+        });
+      });
+      renderPoseDirectionStrip();
+    }
+
+    function syncPoseLabStage() {
+      const open = Boolean($("pose-lab-panel")?.open);
+      const shell = document.querySelector(".image-shell");
+      const stage = $("stage-pose-lab");
+      if (!shell || !stage) return;
+      shell.classList.toggle("pose-mode", open);
+      stage.hidden = !open;
+      if (open) {
+        renderPoseLabEditor();
+        $("output-label").textContent = `Pose Lab / ${state.poseDirection.replaceAll("_", " ")}`;
+      } else {
+        const item = (state.visibleOutputs || [])[state.selectedIndex];
+        $("output-label").textContent = item ? (item.label || basename(item.path)) : "No output";
+      }
+    }
+
+    function renderPoseDirectionStrip() {
+      const strip = $("pose-dir-strip");
+      if (!strip) return;
+      strip.innerHTML = "";
+      for (const direction of poseDirectionList()) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = direction.replaceAll("_", " ");
+        button.className = direction === state.poseDirection ? "active" : "";
+        button.addEventListener("click", () => {
+          state.poseDirection = direction;
+          $("pose-edit-direction").value = direction;
+          renderPoseLabEditor();
+          syncPoseLabStage();
+        });
+        strip.appendChild(button);
+      }
+    }
+
+    function resetCurrentPose() {
+      state.posePointers[state.poseDirection] = defaultPose(state.poseDirection);
+      renderPoseLabEditor();
+    }
+
+    function mirrorCurrentPose() {
+      const pose = currentPose();
+      const mirrored = JSON.parse(JSON.stringify(pose));
+      for (const [left, right] of poseMirrorPairs) {
+        mirrored[left] = [256 - pose[right][0], pose[right][1]];
+        mirrored[right] = [256 - pose[left][0], pose[left][1]];
+      }
+      for (const name of ["head", "neck", "spine", "pelvis"]) {
+        mirrored[name] = [256 - pose[name][0], pose[name][1]];
+      }
+      state.posePointers[state.poseDirection] = mirrored;
+      renderPoseLabEditor();
+    }
+
+    function copyCurrentPoseToAll() {
+      const pose = JSON.parse(JSON.stringify(currentPose()));
+      for (const direction of poseDirectionList()) {
+        state.posePointers[direction] = JSON.parse(JSON.stringify(pose));
+      }
+      renderPoseLabEditor();
+      setProgress("Pose Lab", "Pose copied to all directions.", 100);
+    }
+
+    function poseDataPayload() {
+      ensurePoseLab();
+      const directions = {};
+      for (const direction of poseDirectionList()) {
+        directions[direction] = {
+          joints: JSON.parse(JSON.stringify(state.posePointers[direction] || defaultPose(direction)))
+        };
+      }
+      return {
+        canvas_size: 256,
+        active_direction: state.poseDirection,
+        directions
+      };
+    }
+
+    function poseLabDirections() {
+      if (value("guide-direction-count") === "16") {
+        return "front, front-front-left, front-left, left-front-left, left, left-back-left, back-left, back-back-left, back, back-back-right, back-right, right-back-right, right, right-front-right, front-right, front-front-right";
+      }
+      return "front, front-left, left, back-left, back, back-right, right, front-right";
+    }
+
+    function poseLabControlText() {
+      const control = value("pose-control-type");
+      if (control === "silhouette_line") return "Canny or line-art style control map: clean outer silhouette and major internal pose contours only.";
+      if (control === "scribble") return "Scribble control map: loose confident guide strokes describing body mass and pose.";
+      if (control === "depth_mass") return "Depth-map style guide: grayscale body volume masses, brighter closer forms, smooth simple values.";
+      return "OpenPose annotation map from keypoint detection: edge-to-edge black canvas, sparse colored stick figure, small colored joint dots, one thin colored bone segment per limb, colors like green/cyan/blue/orange/purple/magenta/yellow; no anatomical skeleton, body/mannequin outline, skull, ribs, hands, or feet.";
+    }
+
+    function buildPoseLabPrompt() {
+      const count = value("guide-direction-count") === "16" ? "16" : "8";
+      const layout = count === "16" ? "4x4" : "4x2";
+      return [
+        `Create one square ${count}-direction ControlNet guide reference sheet for game sprite generation.`,
+        `Layout: one ${layout} grid, directions in this exact order: ${poseLabDirections()}.`,
+        `Control type: ${poseLabControlText()}`,
+        `Body target: ${value("body-guide")} / ${value("guide-strength")}.`,
+        "Use a simple black background, high contrast guide marks, consistent scale, centered full-body figure per cell, same foot baseline.",
+        "Use an invisible grid layout; do not draw cell borders or divider lines. The entire image must be an edge-to-edge black canvas with no white margins.",
+        "Draw pose rigs, not anatomy diagrams. For OpenPose, imitate a keypoint detection annotation image, not a drawing of a person.",
+        "For OpenPose, use sparse colored stick figures with small colored dots and thin colored limb segments only; avoid white lines except tiny neutral center points if needed.",
+        "No body outline, silhouette outline, mannequin outline, bones, skulls, ribcages, detailed hands or feet, character art, clothing, face detail, props, scenery, text, labels, arrows, watermark, texture, shadows, thick grid dividers, page border, or final rendering.",
+        `Sprite context: ${value("subject-prompt") || "generic game sprite character"}`,
+        `Extra brief: ${value("pose-lab-brief") || "dependable reusable guide preset candidate"}`
+      ].join("\n");
+    }
+
+    function buildPoseLabPayload() {
+      return {
+        subject_id: value("subject-id"),
+        subject_prompt: value("subject-prompt"),
+        body_type: value("body-guide"),
+        guide_strength: value("guide-strength"),
+        direction_count: value("guide-direction-count"),
+        control_type: value("pose-control-type"),
+        brief: value("pose-lab-brief"),
+        pose_data: value("pose-control-type") === "pose_skeleton" ? poseDataPayload() : null
+      };
+    }
+
+    async function createGeminiGuide() {
+      if (state.busy) return;
+      setBusy(true, "Pose Lab");
+      setProgress("Pose Lab", "Creating guide candidate.", 15);
+      try {
+        const response = await fetch("/api/guides/gemini", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(buildPoseLabPayload())
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body.detail || `Guide request failed with status ${response.status}`);
+        const outputs = (body.outputs || []).map(normalizeManagedOutput);
+        if (!outputs.length) throw new Error("No guide candidate returned.");
+        state.outputs = outputs.concat(state.outputs || []);
+        state.viewerSource = "batch";
+        state.outputView = "recent";
+        state.selectedIndex = -1;
+        state.selectedOutputPaths.clear();
+        renderGallery();
+        showOutput(0);
+        const guideFolder = newestFolderMatching("outputs/guides/candidates/");
+        if (guideFolder) {
+          state.outputView = `folder:${guideFolder}`;
+          renderGallery();
+          if (state.visibleOutputs[0]) showOutput(0);
+        }
+        append(`POSE LAB PROMPT\n${body.prompt || buildPoseLabPrompt()}`);
+        setProgress("Done", "Guide candidate saved in Nymphs Sprite outputs.", 100);
+      } catch (error) {
+        append(`ERROR: ${error.message || error}`);
+        setProgress("Error", error.message || "Guide candidate failed.", 0);
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function copyPoseLabPrompt() {
+      const prompt = buildPoseLabPrompt();
+      try {
+        await navigator.clipboard.writeText(prompt);
+        setProgress("Pose Lab", "Prompt copied.", 100);
+      } catch {
+        append(`POSE LAB PROMPT\n${prompt}`);
+        setProgress("Pose Lab", "Prompt written to logs.", 100);
+      }
     }
 
     function parseRunId(text) {
@@ -1736,7 +2333,18 @@
       $("generate-foundry").disabled = state.busy || Boolean(generationBlocker);
       $("generate-foundry").title = generationBlocker || "Generate a sprite set.";
       $("preview-guides").disabled = state.busy;
-      $("preview-guides").title = "Preview the 8-way guide sheet.";
+      $("preview-guides").title = "Preview guide candidates from Pose Lab.";
+      $("create-gemini-guide").disabled = state.busy;
+      $("create-gemini-guide").title = "Create a guide candidate.";
+      $("view-guide-candidates").disabled = state.busy;
+      $("view-guide-candidates").title = "Show generated guide candidates in the preview strip.";
+      $("pose-lab-copy-prompt").disabled = state.busy;
+      $("pose-lab-copy-prompt").title = "Copy the current Pose Lab prompt.";
+      for (const id of ["pose-reset", "pose-mirror", "pose-copy-all"]) {
+        const button = $(id);
+        if (!button) continue;
+        button.disabled = state.busy;
+      }
       $("review-select-all").disabled = state.busy || state.visibleOutputs.length === 0;
       $("review-clear").disabled = state.busy || state.selectedOutputPaths.size === 0;
       const runButtons = [
@@ -1939,7 +2547,8 @@
     });
     $("z-model-choice").addEventListener("change", () => {
       state.zModelTouched = true;
-      $("model-chip").textContent = zModelChipText();
+      const modelChip = $("model-chip");
+      if (modelChip) modelChip.textContent = zModelChipText();
     });
     function runGeneration() {
       if (state.busy) return;
@@ -1958,8 +2567,13 @@
         parseOutputPaths(text);
         parseRunId(text);
         state.viewerSource = "outputs";
-        state.outputView = "recent";
         await refreshRecentOutputs(true);
+        const subjectFolder = newestFolderMatching(safeSubjectFolderPrefix());
+        if (subjectFolder) {
+          state.outputView = `folder:${subjectFolder}`;
+          renderGallery();
+          if (state.visibleOutputs[0]) showOutput(0);
+        }
         setProgress("Done", state.outputs.length ? "Foundry run ready." : "Finished.", 100);
       })().catch((error) => {
         append(`ERROR: ${error.message || error}`);
@@ -1975,9 +2589,51 @@
     $("run-id").addEventListener("input", updateFoundryControls);
     $("body-guide").addEventListener("change", updateFoundryControls);
     $("guide-strength").addEventListener("change", updateFoundryControls);
-    $("preview-guides").addEventListener("click", () => {
-      setProgress("Guides", "Guide sheet preview will be wired in the next stage.", 35);
+    $("guide-direction-count").addEventListener("change", () => {
+      ensurePoseLab();
+      renderPoseLabEditor();
+      syncPoseLabStage();
+      updateFoundryControls();
     });
+    $("pose-control-type").addEventListener("change", updateFoundryControls);
+    $("pose-lab-panel").addEventListener("toggle", syncPoseLabStage);
+    $("pose-edit-direction").addEventListener("change", () => {
+      const direction = value("pose-edit-direction");
+      if (!direction) return;
+      state.poseDirection = direction;
+      renderPoseLabEditor();
+      syncPoseLabStage();
+    });
+    $("pose-edit-mode").addEventListener("change", renderPoseLabEditor);
+    $("pose-reset").addEventListener("click", resetCurrentPose);
+    $("pose-mirror").addEventListener("click", mirrorCurrentPose);
+    $("pose-copy-all").addEventListener("click", copyCurrentPoseToAll);
+    $("pose-editor").addEventListener("pointermove", (event) => {
+      if (!state.poseDragging) return;
+      event.preventDefault();
+      setPoseJoint(state.poseDragging, svgPosePoint(event));
+    });
+    $("pose-editor").addEventListener("pointerup", (event) => {
+      if (!state.poseDragging) return;
+      event.preventDefault();
+      setPoseJoint(state.poseDragging, svgPosePoint(event));
+      state.poseDragging = "";
+    });
+    $("pose-editor").addEventListener("pointerleave", () => {
+      state.poseDragging = "";
+    });
+    $("pose-editor").addEventListener("pointercancel", () => {
+      state.poseDragging = "";
+    });
+    $("pose-lab-brief").addEventListener("input", updateFoundryControls);
+    $("preview-guides").addEventListener("click", () => {
+      $("pose-lab-panel").open = true;
+      syncPoseLabStage();
+      setProgress("Pose Lab", "Move points, switch direction slots, then create a guide sheet.", 35);
+    });
+    $("create-gemini-guide").addEventListener("click", createGeminiGuide);
+    $("view-guide-candidates").addEventListener("click", viewGuideCandidates);
+    $("pose-lab-copy-prompt").addEventListener("click", copyPoseLabPrompt);
     $("review-select-all").addEventListener("click", selectAllVisibleOutputs);
     $("review-clear").addEventListener("click", clearOutputSelection);
     $("generate-foundry").addEventListener("click", runGeneration);
@@ -1995,6 +2651,9 @@
 
     populatePromptPresets();
     applyPromptPreset("goblin_scout");
+    ensurePoseLab();
+    renderPoseLabEditor();
+    syncPoseLabStage();
     renderGallery();
     refreshStatus();
     refreshRecentOutputs(true);

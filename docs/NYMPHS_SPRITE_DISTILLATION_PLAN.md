@@ -57,7 +57,7 @@ clear reason to inspect files directly.
 Current published module version:
 
 ```text
-Nymphs Sprite 1.2.12
+Nymphs Sprite 1.2.13
 ```
 
 Current module identity:
@@ -270,9 +270,10 @@ The Guide panel should let the user create or adjust the exact ControlNet refs
 used for generation. The simple version comes first:
 
 1. Choose body type.
-2. Generate an 8-direction guide sheet.
-3. Preview the guide sheet.
-4. Generate the sprite set using those guides.
+2. Choose 8 or 16 directions.
+3. Generate candidate guide sheets.
+4. Preview/select likely winners in the normal preview strip.
+5. Generate the sprite set using those guides once ControlNet wiring is live.
 
 Body types:
 
@@ -300,6 +301,77 @@ Future advanced loop:
 bad direction -> make/edit guide -> regenerate that direction -> accept winner
 ```
 
+### Pose Lab
+
+The first implemented guide workflow is a small collapsible `Pose Lab` inside
+the Guide section. It exists to make candidate guide refs, not to become a
+large second product.
+
+Keep this simple:
+
+```text
+Guide settings -> edit one pose slot -> create guide sheet -> preview strip
+```
+
+The default OpenPose Skeleton path is local and deterministic. It does not ask
+Gemini or Z-Image to invent an OpenPose map. The UI owns a small editable rig:
+
+- one page
+- opens in the main preview area as a large pose workbench
+- one active direction at a time
+- direction strip changes the active slot
+- direction strip sits directly underneath the rig editor
+- each direction saves its own joint positions
+- drag colored points to move joints
+- IK mode solves wrists/ankles through elbows/knees
+- FK / Length mode moves the selected point directly, which lets that direction
+  change bone lengths/proportions before switching back to IK
+- Reset restores the active direction
+- Mirror mirrors the active direction
+- Copy All copies the active pose into every direction slot
+
+When `Create Guide` is pressed with `OpenPose Skeleton`, Nymphs Sprite renders
+the slots into a black-background OpenPose-style guide sheet and saves it into
+Nymphs Sprite-owned outputs:
+
+```text
+$HOME/NymphsData/outputs/nymphs-sprite/guides/candidates/<subject>/<timestamp>/
+```
+
+The non-OpenPose candidate types can still call the existing Nymphs Image /
+Gemini Flash route for rough research candidates, but this is no longer the
+main pose workflow.
+
+Supported candidate ref types:
+
+- OpenPose Skeleton: local editable rig; default first-class path for pose and
+  limb control.
+- Canny / Line: useful for silhouette and outline fidelity.
+- Scribble: useful for rough shape and body mass experiments.
+- Depth Mass: later research path for simple grayscale volume cues.
+
+The prompt rules are based on the ControlNet mental model: a control image
+should be structural, simple, high contrast, and low detail. It should not look
+like final art. For guide sheets, avoid character detail, clothing, labels,
+arrows, text, scenery, and decoration.
+
+Guide candidate management should remain lightweight for now:
+
+- generated candidates appear in the normal gallery/preview strip
+- `View Guides` jumps to the newest guide candidate folder
+- selection controls can be used to mark likely winners
+- do not build a large guide database yet
+
+Future promotion path:
+
+```text
+guides/candidates/<subject>/<timestamp>/
+  -> guides/presets/<body>/<control_type>/<8way-or-16way>/
+```
+
+Only add the preset promotion button after real test results show which guide
+refs are worth keeping.
+
 ## Best Working Flow To Build First
 
 Build and test from the top down.
@@ -314,8 +386,10 @@ Build and test from the top down.
 ### 2. Guide
 
 - Pick body type.
-- Generate deterministic 8-direction guide refs.
-- Show a guide contact sheet.
+- Pick 8 or 16 directions.
+- Generate guide candidates in Pose Lab.
+- Test OpenPose, Canny/line, scribble, and depth-mass candidates.
+- Show candidate guide sheets in the preview strip.
 - Save guide files under Nymphs Sprite outputs/tmp.
 
 ### 3. Style
@@ -326,7 +400,7 @@ Build and test from the top down.
 
 ### 4. Generate
 
-- Generate all 8 directions through Z-Image.
+- Generate all selected directions through Z-Image.
 - Use body/direction guides as ControlNet refs once wired.
 - Save into Nymphs Sprite output folders.
 - One main button should cover the normal path.
@@ -344,7 +418,30 @@ right
 front_right
 ```
 
-16-direction support is desired later, after 8-direction quality is dependable.
+16 directions are now exposed as an option for Pose Lab and the Z-Image
+generation runner. Use 8 directions as the default test path. Use 16 when the
+extra angular coverage is worth roughly doubling the generation cost.
+
+16 directions:
+
+```text
+front
+front_front_left
+front_left
+left_front_left
+left
+left_back_left
+back_left
+back_back_left
+back
+back_back_right
+back_right
+right_back_right
+right
+right_front_right
+front_right
+front_front_right
+```
 
 ### 5. Review
 
@@ -372,6 +469,11 @@ The audition stage should stay simple:
 This stage is where the pose panel becomes powerful later. A bad generated
 direction can become the starting point for a manual pose, sketch, or outline
 ref.
+
+The preview strip should stay folder-scoped after generation. Avoid dumping the
+entire `Recent` history into the strip after a run; it gets too noisy. New
+sprite runs should show the newest subject/run folder. New guide candidates
+should show the newest guide candidate folder.
 
 ## Godot / Packaging
 
@@ -447,7 +549,11 @@ Test in small slices.
 ### Slice 4: Guide Preview
 
 - Choose each body type.
-- Generate guide contact sheet.
+- Select 8 or 16 directions.
+- Move points in one direction slot.
+- Switch directions and confirm each slot keeps its own pose.
+- Generate an OpenPose guide contact sheet.
+- Confirm the edited slot appears in the saved sheet.
 - Confirm guide files are deterministic and visible.
 - Confirm the user can understand that guides become ControlNet refs.
 
@@ -478,14 +584,19 @@ Test in small slices.
 
 ## Immediate Next Implementation Order
 
-1. Test/update installed Nymphs Sprite `1.2.12` in the `NymphsCore` test WSL.
+1. Test/update installed Nymphs Sprite `1.2.13` in the `NymphsCore` test WSL.
 2. Confirm status panel and LoRA dropdown are fixed after restart/update.
-3. Generate a tiny current-path 8-way set to validate output ownership.
-4. Implement real guide preview generation.
-5. Wire one guide image into Z-Image ControlNet.
-6. Expand to 8-direction guided generation.
-7. Add audition/regenerate UX using a Nymphs Image-style preview strip.
-8. Revisit Godot/depth/normal export once albedo sets are reliable.
+3. Open Pose Lab, move points in one direction, switch slots, and confirm the
+   slot state is retained.
+4. Generate a Pose Lab OpenPose Skeleton candidate and confirm the edited slot
+   appears in the saved guide sheet.
+5. Generate a Canny/Line candidate only as a secondary research check.
+6. Generate a tiny current-path 8-way set to validate output ownership.
+7. Try one 16-way run only after the 8-way path is stable.
+8. Wire one guide image into Z-Image ControlNet.
+9. Expand to guided 8/16-direction generation.
+10. Add audition/regenerate UX using a Nymphs Image-style preview strip.
+11. Revisit Godot/depth/normal export once albedo sets are reliable.
 
 ## Known Good Checks
 
@@ -509,7 +620,7 @@ Expected current status signs:
 
 ```text
 id=nymphs-sprite
-version=1.2.12 or newer
+version=1.2.13 or newer
 controlnet_ready=true
 models_ready=true
 lora_choices=...

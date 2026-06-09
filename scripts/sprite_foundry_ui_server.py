@@ -3,14 +3,21 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import mimetypes
 import os
 import re
 import shutil
+import struct
 import subprocess
+import time
+import zlib
+from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, quote, unquote, urlparse
+from urllib.request import Request, urlopen
 
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp"}
 
@@ -106,6 +113,9 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
             return
         if path == "/api/outputs/folder/delete":
             self._delete_output_folder()
+            return
+        if path == "/api/guides/gemini":
+            self._create_gemini_guide()
             return
         self.send_error(404, "Not found")
 
@@ -443,6 +453,490 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
         except Exception:
             pass
         self._send_json({"status": "ok", "folder": folder, "removed": removed, "outputs": self._output_records()})
+
+    def _safe_slug(self, value: str, fallback: str = "item") -> str:
+        slug = re.sub(r"[^A-Za-z0-9_.-]+", "-", value.strip()).strip(".-_")
+        return (slug or fallback)[:96]
+
+    def _zimage_url(self) -> str:
+        return (os.environ.get("SPRITE_FOUNDRY_ZIMAGE_URL") or os.environ.get("ZIMAGE_URL") or "http://127.0.0.1:8090").rstrip("/")
+
+    def _post_json(self, url: str, payload: dict, *, timeout: int = 240) -> dict:
+        request = Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urlopen(request, timeout=timeout) as response:
+                text = response.read().decode("utf-8", errors="replace")
+        except HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(detail or str(exc)) from exc
+        except URLError as exc:
+            raise RuntimeError(str(exc.reason or exc)) from exc
+        try:
+            body = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"Backend returned non-JSON response: {text[:500]}") from exc
+        if not isinstance(body, dict):
+            raise RuntimeError("Backend returned an unexpected response.")
+        return body
+
+    def _gemini_guide_prompt(self, payload: dict) -> str:
+        body_type = str(payload.get("body_type") or "humanoid").replace("_", " ").strip()
+        guide_strength = str(payload.get("guide_strength") or "normal").strip()
+        direction_count = 16 if str(payload.get("direction_count") or "8") == "16" else 8
+        control_type = str(payload.get("control_type") or "pose_skeleton").strip()
+        user_brief = str(payload.get("brief") or "").strip()
+        subject_prompt = str(payload.get("subject_prompt") or "").strip()
+        if direction_count == 16:
+            directions = (
+                "front, front-front-left, front-left, left-front-left, left, left-back-left, "
+                "back-left, back-back-left, back, back-back-right, back-right, right-back-right, "
+                "right, right-front-right, front-right, front-front-right"
+            )
+            layout = "one 4x4 grid in a single square image"
+        else:
+            directions = "front, front-left, left, back-left, back, back-right, right, front-right"
+            layout = "one 4x2 grid in a single square image"
+        body_notes = {
+            "humanoid": "humanoid game character, upright readable full-body anatomy",
+            "wide squat": "short wide heavy body, low center of mass, strong blocky silhouette",
+            "tall thin": "tall narrow body, long limbs, thin readable silhouette",
+            "amorphous": "blob-like creature body, organic mass, no detailed costume",
+            "quadruped": "four-legged creature body, side and diagonal reads must be clear",
+            "winged": "humanoid or creature body with folded wings, wings readable but simple",
+            "custom": "simple body-shape guide based on the brief",
+        }
+        note = body_notes.get(body_type.lower(), body_notes["custom"])
+        control_notes = {
+            "pose_skeleton": (
+                "OpenPose annotation map from keypoint detection, like a ControlNet OpenPose preprocessor output; "
+                "black background, sparse colored stick figure, small colored joint dots, one thin colored bone segment per limb, minimal stick-rig only; "
+                "use colors like green, cyan, blue, orange, purple, magenta, and yellow for limb segments; "
+                "head dot or small head marker, neck, shoulders, elbows, wrists, hips, knees, ankles readable; "
+                "no body outline, no mannequin outline, no torso contour, no face outline, no profile face, no hands, no feet; "
+                "absolutely no anatomical skeleton, no skull, no ribs, no spine bones, no pelvis bones, no hand bones, no foot bones"
+            ),
+            "silhouette_line": (
+                "Canny or line-art style control map: clean outer silhouette and major internal pose contours only, "
+                "simple white lines on black, no texture hatching or rendered detail"
+            ),
+            "scribble": (
+                "Scribble control map: loose confident hand-drawn guide strokes that describe the body mass and pose, "
+                "few lines, high contrast, intentionally simple"
+            ),
+            "depth_mass": (
+                "Depth-map style control guide: grayscale body volume masses on black, brighter closer forms, "
+                "smooth simple values, no texture and no final-art rendering"
+            ),
+        }
+        control_note = control_notes.get(control_type, control_notes["pose_skeleton"])
+        prompt = f"""
+Create one square {direction_count}-direction ControlNet guide reference sheet for game sprite generation.
+
+Purpose: this image is not final art. It is a clean structural guide that will be used as ControlNet conditioning.
+
+Layout:
+- {layout}
+- directions in this exact order: {directions}
+- one full-body figure per cell
+- consistent scale, centered in each cell, same foot baseline
+- clear direction changes between front, diagonals, side, and back
+- use an invisible grid layout; do not draw cell borders or divider lines
+- the entire image must be an edge-to-edge black canvas with no white margins
+
+Guide style:
+- simple black background
+- control type: {control_note}
+- use only the minimum marks needed for reliable conditioning
+- draw pose rigs, not anatomy diagrams
+- for OpenPose, imitate a keypoint detection annotation image, not a drawing of a person
+- for OpenPose, use sparse colored stick figures with small colored dots and thin colored limb segments only
+- for OpenPose, do not use white lines except tiny neutral center points if needed
+- for OpenPose, do not draw silhouette, body, mannequin, torso, hand, foot, or face outlines
+- high contrast, low detail, no texture
+- no bones, no skulls, no ribcages, no detailed hands or feet
+- no clothing, no facial details, no rendered character art
+- no text, no labels, no arrows, no watermarks, no frame decorations
+- no grid dividers, no cell borders, no white page border
+- no decorative color; if OpenPose colors are used, keep them flat and sparse
+- no scenery, props, background objects, or shadows
+
+Body target:
+- {note}
+- guide strength intent: {guide_strength}
+
+Sprite target context:
+{subject_prompt[:700] if subject_prompt else "generic game sprite character"}
+
+Extra guide brief:
+{user_brief[:700] if user_brief else "Make this a dependable reusable guide preset candidate."}
+
+The output must look like a clean ControlNet reference sheet, not a character design sheet.
+"""
+        return "\n".join(line.rstrip() for line in prompt.strip().splitlines())
+
+    def _direction_names(self, direction_count: int) -> list[str]:
+        if direction_count == 16:
+            return [
+                "front", "front_front_left", "front_left", "left_front_left",
+                "left", "left_back_left", "back_left", "back_back_left",
+                "back", "back_back_right", "back_right", "right_back_right",
+                "right", "right_front_right", "front_right", "front_front_right",
+            ]
+        return ["front", "front_left", "left", "back_left", "back", "back_right", "right", "front_right"]
+
+    def _direction_yaw(self, name: str) -> float:
+        yaws = {
+            "front": 0,
+            "front_front_left": -22.5,
+            "front_left": -45,
+            "left_front_left": -67.5,
+            "left": -90,
+            "left_back_left": -112.5,
+            "back_left": -135,
+            "back_back_left": -157.5,
+            "back": 180,
+            "back_back_right": 157.5,
+            "back_right": 135,
+            "right_back_right": 112.5,
+            "right": 90,
+            "right_front_right": 67.5,
+            "front_right": 45,
+            "front_front_right": 22.5,
+        }
+        return math.radians(yaws.get(name, 0))
+
+    def _png_chunk(self, chunk_type: bytes, data: bytes) -> bytes:
+        crc = zlib.crc32(chunk_type + data) & 0xFFFFFFFF
+        return struct.pack(">I", len(data)) + chunk_type + data + struct.pack(">I", crc)
+
+    def _write_rgb_png(self, path: Path, width: int, height: int, pixels: bytearray) -> None:
+        rows = []
+        stride = width * 3
+        for y in range(height):
+            rows.append(b"\x00" + bytes(pixels[y * stride : (y + 1) * stride]))
+        data = b"".join(
+            [
+                b"\x89PNG\r\n\x1a\n",
+                self._png_chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)),
+                self._png_chunk(b"IDAT", zlib.compress(b"".join(rows), level=9)),
+                self._png_chunk(b"IEND", b""),
+            ]
+        )
+        path.write_bytes(data)
+
+    def _draw_disk(self, pixels: bytearray, width: int, height: int, x: float, y: float, radius: float, color: tuple[int, int, int]) -> None:
+        r = max(1, int(round(radius)))
+        cx = int(round(x))
+        cy = int(round(y))
+        rr = r * r
+        for py in range(max(0, cy - r), min(height, cy + r + 1)):
+            for px in range(max(0, cx - r), min(width, cx + r + 1)):
+                if (px - cx) * (px - cx) + (py - cy) * (py - cy) <= rr:
+                    offset = (py * width + px) * 3
+                    pixels[offset : offset + 3] = bytes(color)
+
+    def _draw_line(self, pixels: bytearray, width: int, height: int, a: tuple[float, float], b: tuple[float, float], color: tuple[int, int, int], thickness: float) -> None:
+        x0, y0 = a
+        x1, y1 = b
+        steps = max(1, int(max(abs(x1 - x0), abs(y1 - y0))))
+        for step in range(steps + 1):
+            t = step / steps
+            self._draw_disk(pixels, width, height, x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, thickness / 2, color)
+
+    def _draw_openpose_rig(self, pixels: bytearray, width: int, height: int, box: tuple[float, float, float, float], yaw: float) -> None:
+        x, y, w, h = box
+        cx = x + w * 0.5
+        cy = y + h * 0.52
+        scale = min(w, h) * 0.82
+        side = abs(math.sin(yaw))
+        facing = math.sin(yaw)
+        shoulder = (0.18 - 0.105 * side) * scale
+        hip = (0.105 - 0.055 * side) * scale
+        depth = facing * 0.045 * scale
+        head = (cx + facing * 0.035 * scale, cy - 0.39 * scale)
+        neck = (cx + depth * 0.35, cy - 0.29 * scale)
+        pelvis = (cx - depth * 0.2, cy + 0.08 * scale)
+        mid = (cx, cy - 0.10 * scale)
+        left_shoulder = (neck[0] - shoulder, neck[1] + 0.01 * scale)
+        right_shoulder = (neck[0] + shoulder, neck[1] - 0.01 * scale)
+        left_hip = (pelvis[0] - hip, pelvis[1])
+        right_hip = (pelvis[0] + hip, pelvis[1])
+        arm_drop = 0.25 * scale
+        leg_drop = 0.30 * scale
+        left_elbow = (left_shoulder[0] - (0.08 + 0.04 * side) * scale, left_shoulder[1] + arm_drop)
+        right_elbow = (right_shoulder[0] + (0.08 + 0.04 * side) * scale, right_shoulder[1] + arm_drop)
+        left_wrist = (left_elbow[0] - (0.05 + 0.03 * side) * scale, left_elbow[1] + 0.24 * scale)
+        right_wrist = (right_elbow[0] + (0.05 + 0.03 * side) * scale, right_elbow[1] + 0.24 * scale)
+        left_knee = (left_hip[0] - (0.03 + 0.04 * side) * scale, left_hip[1] + leg_drop)
+        right_knee = (right_hip[0] + (0.03 + 0.04 * side) * scale, right_hip[1] + leg_drop)
+        left_ankle = (left_knee[0] - 0.035 * scale, left_knee[1] + 0.29 * scale)
+        right_ankle = (right_knee[0] + 0.035 * scale, right_knee[1] + 0.29 * scale)
+        # Side views should read as one compressed rig, but keep tiny offsets so limbs are visible.
+        if side > 0.82:
+            compress = facing * 0.035 * scale
+            left_shoulder = (neck[0] - compress, left_shoulder[1])
+            right_shoulder = (neck[0] + compress, right_shoulder[1])
+            left_hip = (pelvis[0] - compress * 0.7, left_hip[1])
+            right_hip = (pelvis[0] + compress * 0.7, right_hip[1])
+        colors = {
+            "head": (255, 0, 190),
+            "torso": (0, 210, 230),
+            "left_arm": (255, 156, 0),
+            "right_arm": (0, 220, 65),
+            "left_leg": (0, 190, 125),
+            "right_leg": (0, 80, 230),
+            "dot": (245, 255, 0),
+            "joint": (255, 0, 210),
+        }
+        segments = [
+            (head, neck, colors["head"]),
+            (neck, mid, colors["torso"]),
+            (mid, pelvis, colors["torso"]),
+            (neck, left_shoulder, colors["left_arm"]),
+            (left_shoulder, left_elbow, colors["left_arm"]),
+            (left_elbow, left_wrist, colors["left_arm"]),
+            (neck, right_shoulder, colors["right_arm"]),
+            (right_shoulder, right_elbow, colors["right_arm"]),
+            (right_elbow, right_wrist, colors["right_arm"]),
+            (pelvis, left_hip, colors["left_leg"]),
+            (left_hip, left_knee, colors["left_leg"]),
+            (left_knee, left_ankle, colors["left_leg"]),
+            (pelvis, right_hip, colors["right_leg"]),
+            (right_hip, right_knee, colors["right_leg"]),
+            (right_knee, right_ankle, colors["right_leg"]),
+        ]
+        thickness = max(3, scale * 0.014)
+        for a, b, color in segments:
+            self._draw_line(pixels, width, height, a, b, color, thickness)
+        joints = [head, neck, mid, pelvis, left_shoulder, right_shoulder, left_elbow, right_elbow, left_wrist, right_wrist, left_hip, right_hip, left_knee, right_knee, left_ankle, right_ankle]
+        for index, point in enumerate(joints):
+            color = colors["joint"] if index % 3 == 0 else colors["dot"]
+            self._draw_disk(pixels, width, height, point[0], point[1], max(3, scale * 0.022), color)
+
+    def _draw_openpose_pose(
+        self,
+        pixels: bytearray,
+        width: int,
+        height: int,
+        box: tuple[float, float, float, float],
+        joints: dict,
+        canvas_size: float,
+    ) -> bool:
+        if not isinstance(joints, dict):
+            return False
+        canvas_size = canvas_size if canvas_size > 0 else 256
+        names = [
+            "head", "neck", "spine", "pelvis",
+            "left_shoulder", "left_elbow", "left_wrist",
+            "right_shoulder", "right_elbow", "right_wrist",
+            "left_hip", "left_knee", "left_ankle",
+            "right_hip", "right_knee", "right_ankle",
+        ]
+        x, y, w, h = box
+        margin = min(w, h) * 0.06
+        usable_w = max(1.0, w - margin * 2)
+        usable_h = max(1.0, h - margin * 2)
+        points: dict[str, tuple[float, float]] = {}
+        for name in names:
+            raw = joints.get(name)
+            if not isinstance(raw, list | tuple) or len(raw) < 2:
+                continue
+            try:
+                px = max(0.0, min(canvas_size, float(raw[0])))
+                py = max(0.0, min(canvas_size, float(raw[1])))
+            except (TypeError, ValueError):
+                continue
+            points[name] = (x + margin + px / canvas_size * usable_w, y + margin + py / canvas_size * usable_h)
+        if len(points) < 8:
+            return False
+        colors = {
+            "head": (255, 0, 190),
+            "torso": (0, 210, 230),
+            "left_arm": (255, 156, 0),
+            "right_arm": (0, 220, 65),
+            "left_leg": (0, 190, 125),
+            "right_leg": (0, 80, 230),
+            "dot": (245, 255, 0),
+            "joint": (255, 0, 210),
+        }
+        segments = [
+            ("head", "neck", colors["head"]),
+            ("neck", "spine", colors["torso"]),
+            ("spine", "pelvis", colors["torso"]),
+            ("neck", "left_shoulder", colors["left_arm"]),
+            ("left_shoulder", "left_elbow", colors["left_arm"]),
+            ("left_elbow", "left_wrist", colors["left_arm"]),
+            ("neck", "right_shoulder", colors["right_arm"]),
+            ("right_shoulder", "right_elbow", colors["right_arm"]),
+            ("right_elbow", "right_wrist", colors["right_arm"]),
+            ("pelvis", "left_hip", colors["left_leg"]),
+            ("left_hip", "left_knee", colors["left_leg"]),
+            ("left_knee", "left_ankle", colors["left_leg"]),
+            ("pelvis", "right_hip", colors["right_leg"]),
+            ("right_hip", "right_knee", colors["right_leg"]),
+            ("right_knee", "right_ankle", colors["right_leg"]),
+        ]
+        scale = min(w, h) * 0.82
+        thickness = max(3, scale * 0.014)
+        for a, b, color in segments:
+            if a in points and b in points:
+                self._draw_line(pixels, width, height, points[a], points[b], color, thickness)
+        for index, name in enumerate(names):
+            point = points.get(name)
+            if not point:
+                continue
+            color = colors["joint"] if index % 3 == 0 else colors["dot"]
+            self._draw_disk(pixels, width, height, point[0], point[1], max(3, scale * 0.022), color)
+        return True
+
+    def _create_openpose_guide(self, payload: dict) -> None:
+        subject_id = self._safe_slug(str(payload.get("subject_id") or "guide_candidate"), "guide_candidate")
+        body_type = self._safe_slug(str(payload.get("body_type") or "humanoid"), "humanoid")
+        direction_count = 16 if str(payload.get("direction_count") or "8") == "16" else 8
+        cols = 4
+        rows = 4 if direction_count == 16 else 2
+        width = height = 1024
+        pixels = bytearray(width * height * 3)
+        directions = self._direction_names(direction_count)
+        pose_data = payload.get("pose_data") if isinstance(payload.get("pose_data"), dict) else {}
+        pose_directions = pose_data.get("directions") if isinstance(pose_data.get("directions"), dict) else {}
+        try:
+            pose_canvas_size = float(pose_data.get("canvas_size") or 256)
+        except (TypeError, ValueError):
+            pose_canvas_size = 256
+        for index, name in enumerate(directions):
+            col = index % cols
+            row = index // cols
+            box = (col * width / cols, row * height / rows, width / cols, height / rows)
+            slot = pose_directions.get(name) if isinstance(pose_directions, dict) else None
+            joints = slot.get("joints") if isinstance(slot, dict) else None
+            if not self._draw_openpose_pose(pixels, width, height, box, joints, pose_canvas_size):
+                self._draw_openpose_rig(pixels, width, height, box, self._direction_yaw(name))
+
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+        target_dir = (self.server.output_root / "guides" / "candidates" / subject_id / timestamp).resolve()
+        target_dir.mkdir(parents=True, exist_ok=True)
+        target = self._output_collision_path(target_dir / f"{body_type}-{direction_count}way-openpose-guide-1.png")
+        self._write_rgb_png(target, width, height, pixels)
+        metadata = {
+            "provider": "Nymphs Sprite",
+            "mode": "pose_lab_guide_candidate",
+            "batch_id": f"pose-lab-local-{int(time.time())}",
+            "batch_label": "Pose Lab Guide Candidates",
+            "batch_type": "sprite_guide_candidate",
+            "item_label": f"{body_type.replace('-', ' ').title()} {direction_count}-Way OpenPose Guide",
+            "item_index": 1,
+            "item_total": 1,
+            "subject_id": subject_id,
+            "body_type": body_type,
+            "control_type": "pose_skeleton",
+            "direction_count": direction_count,
+            "directions": directions,
+            "pose_data": pose_data,
+            "guide_strength": str(payload.get("guide_strength") or "normal"),
+            "sprite_prompt_context": str(payload.get("subject_prompt") or ""),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        target.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+        rel = target.relative_to(self.server.output_root).as_posix()
+        record = self._output_record(target, rel)
+        record["source"] = "outputs"
+        record["url"] = f"/outputs/outputs/{quote(rel, safe='/')}"
+        record["folder"] = f"outputs/{record['folder']}".rstrip("/")
+        self._send_json({"status": "ok", "prompt": "Generated deterministic local OpenPose guide.", "outputs": [record]})
+
+    def _create_gemini_guide(self) -> None:
+        payload = self._json_payload()
+        subject_id = self._safe_slug(str(payload.get("subject_id") or "guide_candidate"), "guide_candidate")
+        body_type = self._safe_slug(str(payload.get("body_type") or "humanoid"), "humanoid")
+        direction_count = 16 if str(payload.get("direction_count") or "8") == "16" else 8
+        control_type = self._safe_slug(str(payload.get("control_type") or "pose_skeleton"), "pose_skeleton")
+        if control_type == "pose_skeleton":
+            self._create_openpose_guide(payload)
+            return
+        prompt = self._gemini_guide_prompt(payload)
+        batch_id = f"pose-lab-{int(time.time())}"
+        z_payload = {
+            "prompt": prompt,
+            "variant_count": 1,
+            "aspect_ratio": "1:1",
+            "model_id": str(payload.get("model_id") or "google/gemini-2.5-flash-image"),
+            "batch_id": batch_id,
+            "batch_label": "Nymphs Sprite Pose Lab",
+            "batch_type": "sprite_guide_candidate",
+            "item_label": f"{body_type.replace('-', ' ').title()} {direction_count}-Way {control_type.replace('-', ' ').title()} Guide",
+        }
+        try:
+            response = self._post_json(f"{self._zimage_url()}/api/gemini/generate", z_payload)
+        except RuntimeError as exc:
+            self._send_json_error(502, f"Gemini guide generation failed: {exc}")
+            return
+
+        generated = response.get("outputs") or []
+        if not isinstance(generated, list) or not generated:
+            self._send_json_error(502, "Gemini did not return a guide candidate image.")
+            return
+
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+        target_dir = (self.server.output_root / "guides" / "candidates" / subject_id / timestamp).resolve()
+        try:
+            target_dir.relative_to(self.server.output_root)
+        except ValueError:
+            self._send_json_error(400, "Guide output path is invalid.")
+            return
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        records = []
+        for index, item in enumerate(generated, start=1):
+            if not isinstance(item, dict):
+                continue
+            source_path = Path(str(item.get("path") or "")).expanduser()
+            if not source_path.is_file() or source_path.suffix.lower() not in IMAGE_SUFFIXES:
+                continue
+            target = self._output_collision_path(target_dir / f"{body_type}-{direction_count}way-{control_type}-gemini-guide-{index}{source_path.suffix.lower()}")
+            try:
+                shutil.copy2(source_path, target)
+            except Exception:
+                continue
+            metadata = dict(item.get("metadata") or {})
+            metadata.update(
+                {
+                    "provider": "Gemini Flash via Nymphs Image",
+                    "mode": "pose_lab_guide_candidate",
+                    "batch_id": batch_id,
+                    "batch_label": "Pose Lab Guide Candidates",
+                    "batch_type": "sprite_guide_candidate",
+                    "item_label": f"{body_type.replace('-', ' ').title()} {direction_count}-Way {control_type.replace('-', ' ').title()} Guide",
+                    "item_index": index,
+                    "item_total": len(generated),
+                    "subject_id": subject_id,
+                    "body_type": body_type,
+                    "control_type": control_type,
+                    "direction_count": direction_count,
+                    "guide_strength": str(payload.get("guide_strength") or "normal"),
+                    "sprite_prompt_context": str(payload.get("subject_prompt") or ""),
+                    "pose_lab_prompt": prompt,
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                    "source_output_path": str(source_path),
+                }
+            )
+            target.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+            rel = target.relative_to(self.server.output_root).as_posix()
+            record = self._output_record(target, rel)
+            record["source"] = "outputs"
+            record["url"] = f"/outputs/outputs/{quote(rel, safe='/')}"
+            record["folder"] = f"outputs/{record['folder']}".rstrip("/")
+            records.append(record)
+
+        if not records:
+            self._send_json_error(502, "Gemini returned output, but Nymphs Sprite could not copy it into module outputs.")
+            return
+        self._send_json({"status": "ok", "prompt": prompt, "outputs": records})
 
     def _send_output_file(self, relative: str) -> None:
         try:

@@ -2132,7 +2132,7 @@ def build_parser() -> argparse.ArgumentParser:
                    help="Artifact to register (e.g. --artifacts raw path/to/raw.png)")
 
     # generate-nymphscore
-    p = sub.add_parser("generate-nymphscore", help="Generate an 8-direction run through Nymphs Image / Z-Image")
+    p = sub.add_parser("generate-nymphscore", help="Generate an 8- or 16-direction run through Nymphs Image / Z-Image")
     p.add_argument("--config", required=True, help="Path to character config JSON")
     p.add_argument("--nymphscore-url", default="http://127.0.0.1:8090", help="Nymphs Image API URL")
     p.add_argument("--model-id", default="Tongyi-MAI/Z-Image-Turbo", help="Nymphs Image model id")
@@ -2141,6 +2141,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--lora-scale", type=float, default=0.85)
     p.add_argument("--seed", type=int, help="Override config seed")
     p.add_argument("--seed-step", type=int, default=1)
+    p.add_argument("--direction-count", type=int, default=8, choices=[8, 16])
     p.add_argument("--width", type=int, default=1024)
     p.add_argument("--height", type=int, default=1024)
     p.add_argument("--steps", type=int, default=9)
