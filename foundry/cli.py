@@ -2142,6 +2142,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--seed", type=int, help="Override config seed")
     p.add_argument("--seed-step", type=int, default=1)
     p.add_argument("--direction-count", type=int, default=8, choices=[8, 16])
+    p.add_argument("--guide-strength", default="normal", choices=["soft", "normal", "strong"])
     p.add_argument("--width", type=int, default=1024)
     p.add_argument("--height", type=int, default=1024)
     p.add_argument("--steps", type=int, default=9)

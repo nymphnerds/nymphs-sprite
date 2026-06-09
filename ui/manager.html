@@ -1040,6 +1040,8 @@
         <div class="strip-head">
           <div class="strip-title"><span>Browse</span><span id="strip-label">Current batch (0)</span></div>
           <div class="strip-controls">
+            <button id="view-image-mode" type="button" title="Show generated images">Image</button>
+            <button id="view-pose-mode" type="button" title="Show Pose Lab editor">Pose</button>
             <button id="strip-prev" type="button" title="Previous output">&lt;</button>
             <button id="strip-next" type="button" title="Next output">&gt;</button>
           </div>
@@ -1119,9 +1121,9 @@
       poseProportions: "humanoid",
       poseDragging: null,
       posePointers: {},
+      previewMode: "image",
+      activeTaskTimer: 0,
     };
-    const generationDirections = ["front", "front_left", "left", "back_left", "back", "back_right", "right", "front_right"];
-
     function escapeHtml(value) {
       return String(value).replace(/[&<>"']/g, (char) => ({
         "&": "&amp;",
@@ -1147,6 +1149,44 @@
       $("progress-detail").textContent = detail || "";
       $("progress-percent").textContent = `${Math.round(pct)}%`;
       $("progress-bar").style.width = `${pct}%`;
+    }
+
+    function titleCaseStage(value) {
+      return String(value || "Idle").replace(/[_-]+/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+
+    async function pollActiveTask() {
+      try {
+        const response = await fetch("/active_task", { cache: "no-store" });
+        if (!response.ok) return;
+        const task = await response.json();
+        const pct = Number(task.progress_percent);
+        if (Number.isFinite(pct) && String(task.status || "") !== "idle") {
+          setProgress(titleCaseStage(task.stage), task.detail || "Working.", pct);
+        }
+      } catch {
+        // Progress polling is best-effort; module action output remains authoritative.
+      }
+    }
+
+    function startActiveTaskPolling() {
+      stopActiveTaskPolling();
+      pollActiveTask();
+      state.activeTaskTimer = window.setInterval(pollActiveTask, 900);
+    }
+
+    function stopActiveTaskPolling() {
+      if (!state.activeTaskTimer) return;
+      window.clearInterval(state.activeTaskTimer);
+      state.activeTaskTimer = 0;
+    }
+
+    function setPreviewMode(mode) {
+      state.previewMode = mode === "pose" ? "pose" : "image";
+      if (state.previewMode === "pose") $("pose-lab-panel").open = true;
+      syncPoseLabStage();
+      renderGallery();
+      if (state.previewMode === "image" && state.visibleOutputs[0] && state.selectedIndex < 0) showOutput(0);
     }
 
     function setBusy(value, label = "Running") {
@@ -1371,12 +1411,13 @@
       const direction = line.match(/^\[([a-z_]+)\]\s+generate\b/i);
       if (direction) {
         const name = direction[1].toLowerCase();
-        const index = generationDirections.indexOf(name);
+        const activeDirections = poseDirectionList();
+        const index = activeDirections.indexOf(name);
         state.activeDirection = name;
         const done = /\bOK\b/.test(line);
         const failed = /\bFAIL\b/.test(line);
         const ordinal = index >= 0 ? index + (done || failed ? 1 : 0) : 0;
-        const percent = 15 + (Math.max(0, ordinal) / generationDirections.length) * 75;
+        const percent = 15 + (Math.max(0, ordinal) / Math.max(1, activeDirections.length)) * 75;
         const label = name.replace(/_/g, " ");
         const detail = failed ? `${label} failed` : done ? `${label} complete` : `${label} generating`;
         setProgress(failed ? "Error" : "Generate", detail, failed ? 0 : percent);
@@ -1486,7 +1527,7 @@
     }
 
     function isPoseLabOpen() {
-      return Boolean($("pose-lab-panel")?.open);
+      return state.previewMode === "pose" && Boolean($("pose-lab-panel")?.open);
     }
 
     function syncPoseSlotViewOptions(outputs) {
@@ -2072,6 +2113,7 @@
         "palette-colors": value("palette-colors"),
         "body-class": value("body-guide"),
         "direction-count": value("guide-direction-count") || "8",
+        "guide-strength": value("guide-strength") || "normal",
         "nunchaku-rank": String(zSelection.nunchaku_rank),
         "nunchaku-precision": zSelection.nunchaku_precision
       };
@@ -2452,12 +2494,14 @@
     }
 
     function syncPoseLabStage() {
-      const open = Boolean($("pose-lab-panel")?.open);
+      const open = isPoseLabOpen();
       const shell = document.querySelector(".image-shell");
       const stage = $("stage-pose-lab");
       if (!shell || !stage) return;
       shell.classList.toggle("pose-mode", open);
       stage.hidden = !open;
+      $("view-image-mode").classList.toggle("primary", !open);
+      $("view-pose-mode").classList.toggle("primary", open);
       if (open) {
         if (!poseDirectionList().some((direction) => state.selectedOutputPaths.has(`pose:${direction}`))) {
           selectAllPoseSlots();
@@ -2561,6 +2605,17 @@
         control_type: "pose_skeleton",
         pose_data: poseDataPayload()
       };
+    }
+
+    async function savePoseRefsQuiet() {
+      const response = await fetch("/api/pose-lab/refs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(buildPoseLabPayload())
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.detail || `Pose ref save failed with status ${response.status}`);
+      return (body.outputs || []).map(normalizeManagedOutput);
     }
 
     async function commitPoseRefs() {
@@ -2846,6 +2901,7 @@
     });
     function runGeneration() {
       if (state.busy) return;
+      setPreviewMode("image");
       state.outputs = [];
       state.selectedIndex = -1;
       state.manualFolderName = "";
@@ -2856,7 +2912,10 @@
       $("empty").hidden = false;
       setProgress("Generate", "Starting backend, then generating sprite set.", 10);
       setBusy(true, "Foundry");
+      startActiveTaskPolling();
       (async () => {
+        await savePoseRefsQuiet();
+        setProgress("Pose Refs", "Current Pose Lab refs saved for ControlNet.", 12);
         const text = await moduleAction("foundry_generate", buildModuleArgs(), { busy: false });
         parseOutputPaths(text);
         parseRunId(text);
@@ -2874,7 +2933,11 @@
         setProgress("Error", error.message || "Generation failed.", 0);
         $("status-pill").textContent = "error";
         $("status-pill").className = "status-pill warn";
-      }).finally(() => setBusy(false));
+      }).finally(() => {
+        stopActiveTaskPolling();
+        setPreviewMode("image");
+        setBusy(false);
+      });
     }
 
     $("prompt-preset").addEventListener("change", () => applyPromptPreset($("prompt-preset").value));
@@ -2892,7 +2955,13 @@
       updateFoundryControls();
       setProgress("Pose Lab", `${value("guide-direction-count")} direction slots ready.`, 100);
     });
-    $("pose-lab-panel").addEventListener("toggle", syncPoseLabStage);
+    $("pose-lab-panel").addEventListener("toggle", () => {
+      state.previewMode = $("pose-lab-panel").open ? "pose" : "image";
+      syncPoseLabStage();
+      renderGallery();
+    });
+    $("view-image-mode").addEventListener("click", () => setPreviewMode("image"));
+    $("view-pose-mode").addEventListener("click", () => setPreviewMode("pose"));
     $("pose-edit-direction").addEventListener("change", () => {
       const direction = value("pose-edit-direction");
       if (!direction) return;
@@ -2922,8 +2991,7 @@
       state.poseDragging = "";
     });
     $("preview-guides").addEventListener("click", () => {
-      $("pose-lab-panel").open = true;
-      syncPoseLabStage();
+      setPreviewMode("pose");
       setProgress("Pose Lab", "Move points in the canvas, switch direction slots, then commit refs.", 35);
     });
     $("commit-pose-guide").addEventListener("click", commitPoseRefs);

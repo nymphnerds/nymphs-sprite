@@ -11,6 +11,8 @@ import shutil
 import struct
 import subprocess
 import time
+import urllib.error
+import urllib.request
 import zlib
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -33,6 +35,7 @@ class SpriteFoundryUiServer(ThreadingHTTPServer):
         self.output_root = Path(
             os.environ.get("SPRITE_FOUNDRY_OUTPUTS_ROOT", data_root / "outputs" / "nymphs-sprite")
         ).expanduser().resolve()
+        self.zimage_url = os.environ.get("SPRITE_FOUNDRY_ZIMAGE_URL", "http://127.0.0.1:8090").rstrip("/")
         self.output_sources = self._output_sources()
 
     def _output_sources(self) -> list[tuple[str, Path]]:
@@ -80,7 +83,7 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
             )
             return
         if path == "/active_task":
-            self._send_json({"status": "idle", "stage": "Idle", "detail": "Waiting for Foundry run.", "progress_percent": 0})
+            self._send_json(self._active_task())
             return
         if path == "/api/status":
             self._send_status_text()
@@ -181,6 +184,21 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
             return
         text = result.stdout or result.stderr or "detail=Status script produced no output.\n"
         self._send_text(text, status=200 if result.returncode == 0 else 500)
+
+    def _active_task(self) -> dict:
+        fallback = {
+            "status": "idle",
+            "stage": "idle",
+            "detail": "Waiting for Nymphs Image / Z-Image.",
+            "progress_percent": 0,
+        }
+        try:
+            request = urllib.request.Request(f"{self.server.zimage_url}/active_task", headers={"Accept": "application/json"})
+            with urllib.request.urlopen(request, timeout=2) as response:
+                data = json.loads(response.read().decode("utf-8"))
+        except (OSError, urllib.error.URLError, json.JSONDecodeError):
+            return fallback
+        return data if isinstance(data, dict) else fallback
 
     def _metadata_for(self, path: Path) -> dict:
         metadata_path = path.with_suffix(".json")

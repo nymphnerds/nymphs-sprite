@@ -19,6 +19,7 @@ lora_scale=""
 nunchaku_rank=""
 nunchaku_precision=""
 direction_count="8"
+guide_strength="normal"
 body_class=""
 depth_refs=""
 edge_refs=""
@@ -93,6 +94,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --direction-count)
       direction_count="$2"
+      shift 2
+      ;;
+    --guide-strength)
+      guide_strength="$2"
       shift 2
       ;;
     --subject-id)
@@ -216,6 +221,7 @@ case "${generation_path}" in
     sprite_foundry_start_zimage_backend
     cmd=("${python_bin}" -m foundry.cli generate-nymphscore --config "${config}" --nymphscore-url "${SPRITE_FOUNDRY_ZIMAGE_URL}" --sprite-size "${sprite_size}" --steps "${steps}")
     cmd+=(--direction-count "${direction_count}")
+    cmd+=(--guide-strength "${guide_strength}")
     if [[ -n "${seed}" ]]; then
       cmd+=(--seed "${seed}")
     fi

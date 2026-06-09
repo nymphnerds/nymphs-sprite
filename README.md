@@ -31,9 +31,10 @@ available for experiments when the extra coverage is worth the extra runtime:
 - Regenerate weak directions without throwing away the whole set.
 - Export accepted sprites from this module's own output folders.
 
-The next major upgrade is full ControlNet wiring. The UI now includes Pose Lab
-for creating deterministic OpenPose refs locally, with each direction saved as
-its own editable pose slot.
+Pose Lab creates deterministic OpenPose refs locally, with each direction saved
+as its own editable pose slot. Generate now saves the current Pose Lab JSON set,
+renders temporary OpenPose control images in memory, and sends those refs into
+Z-Image `controlnet_edit` per direction.
 
 ## Module Boundaries
 
@@ -67,10 +68,9 @@ Nymphs Sprite UI
   -> Nymphs Sprite run output
 ```
 
-ControlNet support is staged. Pose Lab can commit reusable per-direction refs,
-but the current Z-Image generation path does not yet pass selected refs into
-sprite generation. That is the next practical milestone after install and
-basic generation testing.
+ControlNet support is wired through the Z-Image `controlnet_edit` path. Pose
+Lab sets are stored as editable JSON; PNG control maps are rendered only as
+temporary generation handoff data, not as persistent guide libraries.
 
 ## Distilled UI Flow
 
@@ -193,14 +193,16 @@ After install, test from top to bottom:
 3. Confirm status reports the shared Hugging Face cache and local LoRAs.
 4. Generate a tiny 8-direction run at conservative settings.
 5. Confirm outputs land under `NymphsData/outputs/nymphs-sprite`.
-6. Review one direction and try a reject/regenerate loop.
-7. Export only after accepted images exist.
+6. Confirm logs say `mode=controlnet` for the generated directions.
+7. Confirm `recipe.json` lists non-empty `controlnet_directions`.
+8. Review one direction and try a reject/regenerate loop.
+9. Export only after accepted images exist.
 
 ## Roadmap
 
 Near-term:
 
-- Pass per-direction ControlNet refs into the Z-Image backend.
+- Tune Pose Lab default proportions and ControlNet strength from real outputs.
 - Add a compact audition strip inspired by Nymphs Image.
 - Make review/regenerate the main workflow instead of an advanced lifecycle
   panel.

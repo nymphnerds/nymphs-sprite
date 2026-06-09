@@ -11,10 +11,12 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import shutil
 import subprocess
 import sys
+from io import BytesIO
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -66,6 +68,32 @@ STYLE_SUFFIX = (
 )
 
 NEGATIVE_BG = "white background, gray background, grey background, beige background, gradient background"
+
+POSE_JOINTS = [
+    "head", "neck", "spine", "pelvis",
+    "left_shoulder", "left_elbow", "left_wrist",
+    "right_shoulder", "right_elbow", "right_wrist",
+    "left_hip", "left_knee", "left_ankle",
+    "right_hip", "right_knee", "right_ankle",
+]
+
+POSE_SEGMENTS = [
+    ("head", "neck", (255, 0, 190)),
+    ("neck", "spine", (0, 210, 230)),
+    ("spine", "pelvis", (0, 210, 230)),
+    ("neck", "left_shoulder", (255, 156, 0)),
+    ("left_shoulder", "left_elbow", (255, 156, 0)),
+    ("left_elbow", "left_wrist", (255, 156, 0)),
+    ("neck", "right_shoulder", (0, 220, 65)),
+    ("right_shoulder", "right_elbow", (0, 220, 65)),
+    ("right_elbow", "right_wrist", (0, 220, 65)),
+    ("pelvis", "left_hip", (0, 190, 125)),
+    ("left_hip", "left_knee", (0, 190, 125)),
+    ("left_knee", "left_ankle", (0, 190, 125)),
+    ("pelvis", "right_hip", (0, 80, 230)),
+    ("right_hip", "right_knee", (0, 80, 230)),
+    ("right_knee", "right_ankle", (0, 80, 230)),
+]
 
 
 def foundry_cmd(*args: str) -> int:
@@ -160,6 +188,81 @@ def pixelate(image: Image.Image, sprite_size: int, palette_colors: int = 0) -> I
         result = quantized.convert("RGB").convert("RGBA")
         result.putalpha(alpha)
     return result
+
+
+def guide_strength_scale(value: str) -> float:
+    return {
+        "soft": 0.55,
+        "normal": 0.75,
+        "strong": 0.95,
+    }.get(str(value or "normal").strip().lower(), 0.75)
+
+
+def latest_pose_lab_set(subject_id: str, direction_count: int) -> tuple[Path, dict[str, Any]] | None:
+    root = Path.home() / "NymphsData" / "outputs" / "nymphs-sprite" / "pose_lab" / "refs" / subject_id
+    if not root.is_dir():
+        return None
+    candidates = sorted(root.glob("*/pose_set.json"), key=lambda path: path.stat().st_mtime, reverse=True)
+    for path in candidates:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if not isinstance(data, dict):
+            continue
+        if int(data.get("direction_count") or 0) not in {0, direction_count}:
+            continue
+        directions = data.get("pose_data", {}).get("directions", {})
+        if isinstance(directions, dict) and directions:
+            return path, data
+    return None
+
+
+def pose_points(slot: dict[str, Any]) -> dict[str, tuple[float, float]]:
+    joints = slot.get("joints") if isinstance(slot, dict) else None
+    if not isinstance(joints, dict):
+        return {}
+    points: dict[str, tuple[float, float]] = {}
+    for name in POSE_JOINTS:
+        raw = joints.get(name)
+        if not isinstance(raw, list | tuple) or len(raw) < 2:
+            continue
+        try:
+            points[name] = (float(raw[0]), float(raw[1]))
+        except (TypeError, ValueError):
+            continue
+    return points
+
+
+def render_pose_control_data_url(slot: dict[str, Any], width: int, height: int, canvas_size: float = 256) -> str | None:
+    points = pose_points(slot)
+    if len(points) < 8:
+        return None
+    canvas_size = canvas_size if canvas_size > 0 else 256
+    image = Image.new("RGB", (width, height), (0, 0, 0))
+    draw = ImageDraw.Draw(image)
+
+    def transform(point: tuple[float, float]) -> tuple[float, float]:
+        x = max(0.0, min(canvas_size, point[0])) / canvas_size * width
+        y = max(0.0, min(canvas_size, point[1])) / canvas_size * height
+        return x, y
+
+    line_width = max(4, int(round(min(width, height) * 0.018)))
+    dot_radius = max(5, int(round(min(width, height) * 0.022)))
+    for a, b, color in POSE_SEGMENTS:
+        if a not in points or b not in points:
+            continue
+        draw.line([transform(points[a]), transform(points[b])], fill=color, width=line_width)
+    for index, name in enumerate(POSE_JOINTS):
+        if name not in points:
+            continue
+        x, y = transform(points[name])
+        fill = (255, 0, 210) if index % 3 == 0 else (245, 255, 0)
+        draw.ellipse([x - dot_radius, y - dot_radius, x + dot_radius, y + dot_radius], fill=fill)
+
+    buffer = BytesIO()
+    image.save(buffer, format="PNG")
+    return "data:image/png;base64," + base64.b64encode(buffer.getvalue()).decode("ascii")
 
 
 def checkerboard(size: int, tile: int = 8) -> Image.Image:
@@ -262,6 +365,8 @@ def build_payload(
     config: dict[str, Any],
     lora_path: str,
     seed: int,
+    control_image: str | None = None,
+    controlnet_scale: float = 0.75,
 ) -> dict[str, Any]:
     negative = str(config.get("negative_prompt") or "")
     full_negative = f"{negative}, {NEGATIVE_BG}" if negative else NEGATIVE_BG
@@ -271,7 +376,7 @@ def build_payload(
         direction_prompt,
         STYLE_SUFFIX,
     ]
-    return {
+    payload = {
         "provider": "zimage",
         "mode": "txt2img",
         "model_id": args.model_id,
@@ -294,6 +399,11 @@ def build_payload(
         "item_total": direction_count,
         "output_dir": str(backend_dir),
     }
+    if control_image:
+        payload["mode"] = "controlnet_edit"
+        payload["image"] = control_image
+        payload["controlnet_conditioning_scale"] = controlnet_scale
+    return payload
 
 
 def selected_directions(args: argparse.Namespace) -> list[tuple[str, str]]:
@@ -331,6 +441,18 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     lora_path = args.lora_path or latest_lora_path(args.nymphscore_url)
     if not lora_path:
         raise SystemExit("No LoRA path supplied and Nymphs Image /api/loras returned no available LoRAs.")
+    pose_set = latest_pose_lab_set(subject_id, len(directions))
+    pose_set_path: Path | None = None
+    pose_directions: dict[str, Any] = {}
+    pose_canvas_size = 256.0
+    if pose_set:
+        pose_set_path, pose_set_data = pose_set
+        pose_data = pose_set_data.get("pose_data") if isinstance(pose_set_data.get("pose_data"), dict) else {}
+        pose_directions = pose_data.get("directions") if isinstance(pose_data.get("directions"), dict) else {}
+        try:
+            pose_canvas_size = float(pose_data.get("canvas_size") or 256)
+        except (TypeError, ValueError):
+            pose_canvas_size = 256.0
 
     ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     run_id = f"{subject_id}_nymphscore_{ts}"
@@ -353,6 +475,10 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     print(f"Output: {out_dir}")
     print(f"Nymphs Image: {args.nymphscore_url}")
     print(f"Directions: {len(directions)}")
+    if pose_set_path:
+        print(f"Pose Lab refs: {pose_set_path}")
+    else:
+        print("Pose Lab refs: none found; using text-only direction prompts.")
     print(f"{'=' * 60}\n")
 
     raw_paths: dict[str, Path] = {}
@@ -360,10 +486,15 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     generated_dirs: list[str] = []
     responses: dict[str, Any] = {}
     direction_seeds: dict[str, int] = {}
+    controlnet_used: list[str] = []
+    controlnet_scale = guide_strength_scale(args.guide_strength)
 
     for index, (direction_name, direction_prompt) in enumerate(directions, start=1):
         item_seed = seed + (index - 1) * args.seed_step
-        print(f"  [{direction_name}] generate seed={item_seed}...", end=" ", flush=True)
+        pose_slot = pose_directions.get(direction_name) if isinstance(pose_directions, dict) else None
+        control_image = render_pose_control_data_url(pose_slot, args.width, args.height, pose_canvas_size) if isinstance(pose_slot, dict) else None
+        mode_label = "controlnet" if control_image else "txt2img"
+        print(f"  [{direction_name}] generate seed={item_seed} mode={mode_label}...", end=" ", flush=True)
         payload = build_payload(
             args=args,
             batch_id=run_id,
@@ -375,6 +506,8 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
             config=config,
             lora_path=lora_path,
             seed=item_seed,
+            control_image=control_image,
+            controlnet_scale=controlnet_scale,
         )
         try:
             response = generate_zimage(args.nymphscore_url, payload)
@@ -418,6 +551,8 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
         pixel_paths[direction_name] = pixel_path
         direction_seeds[direction_name] = item_seed
         responses[direction_name] = response
+        if control_image:
+            controlnet_used.append(direction_name)
         generated_dirs.append(direction_name)
         print("OK")
 
@@ -455,6 +590,9 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
         "subject_prompt": config["subject_prompt"],
         "negative": config.get("negative_prompt") or "",
         "nymphscore_url": args.nymphscore_url,
+        "pose_lab_ref_set": str(pose_set_path) if pose_set_path else "",
+        "controlnet_directions": controlnet_used,
+        "controlnet_conditioning_scale": controlnet_scale if controlnet_used else None,
     }
     (out_dir / "recipe.json").write_text(json.dumps(recipe, indent=2), encoding="utf-8")
     (out_dir / "manifest.json").write_text(
@@ -469,6 +607,8 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
                 "timestamp": ts,
                 "directions": generated_dirs,
                 "direction_seeds": direction_seeds,
+                "pose_lab_ref_set": str(pose_set_path) if pose_set_path else "",
+                "controlnet_directions": controlnet_used,
                 "nymphs_image_responses": responses,
             },
             indent=2,
@@ -535,6 +675,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int)
     parser.add_argument("--seed-step", type=int, default=1)
     parser.add_argument("--direction-count", type=int, default=8, choices=[8, 16])
+    parser.add_argument("--guide-strength", default="normal", choices=["soft", "normal", "strong"])
     parser.add_argument("--width", type=int, default=1024)
     parser.add_argument("--height", type=int, default=1024)
     parser.add_argument("--steps", type=int, default=9)

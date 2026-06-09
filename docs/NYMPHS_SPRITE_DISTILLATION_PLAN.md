@@ -57,7 +57,7 @@ clear reason to inspect files directly.
 Current published module version:
 
 ```text
-Nymphs Sprite 1.2.14
+Nymphs Sprite 1.2.21
 ```
 
 Current module identity:
@@ -208,10 +208,13 @@ flow is being proven, but they should not define the everyday workflow.
 
 This is the main path for Nymphs Sprite.
 
-Today this path uses Z-Image / Nunchaku / LoRA for generation. The copied code
-does not yet fully pass per-direction ControlNet guide images into Z-Image.
-That wiring is the next real milestone after basic install/status/generation
-testing is stable.
+This path uses Z-Image / Nunchaku / LoRA for generation. Pose Lab JSON refs are
+now saved before Generate, rendered as temporary in-memory OpenPose control
+PNGs, and passed into Z-Image as `controlnet_edit` inputs per direction.
+
+The next milestone is empirical: confirm Z-Image follows the refs strongly
+enough, tune the default OpenPose proportions/strength, and compare guided vs
+unguided outputs.
 
 ### Stack A v2
 
@@ -273,7 +276,7 @@ used for generation. The simple version comes first:
 2. Choose 8 or 16 directions.
 3. Edit the live direction slots in the normal preview strip.
 4. Select the direction slots to include.
-5. Generate the sprite set using those guides once ControlNet wiring is live.
+5. Generate the sprite set using those guides through Z-Image ControlNet.
 
 Body types:
 
@@ -332,9 +335,9 @@ another image model to invent an OpenPose map. The UI owns a small editable rig:
 When `Commit Refs` is pressed, Nymphs Sprite stores the editable pose set as
 `pose_set.json`. The JSON contains all direction slots and the selected
 direction list. The browser renders live strip thumbnails directly from the
-JSON. Black-background OpenPose PNG maps should be rendered only on demand when
-the generation backend needs ControlNet inputs; they are temporary handoff
-artifacts, not the source of truth.
+JSON. Black-background OpenPose PNG maps are rendered only on demand when the
+generation backend needs ControlNet inputs; they are temporary handoff data,
+not the source of truth.
 
 Committed sets live in Nymphs Sprite-owned outputs:
 
@@ -403,7 +406,7 @@ Build and test from the top down.
 ### 4. Generate
 
 - Generate all selected directions through Z-Image.
-- Use body/direction guides as ControlNet refs once wired.
+- Use Pose Lab body/direction guides as ControlNet refs.
 - Save into Nymphs Sprite output folders.
 - One main button should cover the normal path.
 
@@ -545,9 +548,10 @@ Test in small slices.
 - Start backend.
 - Confirm Z-Image backend status is readable.
 - Confirm LoRA list loads.
-- Generate one small 8-way set without ControlNet refs if ControlNet wiring is
-  not ready yet.
+- Generate one small 8-way set with Pose Lab refs.
 - Confirm outputs land under `$HOME/NymphsData/outputs/nymphs-sprite`.
+- Confirm generation logs say `mode=controlnet`, not only `mode=txt2img`.
+- Confirm the generated `recipe.json` has non-empty `controlnet_directions`.
 
 ### Slice 4: Guide Preview
 
@@ -562,7 +566,7 @@ Test in small slices.
 - Confirm no persistent PNG pile is created during Pose Lab commit.
 - Confirm the user can understand that guides become ControlNet refs.
 
-### Slice 5: ControlNet Wiring
+### Slice 5: ControlNet Quality
 
 - Send one guide into Z-Image ControlNet.
 - Compare no-guide vs guide output.
@@ -589,7 +593,7 @@ Test in small slices.
 
 ## Immediate Next Implementation Order
 
-1. Test/update installed Nymphs Sprite `1.2.18` or newer in the `NymphsCore`
+1. Test/update installed Nymphs Sprite `1.2.21` or newer in the `NymphsCore`
    test WSL.
 2. Confirm status panel and LoRA dropdown are fixed after restart/update.
 3. Open Pose Lab, move points in one direction, switch slots, and confirm the
@@ -597,10 +601,10 @@ Test in small slices.
 4. Commit Pose Lab OpenPose Skeleton refs and confirm the edited slot appears
    in `pose_set.json`.
 5. Generate a Canny/Line candidate only as a secondary research check.
-6. Generate a tiny current-path 8-way set to validate output ownership.
+6. Generate a tiny guided 8-way set to validate output ownership.
 7. Try one 16-way run only after the 8-way path is stable.
-8. Wire one guide image into Z-Image ControlNet.
-9. Expand to guided 8/16-direction generation.
+8. Confirm guided generation logs `mode=controlnet` for each direction.
+9. Compare guided vs unguided output quality and tune default guide strength.
 10. Add audition/regenerate UX using a Nymphs Image-style preview strip.
 11. Revisit Godot/depth/normal export once albedo sets are reliable.
 
@@ -626,7 +630,7 @@ Expected current status signs:
 
 ```text
 id=nymphs-sprite
-version=1.2.18 or newer
+version=1.2.21 or newer
 controlnet_ready=true
 models_ready=true
 lora_choices=...
@@ -642,11 +646,10 @@ Current source-of-truth repos:
 - Dev registry: `nymphnerds/nymphs-registry`
 - Reference-only old module: local `sprite-foundry` on the dev WSL
 
-Latest pushed module state:
+Latest target module state:
 
-- Nymphs Sprite `1.2.18`
-- Commit: `b74723b Make Pose Lab direction slots live JSON`
-- Registry commit: `82c7133 Publish Nymphs Sprite 1.2.18`
+- Nymphs Sprite `1.2.21`
+- Purpose: wire live Pose Lab JSON refs into Z-Image ControlNet generation.
 
 What changed in the latest working idea:
 
@@ -659,8 +662,14 @@ What changed in the latest working idea:
   committing refs.
 - `Commit Refs` writes one `pose_set.json` containing all editable slots and
   the selected direction list.
-- Persistent Pose Lab PNG piles are intentionally gone. ControlNet PNG maps
-  should be generated later only as temporary/on-demand handoff files.
+- Persistent Pose Lab PNG piles are intentionally gone. ControlNet PNG maps are
+  rendered as temporary in-memory handoff images during Generate.
+- Generate auto-saves the current Pose Lab JSON before calling the backend, so
+  the user does not need to remember `Commit Refs` first.
+- The runner records `pose_lab_ref_set`, `controlnet_directions`, and
+  `controlnet_conditioning_scale` in `recipe.json` / `manifest.json`.
+- Logs should show `[direction] generate seed=... mode=controlnet...` when the
+  Pose Lab handoff is active.
 
 Known untested / risky areas:
 
@@ -669,14 +678,16 @@ Known untested / risky areas:
   sprite-quality baselines.
 - The 16-way in-between poses may feel off because perspective, near/far limb
   placement, and shoulder/hip compression are only approximate.
-- ControlNet handoff is not wired yet, so we do not know the exact generated
-  sprite behavior from these refs.
 - The best OpenPose strength/default settings for Z-Image Turbo ControlNet
   Union still need empirical testing.
+- The first generated outputs before this fix were plain `txt2img`; they did
+  not use Pose Lab refs and are not evidence against the Pose Lab concept.
+- If a new run still ignores poses, check the run log for `mode=controlnet` and
+  check `recipe.json` for `controlnet_directions`.
 
 Next best pickup steps:
 
-1. Update/install Nymphs Sprite `1.2.18+` on the `NymphsCore` test WSL.
+1. Update/install Nymphs Sprite `1.2.21+` on the `NymphsCore` test WSL.
 2. Open Pose Lab and confirm the bottom strip immediately shows all 8 slots.
 3. Switch to 16 directions and confirm all 16 live JSON slots appear.
 4. Click several strip slots and confirm the main editor changes direction.
@@ -689,9 +700,11 @@ Next best pickup steps:
    - stable front/back/side/diagonal turn
 8. Derive **Humanoid Neutral 16** from the proven 8-way set, with gentle
    in-between rotations instead of dramatic new poses.
-9. Add a temporary renderer that turns selected JSON slots into OpenPose PNGs
-   only for ControlNet handoff.
-10. Run one no-guide vs OpenPose-guide test direction through Z-Image ControlNet.
+9. Generate a tiny 8-way run and tail logs for `mode=controlnet`.
+10. Inspect `recipe.json` and confirm `controlnet_directions` contains the
+    generated directions.
+11. Compare guided pose adherence separately from green-screen cleanup;
+    green-screen is a later post-process issue.
 
 Useful research conclusions so far:
 
