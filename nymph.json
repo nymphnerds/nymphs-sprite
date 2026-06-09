@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "description": "Nymphs-native guided 8-direction game sprite generation, review, lifecycle, and export.",
   "category": "image",
   "kind": "sprite",
@@ -110,7 +110,7 @@
             "type": "select",
             "label": "Download",
             "arg": "--model",
-            "default": "sprite_foundry_starter_stack",
+            "default": "nymphs_sprite_starter_stack",
             "options": [
               {
                 "label": "Complete Nymphs Sprite Starter Stack",

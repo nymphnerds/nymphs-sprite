@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=/dev/null
 source "${SCRIPT_DIR}/_sprite_foundry_common.sh"
 
-selected_model="sprite_foundry_starter_stack"
+selected_model="${SPRITE_FOUNDRY_STARTER_PROFILE}"
 args=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -210,33 +210,33 @@ fetch_tarn59() {
 }
 
 case "${selected_model}" in
-  nymphs_sprite_starter_stack|sprite_foundry_starter_stack|starter|complete|complete_sprite_foundry_stack)
+  "${SPRITE_FOUNDRY_STARTER_PROFILE}")
     echo "Nymphs Sprite starter stack fetch"
     fetch_zimage_profile int4_r32
     fetch_zimage_profile zimage_controlnet_2_1
     fetch_mks0813
     ;;
-  nymphs_sprite_all_loras|sprite_foundry_all_loras|all_loras|all-loras)
+  "${SPRITE_FOUNDRY_ALL_LORAS_PROFILE}")
     fetch_mks0813
     fetch_skyasl
     fetch_tarn59
     ;;
-  nymphs_sprite_controlnet_2_1|zimage_controlnet_2_1|sprite_foundry_controlnet_2_1|sprite_foundry_controlnet|sprite-foundry-controlnet)
+  "${SPRITE_FOUNDRY_CONTROLNET_PROFILE}")
     echo "Nymphs Sprite ControlNet fetch"
     fetch_zimage_profile zimage_controlnet_2_1
     ;;
-  nymphs_sprite_lora_mks0813_pixel_art|sprite_foundry_lora_mks0813_pixel_art|mks0813_pixel_art|zimage_turbo_pixel_lora)
+  "${SPRITE_FOUNDRY_LORA_MKS0813_PROFILE}")
     fetch_mks0813
     ;;
-  nymphs_sprite_lora_skyasl_pixel_artist|sprite_foundry_lora_skyasl_pixel_artist|skyasl_pixel_artist|pixel_artist_z)
+  "${SPRITE_FOUNDRY_LORA_SKYASL_PROFILE}")
     fetch_skyasl
     ;;
-  nymphs_sprite_lora_tarn59_pixel_art|sprite_foundry_lora_tarn59_pixel_art|tarn59_pixel_art|pixel_art_style_lora)
+  "${SPRITE_FOUNDRY_LORA_TARN59_PROFILE}")
     fetch_tarn59
     ;;
   *)
     echo "Unsupported Nymphs Sprite fetch selection: ${selected_model:-none}" >&2
-    echo "Expected starter stack, ControlNet, all LoRAs, or one Nymphs Sprite LoRA profile." >&2
+    echo "Expected one of the nymphs_sprite_* fetch profiles from nymph.json." >&2
     exit 2
     ;;
 esac

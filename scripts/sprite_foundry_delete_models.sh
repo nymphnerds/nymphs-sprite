@@ -86,7 +86,7 @@ delete_lora_files() {
 }
 
 case "${profile}" in
-  nymphs_sprite_lora_mks0813_pixel_art|sprite_foundry_lora_mks0813_pixel_art|mks0813_pixel_art|mks0813--z-image-turbo-pixel-art-lora)
+  "${SPRITE_FOUNDRY_LORA_MKS0813_PROFILE}")
     delete_lora_files \
       "mks0813--z-image-turbo-pixel-art-lora" \
       "mks0813--z-image-turbo-pixel-art-lora/z-image-turbo-pixel-art-lora.safetensors" \
@@ -95,7 +95,7 @@ case "${profile}" in
       "mks0813_pixel_art.safetensors"
     exit 0
     ;;
-  nymphs_sprite_lora_skyasl_pixel_artist|sprite_foundry_lora_skyasl_pixel_artist|skyasl_pixel_artist|SkyAsl--Pixel-artist-Z)
+  "${SPRITE_FOUNDRY_LORA_SKYASL_PROFILE}")
     delete_lora_files \
       "SkyAsl--Pixel-artist-Z" \
       "SkyAsl--Pixel-artist-Z/adapter_model.safetensors" \
@@ -103,7 +103,7 @@ case "${profile}" in
       "skyasl_pixel_artist.safetensors"
     exit 0
     ;;
-  nymphs_sprite_lora_tarn59_pixel_art|sprite_foundry_lora_tarn59_pixel_art|tarn59_pixel_art|tarn59--pixel_art_style_lora_z_image_turbo)
+  "${SPRITE_FOUNDRY_LORA_TARN59_PROFILE}")
     delete_lora_files \
       "tarn59--pixel_art_style_lora_z_image_turbo" \
       "tarn59--pixel_art_style_lora_z_image_turbo/pixel_art_style_z_image_turbo.safetensors" \
@@ -111,7 +111,7 @@ case "${profile}" in
       "tarn59_pixel_art.safetensors"
     exit 0
     ;;
-  "${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"|sprite_foundry_controlnet_2_1|zimage_controlnet_2_1)
+  "${SPRITE_FOUNDRY_CONTROLNET_PROFILE}")
     ;;
   *)
     echo "Unsupported delete profile: ${profile:-none}." >&2
