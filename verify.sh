@@ -89,7 +89,7 @@ fi
 
 # 6. Required files
 echo "Checking required files..."
-for f in README.md LICENSE CHANGELOG.md SECURITY.md; do
+for f in README.md LICENSE SECURITY.md; do
     if [ -f "$f" ]; then
         echo "  OK: $f"
     else

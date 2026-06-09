@@ -20,7 +20,6 @@ echo "install_root=${SPRITE_FOUNDRY_INSTALL_DIR}"
 
 install -m 644 "${REPO_DIR}/nymph.json" "${staging_dir}/nymph.json"
 install -m 644 "${REPO_DIR}/README.md" "${staging_dir}/README.md"
-install -m 644 "${REPO_DIR}/CHANGELOG.md" "${staging_dir}/CHANGELOG.md"
 install -m 644 "${REPO_DIR}/LICENSE" "${staging_dir}/LICENSE"
 
 mkdir -p "${staging_dir}/foundry" "${staging_dir}/pipeline" "${staging_dir}/scripts" "${staging_dir}/ui" "${staging_dir}/docs"
