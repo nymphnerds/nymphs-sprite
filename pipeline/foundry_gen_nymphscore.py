@@ -302,6 +302,18 @@ def selected_directions(args: argparse.Namespace) -> list[tuple[str, str]]:
     return DIRECTIONS_8
 
 
+def clean_backend_staging(root: Path) -> None:
+    if root.name != "_backend":
+        return
+    if not root.is_dir():
+        return
+    for child in root.iterdir():
+        if child.is_dir():
+            shutil.rmtree(child, ignore_errors=True)
+        elif child.is_file():
+            child.unlink(missing_ok=True)
+
+
 def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> str:
     if args.sprite_size < 24 or args.sprite_size > 512:
         raise SystemExit("--sprite-size must be between 24 and 512")
@@ -323,7 +335,9 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     run_id = f"{subject_id}_nymphscore_{ts}"
     out_dir = Path.home() / "NymphsData" / "outputs" / "nymphs-sprite" / subject_id
-    backend_dir = Path.home() / "NymphsData" / "outputs" / "nymphs-sprite" / "_backend" / run_id
+    backend_root = Path.home() / "NymphsData" / "outputs" / "nymphs-sprite" / "_backend"
+    clean_backend_staging(backend_root)
+    backend_dir = backend_root / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
     backend_dir.mkdir(parents=True, exist_ok=True)
     all_direction_names = {name for name, _ in DIRECTIONS_8 + DIRECTIONS_16}
