@@ -4,7 +4,7 @@ Nymphs Sprite is a NymphsCore module for making game-ready sprite sets with a
 clean, guided workflow:
 
 ```text
-Character -> Guide -> Style -> Generate -> Review -> Export
+Character -> Pose Lab -> Style -> Generate -> Review -> Export
 ```
 
 This repo replaces the old stale Nymphs Sprite codebase with the more evolved
@@ -31,9 +31,9 @@ available for experiments when the extra coverage is worth the extra runtime:
 - Regenerate weak directions without throwing away the whole set.
 - Export accepted sprites from this module's own output folders.
 
-The next major upgrade is full ControlNet guide wiring. The UI now includes a
-small Pose Lab for creating deterministic OpenPose guide candidates locally,
-with each direction saved as its own editable pose slot.
+The next major upgrade is full ControlNet wiring. The UI now includes Pose Lab
+for creating deterministic OpenPose refs locally, with each direction saved as
+its own editable pose slot.
 
 ## Module Boundaries
 
@@ -67,10 +67,10 @@ Nymphs Sprite UI
   -> Nymphs Sprite run output
 ```
 
-ControlNet support is staged. The UI already has the start of a Guide section,
-but the current Z-Image path does not yet pass per-direction ControlNet images
-into generation. That is the next practical milestone after basic install and
-generation testing.
+ControlNet support is staged. Pose Lab can commit reusable per-direction refs,
+but the current Z-Image generation path does not yet pass selected refs into
+sprite generation. That is the next practical milestone after install and
+basic generation testing.
 
 ## Distilled UI Flow
 
@@ -78,39 +78,37 @@ generation testing.
 
 Choose or write the character prompt, subject id, and negative prompt.
 
-### Guide
+### Pose Lab
 
-Choose body type, guide strength, and 8 or 16 directions. Pose Lab can create
-candidate ControlNet refs:
+Choose body type, ref strength, and 8 or 16 directions. Pose Lab owns all
+ControlNet prep flows:
 
-- OpenPose Skeleton, generated locally from editable per-direction slots
-- Canny / Line
-- Scribble
-- Depth Mass
+- OpenPose Skeleton: local editable rig; implemented first.
+- Canny / Line: future outline/silhouette lane.
+- Scribble: future rough body-mass lane.
+- Depth Mass: future grayscale volume lane.
 
 OpenPose is the first-class path. Expanding Pose Lab hot-swaps the main preview
 area into a large rig editor with the direction strip underneath. Select a
-direction in the strip, adjust the stick rig, and create a guide sheet. The
-current direction keeps its own pose, so front, left, back, and 16-way
+direction in the strip, adjust the stick rig, and commit pose refs. The current
+direction keeps its own pose, so front, left, back, and 16-way
 in-between slots can be tuned independently. Pose IK preserves limb proportions
 while you drag wrists, ankles, knees, elbows, hips, shoulders, pelvis, or neck;
 reset, mirror, and copy-all keep the panel fast. Edit Lengths moves joints
 directly, so the current direction can have stretched or shortened limb
-proportions before switching back to IK. Holding `Shift` while dragging
-temporarily edits lengths/free-moves the point without switching the mode
-selector.
+proportions before switching back to IK. Commit exports separate per-direction
+ControlNet refs, so a 16-way pose set can later be filtered down to an 8-way
+generation pass from the output selection strip.
 
-The non-OpenPose guide types may call the Nymphs Image / Gemini Flash route for
-rough research candidates, but the reliable pose path does not depend on Gemini.
-
-Generated guide candidates stay under:
+Committed refs stay under:
 
 ```text
-$HOME/NymphsData/outputs/nymphs-sprite/guides/candidates/
+$HOME/NymphsData/outputs/nymphs-sprite/pose_lab/refs/
 ```
 
-They appear in the same preview strip/gallery so the best candidates can be
-selected without a separate guide manager.
+They appear in the same preview strip/gallery. Clicking a committed ref reloads
+that saved pose set into Pose Lab for more editing. Checking refs selects them
+for future generation wiring or optional contact sheet export.
 
 ### Style
 
@@ -188,7 +186,7 @@ The module manifest starts the UI on port `8098`.
 After install, test from top to bottom:
 
 1. Confirm Manager shows `Nymphs Sprite`, not `Sprite Foundry`.
-2. Open the UI and confirm the sidebar reads `Character -> Guide -> Style -> Generate -> Review`.
+2. Open the UI and confirm the sidebar reads `Character -> Pose Lab -> Style -> Generate -> Review`.
 3. Confirm status reports the shared Hugging Face cache and local LoRAs.
 4. Generate a tiny 8-direction run at conservative settings.
 5. Confirm outputs land under `NymphsData/outputs/nymphs-sprite`.
@@ -207,7 +205,7 @@ Near-term:
 Next:
 
 - Expand Pose Lab beyond OpenPose into sketch/body guide editing.
-- Promote proven guide sheets into a tiny curated preset set.
+- Promote proven guide refs into a tiny curated preset set.
 - Godot-ready export packaging.
 - Normal and depth post-process outputs.
 - Stronger sprite manifest contract for game projects.

@@ -15,7 +15,7 @@ experimental paths at once. Nymphs Sprite should distill the strongest parts
 into a dependable workflow:
 
 ```text
-Character -> Guide -> Style -> Generate -> Review -> Export
+Character -> Pose Lab -> Style -> Generate -> Review -> Export
 ```
 
 The product should feel like directing a sprite sheet, not configuring an AI
@@ -97,7 +97,7 @@ The dev registry should point at the Nymphs Sprite manifest, not Sprite Foundry.
 Nymphs Image / Z-Image is the backend engine only. Nymphs Sprite owns the
 workflow and should own the generated artifacts.
 
-Final sprites, guide sheets, review artifacts, accepted sets, exports, and
+Final sprites, guide refs, review artifacts, accepted sets, exports, and
 Nymphs Sprite logs should stay under Nymphs Sprite-owned folders:
 
 ```text
@@ -271,7 +271,7 @@ used for generation. The simple version comes first:
 
 1. Choose body type.
 2. Choose 8 or 16 directions.
-3. Generate candidate guide sheets.
+3. Commit candidate direction refs.
 4. Preview/select likely winners in the normal preview strip.
 5. Generate the sprite set using those guides once ControlNet wiring is live.
 
@@ -303,18 +303,17 @@ bad direction -> make/edit guide -> regenerate that direction -> accept winner
 
 ### Pose Lab
 
-The first implemented guide workflow is a small collapsible `Pose Lab` inside
-the Guide section. It exists to make candidate guide refs, not to become a
-large second product.
+The first implemented ControlNet workflow is `Pose Lab`. It exists to make
+clean reusable refs, not to become a large second product.
 
 Keep this simple:
 
 ```text
-Guide settings -> edit one pose slot -> create guide sheet -> preview strip
+Pose Lab settings -> edit one pose slot -> commit refs -> select/refine/export
 ```
 
 The default OpenPose Skeleton path is local and deterministic. It does not ask
-Gemini or Z-Image to invent an OpenPose map. The UI owns a small editable rig:
+another image model to invent an OpenPose map. The UI owns a small editable rig:
 
 - one page
 - opens in the main preview area as a large pose workbench
@@ -333,19 +332,16 @@ Gemini or Z-Image to invent an OpenPose map. The UI owns a small editable rig:
 - Mirror mirrors the active direction
 - Copy All copies the active pose into every direction slot
 
-When `Create Guide` is pressed with `OpenPose Skeleton`, Nymphs Sprite renders
-the slots into a black-background OpenPose-style guide sheet and saves it into
-Nymphs Sprite-owned outputs:
+When `Commit Refs` is pressed, Nymphs Sprite renders each direction slot into
+its own black-background OpenPose-style ref and saves the refs into Nymphs
+Sprite-owned outputs:
 
 ```text
-$HOME/NymphsData/outputs/nymphs-sprite/guides/candidates/<subject>/<timestamp>/
+$HOME/NymphsData/outputs/nymphs-sprite/pose_lab/refs/<subject>/<timestamp>/
 ```
 
-The non-OpenPose candidate types can still call the existing Nymphs Image /
-Gemini Flash route for rough research candidates, but this is no longer the
-main pose workflow.
-
-Supported candidate ref types:
+Pose Lab should own every future ControlNet prep lane, but only OpenPose is
+visible in the simple working UI right now. Future ref types:
 
 - OpenPose Skeleton: local editable rig; default first-class path for pose and
   limb control.
@@ -353,26 +349,22 @@ Supported candidate ref types:
 - Scribble: useful for rough shape and body mass experiments.
 - Depth Mass: later research path for simple grayscale volume cues.
 
-The prompt rules are based on the ControlNet mental model: a control image
-should be structural, simple, high contrast, and low detail. It should not look
-like final art. For guide sheets, avoid character detail, clothing, labels,
-arrows, text, scenery, and decoration.
+Ref management should remain lightweight for now:
 
-Guide candidate management should remain lightweight for now:
-
-- generated candidates appear in the normal gallery/preview strip
-- `View Guides` jumps to the newest guide candidate folder
-- selection controls can be used to mark likely winners
-- do not build a large guide database yet
+- committed refs appear in the normal gallery/preview strip
+- `View Refs` jumps to the newest committed Pose Lab folder
+- clicking a ref thumbnail reloads the saved pose set into the editor
+- checking refs selects them for future generation wiring or contact sheet export
+- do not build a large ref database yet
 
 Future promotion path:
 
 ```text
-guides/candidates/<subject>/<timestamp>/
-  -> guides/presets/<body>/<control_type>/<8way-or-16way>/
+pose_lab/refs/<subject>/<timestamp>/
+  -> pose_lab/presets/<body>/<control_type>/<8way-or-16way>/
 ```
 
-Only add the preset promotion button after real test results show which guide
+Only add the preset promotion button after real test results show which pose
 refs are worth keeping.
 
 ## Best Working Flow To Build First
@@ -386,13 +378,13 @@ Build and test from the top down.
 - Keep prompt and negative prompt visible.
 - Prompt presets are test fixtures, not the whole product.
 
-### 2. Guide
+### 2. Pose Lab
 
 - Pick body type.
 - Pick 8 or 16 directions.
-- Generate guide candidates in Pose Lab.
-- Test OpenPose, Canny/line, scribble, and depth-mass candidates.
-- Show candidate guide sheets in the preview strip.
+- Commit OpenPose refs from the editable rig.
+- Keep Canny/line, scribble, and depth-mass as future Pose Lab lanes.
+- Show committed refs in the preview strip.
 - Save guide files under Nymphs Sprite outputs/tmp.
 
 ### 3. Style
@@ -475,8 +467,9 @@ ref.
 
 The preview strip should stay folder-scoped after generation. Avoid dumping the
 entire `Recent` history into the strip after a run; it gets too noisy. New
-sprite runs should show the newest subject/run folder. New guide candidates
-should show the newest guide candidate folder.
+sprite runs should show the newest subject/run folder. New Pose Lab commits
+should show the newest committed ref folder. Contact sheets are optional exports
+from selected thumbnails, not the ControlNet input format.
 
 ## Godot / Packaging
 
@@ -486,7 +479,7 @@ generator.
 Target export contents:
 
 - accepted direction PNGs
-- contact sheet
+- selected direction refs
 - manifest JSON
 - optional normal maps
 - optional depth maps
@@ -555,8 +548,8 @@ Test in small slices.
 - Select 8 or 16 directions.
 - Move points in one direction slot.
 - Switch directions and confirm each slot keeps its own pose.
-- Generate an OpenPose guide contact sheet.
-- Confirm the edited slot appears in the saved sheet.
+- Commit OpenPose direction refs.
+- Confirm the edited slot appears in the saved ref.
 - Confirm guide files are deterministic and visible.
 - Confirm the user can understand that guides become ControlNet refs.
 
@@ -591,8 +584,8 @@ Test in small slices.
 2. Confirm status panel and LoRA dropdown are fixed after restart/update.
 3. Open Pose Lab, move points in one direction, switch slots, and confirm the
    slot state is retained.
-4. Generate a Pose Lab OpenPose Skeleton candidate and confirm the edited slot
-   appears in the saved guide sheet.
+4. Generate Pose Lab OpenPose Skeleton refs and confirm the edited slot appears
+   in the saved direction ref.
 5. Generate a Canny/Line candidate only as a secondary research check.
 6. Generate a tiny current-path 8-way set to validate output ownership.
 7. Try one 16-way run only after the 8-way path is stable.

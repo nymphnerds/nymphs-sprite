@@ -849,8 +849,8 @@
       </section>
 
       <section class="section">
-        <div class="section-title"><span>Guide</span><span>2</span></div>
-        <p class="flow-note">Body guides will become the ControlNet refs for each direction.</p>
+        <div class="section-title"><span>Pose Lab</span><span>2</span></div>
+        <p class="flow-note">Pose refs become the ControlNet inputs for each direction.</p>
         <div class="grid">
           <div class="field wide">
             <label for="body-guide">Body Type</label>
@@ -865,7 +865,7 @@
             </select>
           </div>
           <div class="field wide">
-            <label for="guide-strength">Guide Strength</label>
+            <label for="guide-strength">Ref Strength</label>
             <select id="guide-strength">
               <option value="normal">Normal</option>
               <option value="soft">Soft</option>
@@ -881,29 +881,12 @@
           </div>
         </div>
         <div class="command-row">
-          <button id="preview-guides" type="button">Preview Guide Sheet</button>
+          <button id="preview-guides" type="button">Open Editor</button>
         </div>
         <details class="pose-lab" id="pose-lab-panel">
-          <summary>Pose Lab</summary>
-          <p class="flow-note">Generate candidate ControlNet refs, then keep only the guides that behave. OpenPose is local; sketch-style guides can use Gemini.</p>
+          <summary>Rig Controls</summary>
+          <p class="flow-note">Edit one direction at a time, switch slots in the main preview strip, then commit clean OpenPose refs.</p>
           <div class="grid">
-            <div class="field wide">
-              <label for="pose-control-type">Control Type</label>
-              <select id="pose-control-type">
-                <option value="pose_skeleton">OpenPose Skeleton</option>
-                <option value="silhouette_line">Canny / Line</option>
-                <option value="scribble">Scribble</option>
-                <option value="depth_mass">Depth Mass</option>
-              </select>
-            </div>
-            <div class="field wide">
-              <label for="pose-lab-brief">Guide Brief</label>
-              <textarea id="pose-lab-brief" spellcheck="false" maxlength="520">clean reusable ControlNet guide refs for this body type; strong readable silhouette; consistent centered scale; no character detail</textarea>
-            </div>
-            <div class="field">
-              <label for="pose-edit-direction">Direction</label>
-              <select id="pose-edit-direction"></select>
-            </div>
             <div class="field">
               <label for="pose-edit-mode">Mode</label>
               <select id="pose-edit-mode">
@@ -912,6 +895,7 @@
               </select>
             </div>
           </div>
+          <select id="pose-edit-direction" hidden></select>
           <p class="flow-note">Pose IK keeps limb lengths. Edit Lengths moves points directly for proportions.</p>
           <div class="command-row three">
             <button id="pose-reset" type="button">Reset</button>
@@ -919,11 +903,8 @@
             <button id="pose-copy-all" type="button">Copy All</button>
           </div>
           <div class="command-row two">
-            <button id="create-gemini-guide" type="button">Create Guide</button>
-            <button id="view-guide-candidates" type="button">View Guides</button>
-          </div>
-          <div class="command-row">
-            <button id="pose-lab-copy-prompt" type="button">Copy Prompt</button>
+            <button id="commit-pose-guide" type="button">Commit Refs</button>
+            <button id="view-guide-candidates" type="button">View Refs</button>
           </div>
         </details>
       </section>
@@ -1060,6 +1041,7 @@
             <button id="select-visible" type="button">Select</button>
             <button id="select-all-visible" type="button">Select All</button>
             <button id="clear-selection" type="button">Clear</button>
+            <button id="export-contact-sheet" type="button">Export Sheet</button>
             <button class="danger" id="delete-selected" type="button">Delete</button>
           </div>
         </div>
@@ -1514,14 +1496,14 @@
     async function viewGuideCandidates() {
       state.viewerSource = "outputs";
       await refreshRecentOutputs(false);
-      const guideFolder = newestFolderMatching("outputs/guides/candidates/");
-      if (guideFolder) {
-        state.outputView = `folder:${guideFolder}`;
+      const refFolder = newestFolderMatching("outputs/pose_lab/refs/");
+      if (refFolder) {
+        state.outputView = `folder:${refFolder}`;
         renderGallery();
         if (state.visibleOutputs[0]) showOutput(0);
-        setProgress("Guides", "Showing latest guide candidates.", 100);
+        setProgress("Pose Refs", "Showing latest committed refs.", 100);
       } else {
-        setProgress("Guides", "No guide candidates yet. Use Pose Lab first.", 0);
+        setProgress("Pose Refs", "No committed refs yet. Use Pose Lab first.", 0);
       }
     }
 
@@ -1576,7 +1558,26 @@
         source: item.source || "",
         created: item.created || item.mtime || 0,
         folder: item.folder || "",
+        metadata: item.metadata || {},
       };
+    }
+
+    function loadPoseRefIntoEditor(item) {
+      const metadata = item?.metadata || {};
+      if (metadata.mode !== "pose_lab_direction_ref" || !metadata.pose_data?.directions) return false;
+      const directionCount = String(metadata.direction_count || "");
+      if (["8", "16"].includes(directionCount)) $("guide-direction-count").value = directionCount;
+      ensurePoseLab();
+      for (const [direction, slot] of Object.entries(metadata.pose_data.directions || {})) {
+        if (slot?.joints) state.posePointers[direction] = JSON.parse(JSON.stringify(slot.joints));
+      }
+      if (metadata.direction && state.posePointers[metadata.direction]) state.poseDirection = metadata.direction;
+      $("pose-edit-direction").value = state.poseDirection;
+      $("pose-lab-panel").open = true;
+      renderPoseLabEditor();
+      syncPoseLabStage();
+      setProgress("Pose Lab", `Editing ${state.poseDirection.replaceAll("_", " ")} ref.`, 100);
+      return true;
     }
 
     async function refreshRecentOutputs(selectFirst = false) {
@@ -1606,6 +1607,7 @@
       image.style.display = "block";
       $("empty").hidden = true;
       $("output-label").textContent = item.label || basename(item.path);
+      loadPoseRefIntoEditor(item);
       renderGallery();
     }
 
@@ -1652,6 +1654,7 @@
       $("review-select-all").disabled = visible.length === 0 || state.busy;
       $("review-clear").disabled = state.selectedOutputPaths.size === 0 || state.busy;
       $("move-selected").disabled = managedSelected.length === 0 || state.busy;
+      $("export-contact-sheet").disabled = selected.length === 0 || state.busy;
       $("delete-selected").disabled = managedSelected.length === 0 || state.busy;
       $("delete-folder").disabled = !currentManagedFolder() || state.busy;
       updateSelectionCount();
@@ -1764,6 +1767,85 @@
       }
       for (const item of managed) state.selectedOutputPaths.delete(outputKey(item));
       applyOutputResponse(body);
+    }
+
+    function loadCanvasImage(url) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error(`Could not load ${url}`));
+        image.src = url;
+      });
+    }
+
+    function drawContainedImage(context, image, x, y, width, height) {
+      const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight);
+      const drawWidth = image.naturalWidth * scale;
+      const drawHeight = image.naturalHeight * scale;
+      const drawX = x + (width - drawWidth) / 2;
+      const drawY = y + (height - drawHeight) / 2;
+      context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+    }
+
+    async function exportSelectedContactSheet() {
+      const selected = visibleSelectedOutputs();
+      if (!selected.length || state.busy) return;
+      setBusy(true, "Contact Sheet");
+      setProgress("Contact Sheet", "Building selected contact sheet.", 35);
+      try {
+        const images = await Promise.all(selected.map((item) => loadCanvasImage(previewUrl(item))));
+        const cell = 192;
+        const labelHeight = 28;
+        const gap = 10;
+        const cols = Math.min(4, Math.max(1, Math.ceil(Math.sqrt(images.length))));
+        const rows = Math.ceil(images.length / cols);
+        const canvas = document.createElement("canvas");
+        canvas.width = cols * cell + (cols + 1) * gap;
+        canvas.height = rows * (cell + labelHeight) + (rows + 1) * gap;
+        const context = canvas.getContext("2d");
+        context.fillStyle = "#020403";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.font = "12px Cascadia Mono, monospace";
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        for (const [index, image] of images.entries()) {
+          const col = index % cols;
+          const row = Math.floor(index / cols);
+          const x = gap + col * (cell + gap);
+          const y = gap + row * (cell + labelHeight + gap);
+          context.fillStyle = "#000000";
+          context.fillRect(x, y, cell, cell);
+          drawContainedImage(context, image, x, y, cell, cell);
+          context.fillStyle = "#29e6da";
+          context.fillText((selected[index].label || `image ${index + 1}`).slice(0, 24), x + cell / 2, y + cell + labelHeight / 2);
+        }
+        const response = await fetch("/api/outputs/contact-sheet", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            image_data: canvas.toDataURL("image/png"),
+            subject_id: value("subject-id"),
+            source_count: selected.length,
+            source_paths: selected.map(localOutputPath).filter(Boolean),
+          }),
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body.detail || `Contact sheet failed with status ${response.status}`);
+        const outputs = (body.outputs || []).map(normalizeManagedOutput);
+        state.outputs = outputs.concat(state.outputs || []);
+        state.viewerSource = "outputs";
+        state.selectedOutputPaths.clear();
+        const sheetFolder = newestFolderMatching("outputs/contact_sheets/");
+        state.outputView = sheetFolder ? `folder:${sheetFolder}` : "recent";
+        renderGallery();
+        if (state.visibleOutputs[0]) showOutput(0);
+        setProgress("Done", "Selected contact sheet exported.", 100);
+      } catch (error) {
+        append(`ERROR: ${error.message || error}`);
+        setProgress("Error", error.message || "Contact sheet export failed.", 0);
+      } finally {
+        setBusy(false);
+      }
     }
 
     function clearLocalObjectUrls() {
@@ -2217,6 +2299,7 @@
         button.type = "button";
         button.textContent = direction.replaceAll("_", " ");
         button.className = direction === state.poseDirection ? "active" : "";
+        button.title = "Edit this direction slot.";
         button.addEventListener("click", () => {
           state.poseDirection = direction;
           $("pose-edit-direction").value = direction;
@@ -2270,39 +2353,6 @@
       };
     }
 
-    function poseLabDirections() {
-      if (value("guide-direction-count") === "16") {
-        return "front, front-front-left, front-left, left-front-left, left, left-back-left, back-left, back-back-left, back, back-back-right, back-right, right-back-right, right, right-front-right, front-right, front-front-right";
-      }
-      return "front, front-left, left, back-left, back, back-right, right, front-right";
-    }
-
-    function poseLabControlText() {
-      const control = value("pose-control-type");
-      if (control === "silhouette_line") return "Canny or line-art style control map: clean outer silhouette and major internal pose contours only.";
-      if (control === "scribble") return "Scribble control map: loose confident guide strokes describing body mass and pose.";
-      if (control === "depth_mass") return "Depth-map style guide: grayscale body volume masses, brighter closer forms, smooth simple values.";
-      return "OpenPose annotation map from keypoint detection: edge-to-edge black canvas, sparse colored stick figure, small colored joint dots, one thin colored bone segment per limb, colors like green/cyan/blue/orange/purple/magenta/yellow; no anatomical skeleton, body/mannequin outline, skull, ribs, hands, or feet.";
-    }
-
-    function buildPoseLabPrompt() {
-      const count = value("guide-direction-count") === "16" ? "16" : "8";
-      const layout = count === "16" ? "4x4" : "4x2";
-      return [
-        `Create one square ${count}-direction ControlNet guide reference sheet for game sprite generation.`,
-        `Layout: one ${layout} grid, directions in this exact order: ${poseLabDirections()}.`,
-        `Control type: ${poseLabControlText()}`,
-        `Body target: ${value("body-guide")} / ${value("guide-strength")}.`,
-        "Use a simple black background, high contrast guide marks, consistent scale, centered full-body figure per cell, same foot baseline.",
-        "Use an invisible grid layout; do not draw cell borders or divider lines. The entire image must be an edge-to-edge black canvas with no white margins.",
-        "Draw pose rigs, not anatomy diagrams. For OpenPose, imitate a keypoint detection annotation image, not a drawing of a person.",
-        "For OpenPose, use sparse colored stick figures with small colored dots and thin colored limb segments only; avoid white lines except tiny neutral center points if needed.",
-        "No body outline, silhouette outline, mannequin outline, bones, skulls, ribcages, detailed hands or feet, character art, clothing, face detail, props, scenery, text, labels, arrows, watermark, texture, shadows, thick grid dividers, page border, or final rendering.",
-        `Sprite context: ${value("subject-prompt") || "generic game sprite character"}`,
-        `Extra brief: ${value("pose-lab-brief") || "dependable reusable guide preset candidate"}`
-      ].join("\n");
-    }
-
     function buildPoseLabPayload() {
       return {
         subject_id: value("subject-id"),
@@ -2310,26 +2360,25 @@
         body_type: value("body-guide"),
         guide_strength: value("guide-strength"),
         direction_count: value("guide-direction-count"),
-        control_type: value("pose-control-type"),
-        brief: value("pose-lab-brief"),
-        pose_data: value("pose-control-type") === "pose_skeleton" ? poseDataPayload() : null
+        control_type: "pose_skeleton",
+        pose_data: poseDataPayload()
       };
     }
 
-    async function createGeminiGuide() {
+    async function commitPoseRefs() {
       if (state.busy) return;
       setBusy(true, "Pose Lab");
-      setProgress("Pose Lab", "Creating guide candidate.", 15);
+      setProgress("Pose Lab", "Committing direction refs.", 15);
       try {
-        const response = await fetch("/api/guides/gemini", {
+        const response = await fetch("/api/pose-lab/refs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(buildPoseLabPayload())
         });
         const body = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(body.detail || `Guide request failed with status ${response.status}`);
+        if (!response.ok) throw new Error(body.detail || `Pose ref commit failed with status ${response.status}`);
         const outputs = (body.outputs || []).map(normalizeManagedOutput);
-        if (!outputs.length) throw new Error("No guide candidate returned.");
+        if (!outputs.length) throw new Error("No pose refs were committed.");
         state.outputs = outputs.concat(state.outputs || []);
         state.viewerSource = "batch";
         state.outputView = "recent";
@@ -2337,30 +2386,18 @@
         state.selectedOutputPaths.clear();
         renderGallery();
         showOutput(0);
-        const guideFolder = newestFolderMatching("outputs/guides/candidates/");
-        if (guideFolder) {
-          state.outputView = `folder:${guideFolder}`;
+        const refFolder = newestFolderMatching("outputs/pose_lab/refs/");
+        if (refFolder) {
+          state.outputView = `folder:${refFolder}`;
           renderGallery();
           if (state.visibleOutputs[0]) showOutput(0);
         }
-        append(`POSE LAB PROMPT\n${body.prompt || buildPoseLabPrompt()}`);
-        setProgress("Done", "Guide candidate saved in Nymphs Sprite outputs.", 100);
+        setProgress("Done", "Pose refs committed as reusable presets.", 100);
       } catch (error) {
         append(`ERROR: ${error.message || error}`);
-        setProgress("Error", error.message || "Guide candidate failed.", 0);
+        setProgress("Error", error.message || "Pose ref commit failed.", 0);
       } finally {
         setBusy(false);
-      }
-    }
-
-    async function copyPoseLabPrompt() {
-      const prompt = buildPoseLabPrompt();
-      try {
-        await navigator.clipboard.writeText(prompt);
-        setProgress("Pose Lab", "Prompt copied.", 100);
-      } catch {
-        append(`POSE LAB PROMPT\n${prompt}`);
-        setProgress("Pose Lab", "Prompt written to logs.", 100);
       }
     }
 
@@ -2391,13 +2428,11 @@
       $("generate-foundry").disabled = state.busy || Boolean(generationBlocker);
       $("generate-foundry").title = generationBlocker || "Generate a sprite set.";
       $("preview-guides").disabled = state.busy;
-      $("preview-guides").title = "Preview guide candidates from Pose Lab.";
-      $("create-gemini-guide").disabled = state.busy;
-      $("create-gemini-guide").title = "Create a guide candidate.";
+      $("preview-guides").title = "Open the main-stage Pose Lab editor.";
+      $("commit-pose-guide").disabled = state.busy;
+      $("commit-pose-guide").title = "Commit the current Pose Lab slots as reusable ControlNet refs.";
       $("view-guide-candidates").disabled = state.busy;
-      $("view-guide-candidates").title = "Show generated guide candidates in the preview strip.";
-      $("pose-lab-copy-prompt").disabled = state.busy;
-      $("pose-lab-copy-prompt").title = "Copy the current Pose Lab prompt.";
+      $("view-guide-candidates").title = "Show committed Pose Lab refs in the preview strip.";
       for (const id of ["pose-reset", "pose-mirror", "pose-copy-all"]) {
         const button = $(id);
         if (!button) continue;
@@ -2653,7 +2688,6 @@
       syncPoseLabStage();
       updateFoundryControls();
     });
-    $("pose-control-type").addEventListener("change", updateFoundryControls);
     $("pose-lab-panel").addEventListener("toggle", syncPoseLabStage);
     $("pose-edit-direction").addEventListener("change", () => {
       const direction = value("pose-edit-direction");
@@ -2683,17 +2717,16 @@
     $("pose-editor").addEventListener("pointercancel", () => {
       state.poseDragging = "";
     });
-    $("pose-lab-brief").addEventListener("input", updateFoundryControls);
     $("preview-guides").addEventListener("click", () => {
       $("pose-lab-panel").open = true;
       syncPoseLabStage();
-      setProgress("Pose Lab", "Move points, switch direction slots, then create a guide sheet.", 35);
+      setProgress("Pose Lab", "Move points, switch direction slots, then commit direction refs.", 35);
     });
-    $("create-gemini-guide").addEventListener("click", createGeminiGuide);
+    $("commit-pose-guide").addEventListener("click", commitPoseRefs);
     $("view-guide-candidates").addEventListener("click", viewGuideCandidates);
-    $("pose-lab-copy-prompt").addEventListener("click", copyPoseLabPrompt);
     $("review-select-all").addEventListener("click", selectAllVisibleOutputs);
     $("review-clear").addEventListener("click", clearOutputSelection);
+    $("export-contact-sheet").addEventListener("click", exportSelectedContactSheet);
     $("generate-foundry").addEventListener("click", runGeneration);
     $("foundry-check").addEventListener("click", () => runFoundryCommand("check", "Gates"));
     $("foundry-review").addEventListener("click", () => runFoundryCommand("review-show", "Review"));

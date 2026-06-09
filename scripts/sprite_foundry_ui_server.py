@@ -15,9 +15,7 @@ import zlib
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, quote, unquote, urlparse
-from urllib.request import Request, urlopen
 
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp"}
 
@@ -114,8 +112,11 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
         if path == "/api/outputs/folder/delete":
             self._delete_output_folder()
             return
-        if path == "/api/guides/gemini":
-            self._create_gemini_guide()
+        if path == "/api/outputs/contact-sheet":
+            self._save_contact_sheet()
+            return
+        if path == "/api/pose-lab/refs":
+            self._create_openpose_guide(self._json_payload())
             return
         self.send_error(404, "Not found")
 
@@ -454,130 +455,53 @@ class SpriteFoundryUiHandler(BaseHTTPRequestHandler):
             pass
         self._send_json({"status": "ok", "folder": folder, "removed": removed, "outputs": self._output_records()})
 
+    def _save_contact_sheet(self) -> None:
+        payload = self._json_payload()
+        image_data = str(payload.get("image_data") or "")
+        if not image_data.startswith("data:image/png;base64,"):
+            self._send_json_error(400, "PNG image data is required.")
+            return
+        try:
+            import base64
+
+            data = base64.b64decode(image_data.split(",", 1)[1], validate=True)
+        except Exception:
+            self._send_json_error(400, "Contact sheet image data is invalid.")
+            return
+        if not data.startswith(b"\x89PNG\r\n\x1a\n"):
+            self._send_json_error(400, "Contact sheet must be a PNG.")
+            return
+        subject_id = self._safe_slug(str(payload.get("subject_id") or "selected"), "selected")
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+        target_dir = (self.server.output_root / "contact_sheets" / subject_id / timestamp).resolve()
+        target_dir.mkdir(parents=True, exist_ok=True)
+        target = self._output_collision_path(target_dir / "selected-contact-sheet.png")
+        target.write_bytes(data)
+        metadata = {
+            "provider": "Nymphs Sprite",
+            "mode": "selected_contact_sheet",
+            "batch_id": f"contact-sheet-{int(time.time())}",
+            "batch_label": "Selected Contact Sheet",
+            "batch_type": "contact_sheet",
+            "item_label": "Selected Contact Sheet",
+            "item_index": 1,
+            "item_total": 1,
+            "subject_id": subject_id,
+            "source_count": int(payload.get("source_count") or 0),
+            "source_paths": payload.get("source_paths") if isinstance(payload.get("source_paths"), list) else [],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        target.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+        rel = target.relative_to(self.server.output_root).as_posix()
+        record = self._output_record(target, rel)
+        record["source"] = "outputs"
+        record["url"] = f"/outputs/outputs/{quote(rel, safe='/')}"
+        record["folder"] = f"outputs/{record['folder']}".rstrip("/")
+        self._send_json({"status": "ok", "outputs": [record]})
+
     def _safe_slug(self, value: str, fallback: str = "item") -> str:
         slug = re.sub(r"[^A-Za-z0-9_.-]+", "-", value.strip()).strip(".-_")
         return (slug or fallback)[:96]
-
-    def _zimage_url(self) -> str:
-        return (os.environ.get("SPRITE_FOUNDRY_ZIMAGE_URL") or os.environ.get("ZIMAGE_URL") or "http://127.0.0.1:8090").rstrip("/")
-
-    def _post_json(self, url: str, payload: dict, *, timeout: int = 240) -> dict:
-        request = Request(
-            url,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
-            method="POST",
-        )
-        try:
-            with urlopen(request, timeout=timeout) as response:
-                text = response.read().decode("utf-8", errors="replace")
-        except HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace")
-            raise RuntimeError(detail or str(exc)) from exc
-        except URLError as exc:
-            raise RuntimeError(str(exc.reason or exc)) from exc
-        try:
-            body = json.loads(text)
-        except json.JSONDecodeError as exc:
-            raise RuntimeError(f"Backend returned non-JSON response: {text[:500]}") from exc
-        if not isinstance(body, dict):
-            raise RuntimeError("Backend returned an unexpected response.")
-        return body
-
-    def _gemini_guide_prompt(self, payload: dict) -> str:
-        body_type = str(payload.get("body_type") or "humanoid").replace("_", " ").strip()
-        guide_strength = str(payload.get("guide_strength") or "normal").strip()
-        direction_count = 16 if str(payload.get("direction_count") or "8") == "16" else 8
-        control_type = str(payload.get("control_type") or "pose_skeleton").strip()
-        user_brief = str(payload.get("brief") or "").strip()
-        subject_prompt = str(payload.get("subject_prompt") or "").strip()
-        if direction_count == 16:
-            directions = (
-                "front, front-front-left, front-left, left-front-left, left, left-back-left, "
-                "back-left, back-back-left, back, back-back-right, back-right, right-back-right, "
-                "right, right-front-right, front-right, front-front-right"
-            )
-            layout = "one 4x4 grid in a single square image"
-        else:
-            directions = "front, front-left, left, back-left, back, back-right, right, front-right"
-            layout = "one 4x2 grid in a single square image"
-        body_notes = {
-            "humanoid": "humanoid game character, upright readable full-body anatomy",
-            "wide squat": "short wide heavy body, low center of mass, strong blocky silhouette",
-            "tall thin": "tall narrow body, long limbs, thin readable silhouette",
-            "amorphous": "blob-like creature body, organic mass, no detailed costume",
-            "quadruped": "four-legged creature body, side and diagonal reads must be clear",
-            "winged": "humanoid or creature body with folded wings, wings readable but simple",
-            "custom": "simple body-shape guide based on the brief",
-        }
-        note = body_notes.get(body_type.lower(), body_notes["custom"])
-        control_notes = {
-            "pose_skeleton": (
-                "OpenPose annotation map from keypoint detection, like a ControlNet OpenPose preprocessor output; "
-                "black background, sparse colored stick figure, small colored joint dots, one thin colored bone segment per limb, minimal stick-rig only; "
-                "use colors like green, cyan, blue, orange, purple, magenta, and yellow for limb segments; "
-                "head dot or small head marker, neck, shoulders, elbows, wrists, hips, knees, ankles readable; "
-                "no body outline, no mannequin outline, no torso contour, no face outline, no profile face, no hands, no feet; "
-                "absolutely no anatomical skeleton, no skull, no ribs, no spine bones, no pelvis bones, no hand bones, no foot bones"
-            ),
-            "silhouette_line": (
-                "Canny or line-art style control map: clean outer silhouette and major internal pose contours only, "
-                "simple white lines on black, no texture hatching or rendered detail"
-            ),
-            "scribble": (
-                "Scribble control map: loose confident hand-drawn guide strokes that describe the body mass and pose, "
-                "few lines, high contrast, intentionally simple"
-            ),
-            "depth_mass": (
-                "Depth-map style control guide: grayscale body volume masses on black, brighter closer forms, "
-                "smooth simple values, no texture and no final-art rendering"
-            ),
-        }
-        control_note = control_notes.get(control_type, control_notes["pose_skeleton"])
-        prompt = f"""
-Create one square {direction_count}-direction ControlNet guide reference sheet for game sprite generation.
-
-Purpose: this image is not final art. It is a clean structural guide that will be used as ControlNet conditioning.
-
-Layout:
-- {layout}
-- directions in this exact order: {directions}
-- one full-body figure per cell
-- consistent scale, centered in each cell, same foot baseline
-- clear direction changes between front, diagonals, side, and back
-- use an invisible grid layout; do not draw cell borders or divider lines
-- the entire image must be an edge-to-edge black canvas with no white margins
-
-Guide style:
-- simple black background
-- control type: {control_note}
-- use only the minimum marks needed for reliable conditioning
-- draw pose rigs, not anatomy diagrams
-- for OpenPose, imitate a keypoint detection annotation image, not a drawing of a person
-- for OpenPose, use sparse colored stick figures with small colored dots and thin colored limb segments only
-- for OpenPose, do not use white lines except tiny neutral center points if needed
-- for OpenPose, do not draw silhouette, body, mannequin, torso, hand, foot, or face outlines
-- high contrast, low detail, no texture
-- no bones, no skulls, no ribcages, no detailed hands or feet
-- no clothing, no facial details, no rendered character art
-- no text, no labels, no arrows, no watermarks, no frame decorations
-- no grid dividers, no cell borders, no white page border
-- no decorative color; if OpenPose colors are used, keep them flat and sparse
-- no scenery, props, background objects, or shadows
-
-Body target:
-- {note}
-- guide strength intent: {guide_strength}
-
-Sprite target context:
-{subject_prompt[:700] if subject_prompt else "generic game sprite character"}
-
-Extra guide brief:
-{user_brief[:700] if user_brief else "Make this a dependable reusable guide preset candidate."}
-
-The output must look like a clean ControlNet reference sheet, not a character design sheet.
-"""
-        return "\n".join(line.rstrip() for line in prompt.strip().splitlines())
 
     def _direction_names(self, direction_count: int) -> list[str]:
         if direction_count == 16:
@@ -798,133 +722,54 @@ The output must look like a clean ControlNet reference sheet, not a character de
         subject_id = self._safe_slug(str(payload.get("subject_id") or "guide_candidate"), "guide_candidate")
         body_type = self._safe_slug(str(payload.get("body_type") or "humanoid"), "humanoid")
         direction_count = 16 if str(payload.get("direction_count") or "8") == "16" else 8
-        cols = 4
-        rows = 4 if direction_count == 16 else 2
-        width = height = 1024
-        pixels = bytearray(width * height * 3)
+        width = height = 512
         directions = self._direction_names(direction_count)
         pose_data = payload.get("pose_data") if isinstance(payload.get("pose_data"), dict) else {}
         pose_directions = pose_data.get("directions") if isinstance(pose_data.get("directions"), dict) else {}
+        selected_directions = pose_data.get("selected_directions") if isinstance(pose_data.get("selected_directions"), list) else directions
+        selected_directions = [name for name in selected_directions if name in directions]
+        if not selected_directions:
+            selected_directions = directions
         try:
             pose_canvas_size = float(pose_data.get("canvas_size") or 256)
         except (TypeError, ValueError):
             pose_canvas_size = 256
-        for index, name in enumerate(directions):
-            col = index % cols
-            row = index // cols
-            box = (col * width / cols, row * height / rows, width / cols, height / rows)
+
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+        target_dir = (self.server.output_root / "pose_lab" / "refs" / subject_id / timestamp).resolve()
+        target_dir.mkdir(parents=True, exist_ok=True)
+        batch_id = f"pose-lab-local-{int(time.time())}"
+        records = []
+        for index, name in enumerate(selected_directions, start=1):
+            pixels = bytearray(width * height * 3)
+            box = (0, 0, width, height)
             slot = pose_directions.get(name) if isinstance(pose_directions, dict) else None
             joints = slot.get("joints") if isinstance(slot, dict) else None
             if not self._draw_openpose_pose(pixels, width, height, box, joints, pose_canvas_size):
                 self._draw_openpose_rig(pixels, width, height, box, self._direction_yaw(name))
-
-        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-        target_dir = (self.server.output_root / "guides" / "candidates" / subject_id / timestamp).resolve()
-        target_dir.mkdir(parents=True, exist_ok=True)
-        target = self._output_collision_path(target_dir / f"{body_type}-{direction_count}way-openpose-guide-1.png")
-        self._write_rgb_png(target, width, height, pixels)
-        metadata = {
-            "provider": "Nymphs Sprite",
-            "mode": "pose_lab_guide_candidate",
-            "batch_id": f"pose-lab-local-{int(time.time())}",
-            "batch_label": "Pose Lab Guide Candidates",
-            "batch_type": "sprite_guide_candidate",
-            "item_label": f"{body_type.replace('-', ' ').title()} {direction_count}-Way OpenPose Guide",
-            "item_index": 1,
-            "item_total": 1,
-            "subject_id": subject_id,
-            "body_type": body_type,
-            "control_type": "pose_skeleton",
-            "direction_count": direction_count,
-            "directions": directions,
-            "pose_data": pose_data,
-            "guide_strength": str(payload.get("guide_strength") or "normal"),
-            "sprite_prompt_context": str(payload.get("subject_prompt") or ""),
-            "created_at": datetime.now(timezone.utc).isoformat(),
-        }
-        target.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
-        rel = target.relative_to(self.server.output_root).as_posix()
-        record = self._output_record(target, rel)
-        record["source"] = "outputs"
-        record["url"] = f"/outputs/outputs/{quote(rel, safe='/')}"
-        record["folder"] = f"outputs/{record['folder']}".rstrip("/")
-        self._send_json({"status": "ok", "prompt": "Generated deterministic local OpenPose guide.", "outputs": [record]})
-
-    def _create_gemini_guide(self) -> None:
-        payload = self._json_payload()
-        subject_id = self._safe_slug(str(payload.get("subject_id") or "guide_candidate"), "guide_candidate")
-        body_type = self._safe_slug(str(payload.get("body_type") or "humanoid"), "humanoid")
-        direction_count = 16 if str(payload.get("direction_count") or "8") == "16" else 8
-        control_type = self._safe_slug(str(payload.get("control_type") or "pose_skeleton"), "pose_skeleton")
-        if control_type == "pose_skeleton":
-            self._create_openpose_guide(payload)
-            return
-        prompt = self._gemini_guide_prompt(payload)
-        batch_id = f"pose-lab-{int(time.time())}"
-        z_payload = {
-            "prompt": prompt,
-            "variant_count": 1,
-            "aspect_ratio": "1:1",
-            "model_id": str(payload.get("model_id") or "google/gemini-2.5-flash-image"),
-            "batch_id": batch_id,
-            "batch_label": "Nymphs Sprite Pose Lab",
-            "batch_type": "sprite_guide_candidate",
-            "item_label": f"{body_type.replace('-', ' ').title()} {direction_count}-Way {control_type.replace('-', ' ').title()} Guide",
-        }
-        try:
-            response = self._post_json(f"{self._zimage_url()}/api/gemini/generate", z_payload)
-        except RuntimeError as exc:
-            self._send_json_error(502, f"Gemini guide generation failed: {exc}")
-            return
-
-        generated = response.get("outputs") or []
-        if not isinstance(generated, list) or not generated:
-            self._send_json_error(502, "Gemini did not return a guide candidate image.")
-            return
-
-        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-        target_dir = (self.server.output_root / "guides" / "candidates" / subject_id / timestamp).resolve()
-        try:
-            target_dir.relative_to(self.server.output_root)
-        except ValueError:
-            self._send_json_error(400, "Guide output path is invalid.")
-            return
-        target_dir.mkdir(parents=True, exist_ok=True)
-
-        records = []
-        for index, item in enumerate(generated, start=1):
-            if not isinstance(item, dict):
-                continue
-            source_path = Path(str(item.get("path") or "")).expanduser()
-            if not source_path.is_file() or source_path.suffix.lower() not in IMAGE_SUFFIXES:
-                continue
-            target = self._output_collision_path(target_dir / f"{body_type}-{direction_count}way-{control_type}-gemini-guide-{index}{source_path.suffix.lower()}")
-            try:
-                shutil.copy2(source_path, target)
-            except Exception:
-                continue
-            metadata = dict(item.get("metadata") or {})
-            metadata.update(
-                {
-                    "provider": "Gemini Flash via Nymphs Image",
-                    "mode": "pose_lab_guide_candidate",
-                    "batch_id": batch_id,
-                    "batch_label": "Pose Lab Guide Candidates",
-                    "batch_type": "sprite_guide_candidate",
-                    "item_label": f"{body_type.replace('-', ' ').title()} {direction_count}-Way {control_type.replace('-', ' ').title()} Guide",
-                    "item_index": index,
-                    "item_total": len(generated),
-                    "subject_id": subject_id,
-                    "body_type": body_type,
-                    "control_type": control_type,
-                    "direction_count": direction_count,
-                    "guide_strength": str(payload.get("guide_strength") or "normal"),
-                    "sprite_prompt_context": str(payload.get("subject_prompt") or ""),
-                    "pose_lab_prompt": prompt,
-                    "created_at": datetime.now(timezone.utc).isoformat(),
-                    "source_output_path": str(source_path),
-                }
-            )
+            target = self._output_collision_path(target_dir / f"{body_type}-openpose-{index:02d}-{name}.png")
+            self._write_rgb_png(target, width, height, pixels)
+            metadata = {
+                "provider": "Nymphs Sprite",
+                "mode": "pose_lab_direction_ref",
+                "batch_id": batch_id,
+                "batch_label": "Pose Lab Ref Preset",
+                "batch_type": "sprite_direction_ref",
+                "item_label": f"{name.replace('_', ' ').title()} OpenPose Ref",
+                "item_index": index,
+                "item_total": len(selected_directions),
+                "subject_id": subject_id,
+                "body_type": body_type,
+                "control_type": "pose_skeleton",
+                "direction_count": direction_count,
+                "direction": name,
+                "selected_directions": selected_directions,
+                "directions": directions,
+                "pose_data": pose_data,
+                "guide_strength": str(payload.get("guide_strength") or "normal"),
+                "sprite_prompt_context": str(payload.get("subject_prompt") or ""),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            }
             target.with_suffix(".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
             rel = target.relative_to(self.server.output_root).as_posix()
             record = self._output_record(target, rel)
@@ -932,11 +777,7 @@ The output must look like a clean ControlNet reference sheet, not a character de
             record["url"] = f"/outputs/outputs/{quote(rel, safe='/')}"
             record["folder"] = f"outputs/{record['folder']}".rstrip("/")
             records.append(record)
-
-        if not records:
-            self._send_json_error(502, "Gemini returned output, but Nymphs Sprite could not copy it into module outputs.")
-            return
-        self._send_json({"status": "ok", "prompt": prompt, "outputs": records})
+        self._send_json({"status": "ok", "prompt": "Generated deterministic local OpenPose direction refs.", "outputs": records})
 
     def _send_output_file(self, relative: str) -> None:
         try:
