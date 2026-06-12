@@ -34,6 +34,13 @@ print(f'OK: {len(DIRECTIONS)} directions, {len(LIFECYCLE_STATES)} states, schema
 # 3. CLI parser builds without error
 echo "Checking CLI parser..."
 "$PYTHON_BIN" -c "from foundry.cli import build_parser; p = build_parser(); print('OK: CLI parser builds')" || { echo "FAIL: CLI parser"; FAIL=1; }
+"$PYTHON_BIN" -c "
+from foundry.cli import build_parser
+args = build_parser().parse_args(['generate-nymphscore', '--config', 'pipeline/chars/goblin_scout.json'])
+assert hasattr(args, 'controlnet_guidance_scale'), 'missing controlnet_guidance_scale'
+assert args.controlnet_guidance_scale == 1.0, args.controlnet_guidance_scale
+print('OK: generate-nymphscore args include controlnet guidance')
+" || { echo "FAIL: generate-nymphscore args"; FAIL=1; }
 
 # 4. Export packs structure
 echo "Checking export packs..."
