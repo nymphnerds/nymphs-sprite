@@ -170,6 +170,34 @@ if [[ -n "${decoded_lora_trigger}" ]]; then
   lora_trigger="${decoded_lora_trigger}"
 fi
 
+if [[ "${generation_path}" == "nymphscore" && -z "${lora_path}" ]]; then
+  lora_candidates=(
+    "${SPRITE_FOUNDRY_LORA_ROOT}/mks0813_pixel_art/mks0813_pixel_art.safetensors"
+    "${SPRITE_FOUNDRY_LORA_ROOT}/skyasl_pixel_artist/skyasl_pixel_artist.safetensors"
+    "${SPRITE_FOUNDRY_LORA_ROOT}/tarn59_pixel_art/tarn59_pixel_art.safetensors"
+  )
+  for candidate in "${lora_candidates[@]}"; do
+    if [[ -f "${candidate}" ]]; then
+      lora_path="${candidate}"
+      break
+    fi
+  done
+  if [[ -z "${lora_path}" ]]; then
+    lora_path="$(find "${SPRITE_FOUNDRY_LORA_ROOT}" -type f -name '*.safetensors' -print -quit 2>/dev/null || true)"
+  fi
+fi
+
+if [[ -n "${lora_path}" && -z "${lora_trigger}" ]]; then
+  lora_path_lower="${lora_path,,}"
+  if [[ "${lora_path_lower}" == *mks0813* ]]; then
+    lora_trigger="pxlstl"
+  elif [[ "${lora_path_lower}" == *skyasl* || "${lora_path_lower}" == *pixel_artist* || "${lora_path_lower}" == *pixel-artist-z* ]]; then
+    lora_trigger="a pixel art character"
+  elif [[ "${lora_path_lower}" == *tarn59* || "${lora_path_lower}" == *pixel_art_style* ]]; then
+    lora_trigger="Pixel art style."
+  fi
+fi
+
 if [[ "${generation_path}" == "nymphscore" && -n "${subject_prompt}" ]]; then
   safe_subject_id="$(python3 - "${subject_id:-sprite_subject}" <<'PY'
 from __future__ import annotations

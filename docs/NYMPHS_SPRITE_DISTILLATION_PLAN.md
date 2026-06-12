@@ -762,9 +762,21 @@ Patch direction for `1.2.22`:
   `controlnet_guidance_scale: 1.0`.
 - Record `controlnet_guidance_scale` in `recipe.json`.
 
+Follow-up patch for `1.2.23`:
+
+- A test run exposed that `foundry_generate` could still receive no LoRA path
+  from the UI/Manager action args.
+- The generate action now has a deterministic Nymphs Sprite LoRA fallback:
+  prefer bundled mks0813, then SkyAsl, then tarn59, then the first local
+  `.safetensors` under `$HOME/LoRA/loras`.
+- This fallback also assigns the known trigger for bundled LoRAs.
+- This is intentionally different from the removed Z-Image `/api/loras`
+  fallback: it does not ask the backend for its latest/random LoRA and should
+  avoid the previous tarn59 + `pxlstl` mismatch.
+
 Next validation:
 
-1. Update the test WSL to Nymphs Sprite `1.2.22`.
+1. Update the test WSL to Nymphs Sprite `1.2.23`.
 2. Start Z-Image fresh if the backend gets wedged after a failed run.
 3. Run the same 8-way Goblin Scout set.
 4. Confirm the new `recipe.json` uses the selected mks0813 LoRA path and
