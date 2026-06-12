@@ -2147,6 +2147,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--height", type=int, default=1024)
     p.add_argument("--steps", type=int, default=9)
     p.add_argument("--guidance-scale", type=float, default=0.0)
+    p.add_argument("--controlnet-guidance-scale", type=float, default=1.0)
     p.add_argument("--nunchaku-rank", type=int, default=32)
     p.add_argument("--nunchaku-precision", default="auto", choices=["auto", "int4", "fp4"])
     p.add_argument("--sprite-size", type=int, default=96)

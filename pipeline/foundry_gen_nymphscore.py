@@ -491,7 +491,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     direction_seeds: dict[str, int] = {}
     controlnet_used: list[str] = []
     controlnet_scale = guide_strength_scale(args.guide_strength)
-    controlnet_guidance_scale = args.controlnet_guidance_scale
+    controlnet_guidance_scale = getattr(args, "controlnet_guidance_scale", 1.0)
 
     for index, (direction_name, direction_prompt) in enumerate(directions, start=1):
         item_seed = seed + (index - 1) * args.seed_step

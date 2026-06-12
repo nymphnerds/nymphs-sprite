@@ -774,9 +774,18 @@ Follow-up patch for `1.2.23`:
   fallback: it does not ask the backend for its latest/random LoRA and should
   avoid the previous tarn59 + `pxlstl` mismatch.
 
+Follow-up patch for `1.2.24`:
+
+- The real Manager action launches through `foundry.cli generate-nymphscore`,
+  not directly through `pipeline/foundry_gen_nymphscore.py`.
+- `1.2.22` added `--controlnet-guidance-scale` only to the pipeline parser, so
+  the CLI-created `Namespace` lacked `controlnet_guidance_scale` and crashed
+  before the garbled-output fix could be tested.
+- Added the missing CLI arg and a defensive runner default of `1.0`.
+
 Next validation:
 
-1. Update the test WSL to Nymphs Sprite `1.2.23`.
+1. Update the test WSL to Nymphs Sprite `1.2.24`.
 2. Start Z-Image fresh if the backend gets wedged after a failed run.
 3. Run the same 8-way Goblin Scout set.
 4. Confirm the new `recipe.json` uses the selected mks0813 LoRA path and
