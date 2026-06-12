@@ -2100,6 +2100,9 @@
     function buildModuleArgs() {
       const zSelection = zImageSelection();
       const preset = currentPreset();
+      const selectedLoraOption = $("lora-choice").selectedOptions[0];
+      const selectedLoraPath = selectedLoraOption?.dataset.path || state.selectedLoraPath || "";
+      state.selectedLoraPath = selectedLoraPath;
       const args = {
         "generation-path": value("foundry-method") || "nymphscore",
         config: preset.sourceConfig || "pipeline/chars/goblin_scout.json",
@@ -2119,7 +2122,7 @@
       };
       addEncodedArg(args, "subject-prompt", value("subject-prompt"));
       addEncodedArg(args, "negative-prompt", value("negative-prompt"));
-      addEncodedArg(args, "lora-path", state.selectedLoraPath);
+      addEncodedArg(args, "lora-path", selectedLoraPath);
       addEncodedArg(args, "lora-trigger", value("lora-trigger"));
       return compactArgs(args);
     }

@@ -24,7 +24,7 @@ from typing import Any
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 from foundry import db
-from pipeline.nymphscore_client import generate_zimage, latest_lora_path, output_path
+from pipeline.nymphscore_client import generate_zimage, output_path
 
 
 FOUNDRY_ROOT = Path(__file__).parent.parent
@@ -367,6 +367,7 @@ def build_payload(
     seed: int,
     control_image: str | None = None,
     controlnet_scale: float = 0.75,
+    controlnet_guidance_scale: float | None = None,
 ) -> dict[str, Any]:
     negative = str(config.get("negative_prompt") or "")
     full_negative = f"{negative}, {NEGATIVE_BG}" if negative else NEGATIVE_BG
@@ -403,6 +404,8 @@ def build_payload(
         payload["mode"] = "controlnet_edit"
         payload["image"] = control_image
         payload["controlnet_conditioning_scale"] = controlnet_scale
+        if controlnet_guidance_scale is not None:
+            payload["guidance_scale"] = controlnet_guidance_scale
     return payload
 
 
@@ -438,9 +441,9 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     subject_id = config["subject_id"]
     display_name = config.get("display_name") or subject_id
     seed = args.seed if args.seed is not None else int(config["seed"])
-    lora_path = args.lora_path or latest_lora_path(args.nymphscore_url)
+    lora_path = args.lora_path
     if not lora_path:
-        raise SystemExit("No LoRA path supplied and Nymphs Image /api/loras returned no available LoRAs.")
+        raise SystemExit("No LoRA path supplied. Choose a Nymphs Sprite LoRA in the UI before generating.")
     pose_set = latest_pose_lab_set(subject_id, len(directions))
     pose_set_path: Path | None = None
     pose_directions: dict[str, Any] = {}
@@ -488,6 +491,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     direction_seeds: dict[str, int] = {}
     controlnet_used: list[str] = []
     controlnet_scale = guide_strength_scale(args.guide_strength)
+    controlnet_guidance_scale = args.controlnet_guidance_scale
 
     for index, (direction_name, direction_prompt) in enumerate(directions, start=1):
         item_seed = seed + (index - 1) * args.seed_step
@@ -508,6 +512,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
             seed=item_seed,
             control_image=control_image,
             controlnet_scale=controlnet_scale,
+            controlnet_guidance_scale=controlnet_guidance_scale,
         )
         try:
             response = generate_zimage(args.nymphscore_url, payload)
@@ -593,6 +598,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
         "pose_lab_ref_set": str(pose_set_path) if pose_set_path else "",
         "controlnet_directions": controlnet_used,
         "controlnet_conditioning_scale": controlnet_scale if controlnet_used else None,
+        "controlnet_guidance_scale": controlnet_guidance_scale if controlnet_used else None,
     }
     (out_dir / "recipe.json").write_text(json.dumps(recipe, indent=2), encoding="utf-8")
     (out_dir / "manifest.json").write_text(
@@ -680,6 +686,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--height", type=int, default=1024)
     parser.add_argument("--steps", type=int, default=9)
     parser.add_argument("--guidance-scale", type=float, default=0.0)
+    parser.add_argument("--controlnet-guidance-scale", type=float, default=1.0)
     parser.add_argument("--nunchaku-rank", type=int, default=32)
     parser.add_argument("--nunchaku-precision", default="auto", choices=["auto", "int4", "fp4"])
     parser.add_argument("--sprite-size", type=int, default=96)

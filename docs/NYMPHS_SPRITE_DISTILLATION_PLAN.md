@@ -728,5 +728,52 @@ Useful research conclusions so far:
 - Keep the everyday UI simple.
 - Keep experimental flows available only as reference or Advanced tools until
   they prove they make better sprites.
+
+## Resume Checkpoint: 2026-06-12
+
+Current test symptom:
+
+- A guided 8-way Goblin Scout run completed and saved all direction outputs,
+  but the saved images were blue/white/black unresolved noise rather than
+  sprites.
+- The UI showed the run as done, and `manifest.json` confirmed the backend
+  returned `mode: controlnet_edit` for every direction.
+- This means the Pose Lab handoff reached Z-Image ControlNet. The failure is
+  not that Pose Lab refs were missing from the runner.
+
+Important finding:
+
+- The recipe for the failed run used:
+  `/home/nymph/LoRA/loras/tarn59_pixel_art/tarn59_pixel_art.safetensors`
+  while still using the `pxlstl` trigger that belongs to the mks0813 LoRA.
+- The UI/status path was showing the mks0813 LoRA, so this pointed to a stale
+  or fallback LoRA path during argument assembly.
+- The runner also sent `guidance_scale: 0.0` into `controlnet_edit`. Plain
+  Z-Image Turbo txt2img commonly uses zero guidance, but the known
+  ControlNet-edit notes used CFG/guidance around `1.0`.
+
+Patch direction for `1.2.22`:
+
+- Do not silently fall back to the latest LoRA reported by Z-Image. If no LoRA
+  path is supplied, fail clearly and ask the user to choose one.
+- Build the generate args from the actual selected LoRA dropdown option so the
+  payload matches what the UI shows.
+- Keep normal txt2img guidance at `0.0`, but send ControlNet generations with
+  `controlnet_guidance_scale: 1.0`.
+- Record `controlnet_guidance_scale` in `recipe.json`.
+
+Next validation:
+
+1. Update the test WSL to Nymphs Sprite `1.2.22`.
+2. Start Z-Image fresh if the backend gets wedged after a failed run.
+3. Run the same 8-way Goblin Scout set.
+4. Confirm the new `recipe.json` uses the selected mks0813 LoRA path and
+   `lora_trigger: pxlstl`.
+5. Confirm `controlnet_directions` contains all generated directions.
+6. Confirm `controlnet_guidance_scale` is `1.0`.
+7. If outputs are still unresolved noise, isolate with a no-LoRA direct
+   `controlnet_edit` probe before blaming Pose Lab. If no-LoRA also produces
+   noise, investigate the Z-Image ControlNet runtime/adaptation. If no-LoRA
+   works, investigate LoRA + ControlNet interaction and scale.
 - A working 8-direction generator matters more than preserving every old
   Foundry feature.
