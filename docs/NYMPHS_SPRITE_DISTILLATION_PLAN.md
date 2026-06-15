@@ -57,7 +57,7 @@ clear reason to inspect files directly.
 Current published module version:
 
 ```text
-Nymphs Sprite 1.2.33
+Nymphs Sprite 1.2.34
 ```
 
 Current module identity:
@@ -125,6 +125,8 @@ Sidebar order:
 4. Generate
    [collapsed] Optional Outputs
      [x] Pixelated final sprites
+       Sprite Size
+       Palette
      [ ] Depth/normal maps
      Map Backend: Depth Anything / MiDaS
      Map Source: Pre-pixel cutout / Final sprite / Raw image
@@ -918,13 +920,15 @@ Build and test from the top down.
 ### 3. Style
 
 - Pick LoRA.
-- Pick sprite size and palette options.
+- Style controls are model/style inputs, not Python pixelation.
 - Keep advanced model/rank/seed/step controls available but not dominant.
 
 ### 4. Generate
 
 - Generate all selected directions through Z-Image.
 - Use Pose Lab body/direction guides as ControlNet refs.
+- Optional Outputs contains postprocess/export extras:
+  pixelated final sprites, sprite size, palette, and depth/normal maps.
 - Save into Nymphs Sprite output folders.
 - One main button should cover the normal path.
 
@@ -1111,7 +1115,7 @@ Test in small slices.
 
 ## Immediate Next Implementation Order
 
-1. Test/update installed Nymphs Sprite `1.2.33` or newer in the `NymphsCore`
+1. Test/update installed Nymphs Sprite `1.2.34` or newer in the `NymphsCore`
    test WSL.
 2. Confirm status panel and LoRA dropdown are fixed after restart/update.
 3. Open Pose Lab, move points in one direction, switch slots, and confirm the
@@ -1148,7 +1152,7 @@ Expected current status signs:
 
 ```text
 id=nymphs-sprite
-version=1.2.33 or newer
+version=1.2.34 or newer
 controlnet_ready=true
 models_ready=true
 lora_choices=...
@@ -1166,7 +1170,7 @@ Current source-of-truth repos:
 
 Latest target module state:
 
-- Nymphs Sprite `1.2.33`
+- Nymphs Sprite `1.2.34`
 - Purpose: wire live Pose Lab JSON refs into Z-Image ControlNet generation.
 
 What changed in the latest working idea:
@@ -1205,7 +1209,7 @@ Known untested / risky areas:
 
 Next best pickup steps:
 
-1. Update/install Nymphs Sprite `1.2.33+` on the `NymphsCore` test WSL.
+1. Update/install Nymphs Sprite `1.2.34+` on the `NymphsCore` test WSL.
 2. Open Pose Lab and confirm the bottom strip immediately shows all 8 slots.
 3. Switch to 16 directions and confirm all 16 live JSON slots appear.
 4. Click several strip slots and confirm the main editor changes direction.
@@ -1641,7 +1645,7 @@ Backend attempt:
 - Same-pass ControlNet + LoRA was restored as the intended product path after
   the Z-Image `0.1.114` packed-LoRA compatibility fix. If checker/noise appears
   again, first confirm the test WSL has both Nymphs Image `0.1.114+` and Nymphs
-  Sprite `1.2.33+` installed.
+  Sprite `1.2.34+` installed.
 
 Current Sprite behavior after the 2026-06-15 cleanup:
 
@@ -1670,7 +1674,7 @@ result:
 That installed-runtime result is now treated as stale/mismatched-runtime
 evidence, not the current product stance. Normal generation should stay
 same-pass unless a fresh test on Nymphs Image `0.1.114+` and Nymphs Sprite
-`1.2.33+` proves otherwise.
+`1.2.34+` proves otherwise.
 
 Next backend/frontend work:
 
