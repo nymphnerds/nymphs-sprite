@@ -1351,7 +1351,9 @@
       const zReady = yes(values.zimage_models_ready);
       const zRunning = yes(values.zimage_running);
       const controlReady = yes(values.controlnet_ready);
-      if (!state.zModelTouched) $("z-model-choice").value = zModelChoiceFromStatus(values);
+      // Keep Sprite's batch default stable. The shared Z-Image backend may be
+      // running a heavier rank from another workflow; do not silently inherit it.
+      if (!$("z-model-choice").value) $("z-model-choice").value = "auto_r32";
 
       $("status-pill").textContent = statusLabel();
       $("status-pill").className = statusClass();
@@ -2860,7 +2862,7 @@
     }
 
     function zImageSelection() {
-      const choice = $("z-model-choice")?.value || zModelChoiceFromStatus(state.statusValues || {});
+      const choice = $("z-model-choice")?.value || "auto_r32";
       const [precision, rawRank] = String(choice || "auto_r32").split("_r");
       const rank = parseInt(rawRank || "32", 10);
       return {

@@ -57,7 +57,7 @@ clear reason to inspect files directly.
 Current published module version:
 
 ```text
-Nymphs Sprite 1.2.37
+Nymphs Sprite 1.2.38
 ```
 
 Current module identity:
@@ -278,6 +278,25 @@ output_dir: Nymphs Sprite backend staging folder
 The normal product path is same-pass ControlNet + LoRA. The old staged path was
 a temporary diagnostic workaround from the broken-backend period; keep it only
 for isolating regressions.
+
+### Nunchaku Rank Safety
+
+Sprite batch generation should default to `r32` unless the user explicitly
+chooses a heavier model rank in the Advanced model dropdown.
+
+The model dropdown must remain user-selectable:
+
+```text
+Z-Image Nunchaku r32   default for sprite batches
+Z-Image Nunchaku r128  manual high-rank test path
+Z-Image Nunchaku r256  manual high-rank test path
+```
+
+Do not silently inherit the rank from the shared Nymphs Image backend status.
+That backend can already be loaded at `r128` or `r256` from another workflow,
+and a 1024px multi-direction Sprite batch with ControlNet + LoRA can saturate a
+16GB GPU and stall mid-denoise. The UI should show the user's selected model,
+not auto-switch to the running backend's current rank.
 
 Raw direction output is moved to:
 
