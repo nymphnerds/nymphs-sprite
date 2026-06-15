@@ -298,6 +298,31 @@ and a 1024px multi-direction Sprite batch with ControlNet + LoRA can saturate a
 16GB GPU and stall mid-denoise. The UI should show the user's selected model,
 not auto-switch to the running backend's current rank.
 
+Latest observed stall:
+
+```text
+Nunchaku ControlNet denoising step 5/9
+1024x1024
+ControlNet + LoRA
+--nunchaku-rank 128
+GPU VRAM near full on a 16GB card
+```
+
+This is treated as a rank/VRAM stall, not a prompt or postprocess issue.
+`1.2.38` fixes the UI footgun where the shared backend status could silently
+move the Sprite model dropdown from `r32` to `r128`.
+
+Next test checklist:
+
+```text
+1. Update Nymphs Sprite on the test WSL.
+2. Kill/restart any wedged Z-Image backend left from an r128 run.
+3. Open Nymphs Sprite -> Advanced.
+4. Confirm Model remains "Z-Image Nunchaku r32" unless manually changed.
+5. Generate 8 directions with postprocess off first.
+6. Judge <direction>_raw.png before judging cutout/pixelated outputs.
+```
+
 Raw direction output is moved to:
 
 ```text
