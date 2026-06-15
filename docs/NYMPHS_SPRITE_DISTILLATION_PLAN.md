@@ -57,7 +57,7 @@ clear reason to inspect files directly.
 Current published module version:
 
 ```text
-Nymphs Sprite 1.2.29
+Nymphs Sprite 1.2.30
 ```
 
 Current module identity:
@@ -110,6 +110,39 @@ $HOME/NymphsData/logs/nymphs-sprite/
 Do not silently dump final sprite assets into generic Nymphs Image / Z-Image
 output folders. Passing an explicit output directory to the backend is the
 correct pattern.
+
+## Generate Optional Maps UI
+
+Depth/normal maps are an optional part of the single Generate flow, not a
+second user action.
+
+Sidebar order:
+
+```text
+1. Character
+2. Pose Lab
+3. Style
+4. Generate
+   [collapsed] Optional Outputs
+     [ ] Depth/normal maps
+     Map Backend: Depth Anything / MiDaS
+     Map Source: Pre-pixel cutout / Final sprite / Raw image
+   [Generate Sprite Set]
+5. Review
+```
+
+Runtime order when maps are enabled:
+
+```text
+Nymphs Sprite UI -> foundry_generate
+Nymphs Sprite pipeline generates sprites through Nymphs Image / Z-Image
+Nymphs Sprite postprocess saves cutouts and sprites
+Nymphs Sprite derive-maps runs from the selected source, default cutout
+UI shows the normal sprite outputs plus map_review.png in the same batch strip
+```
+
+Keep this as one Generate button. The map controls are deliberately collapsed
+inside Generate because they are optional outputs from the same run.
 
 ## Current Runtime Model
 
@@ -1040,7 +1073,7 @@ Test in small slices.
 
 ## Immediate Next Implementation Order
 
-1. Test/update installed Nymphs Sprite `1.2.29` or newer in the `NymphsCore`
+1. Test/update installed Nymphs Sprite `1.2.30` or newer in the `NymphsCore`
    test WSL.
 2. Confirm status panel and LoRA dropdown are fixed after restart/update.
 3. Open Pose Lab, move points in one direction, switch slots, and confirm the
@@ -1077,7 +1110,7 @@ Expected current status signs:
 
 ```text
 id=nymphs-sprite
-version=1.2.29 or newer
+version=1.2.30 or newer
 controlnet_ready=true
 models_ready=true
 lora_choices=...
@@ -1095,7 +1128,7 @@ Current source-of-truth repos:
 
 Latest target module state:
 
-- Nymphs Sprite `1.2.29`
+- Nymphs Sprite `1.2.30`
 - Purpose: wire live Pose Lab JSON refs into Z-Image ControlNet generation.
 
 What changed in the latest working idea:
@@ -1134,7 +1167,7 @@ Known untested / risky areas:
 
 Next best pickup steps:
 
-1. Update/install Nymphs Sprite `1.2.29+` on the `NymphsCore` test WSL.
+1. Update/install Nymphs Sprite `1.2.30+` on the `NymphsCore` test WSL.
 2. Open Pose Lab and confirm the bottom strip immediately shows all 8 slots.
 3. Switch to 16 directions and confirm all 16 live JSON slots appear.
 4. Click several strip slots and confirm the main editor changes direction.

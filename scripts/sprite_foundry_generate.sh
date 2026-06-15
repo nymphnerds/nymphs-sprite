@@ -30,6 +30,10 @@ body_class=""
 depth_refs=""
 edge_refs=""
 subject_id=""
+generate_maps="false"
+map_backend="depth_anything"
+map_source="cutout"
+map_device="auto"
 subject_prompt_parts=()
 negative_prompt_parts=()
 lora_path_parts=()
@@ -152,6 +156,35 @@ while [[ $# -gt 0 ]]; do
       ;;
     --edge-refs)
       edge_refs="$2"
+      shift 2
+      ;;
+    --generate-maps)
+      if [[ "${2:-}" == "true" || "${2:-}" == "false" ]]; then
+        generate_maps="$2"
+        shift 2
+      else
+        generate_maps="true"
+        shift
+      fi
+      ;;
+    --generate-maps=true)
+      generate_maps="true"
+      shift
+      ;;
+    --generate-maps=false)
+      generate_maps="false"
+      shift
+      ;;
+    --map-backend)
+      map_backend="$2"
+      shift 2
+      ;;
+    --map-source)
+      map_source="$2"
+      shift 2
+      ;;
+    --map-device)
+      map_device="$2"
       shift 2
       ;;
     *)
@@ -362,6 +395,41 @@ cmd+=("${extra_args[@]}")
   printf 'lora_img2img_strength=%s\n' "${lora_img2img_strength:-0.45}"
   printf 'debug_no_lora=%s\n' "${debug_no_lora}"
   printf 'max_directions=%s\n' "${max_directions:-all}"
+  printf 'generate_maps=%s\n' "${generate_maps}"
+  printf 'map_backend=%s\n' "${map_backend}"
+  printf 'map_source=%s\n' "${map_source}"
 } >> "${SPRITE_FOUNDRY_LOG_FILE}"
 
-exec "${cmd[@]}"
+"${cmd[@]}"
+
+if [[ "${generate_maps}" == "true" ]]; then
+  if [[ "${generation_path}" != "nymphscore" ]]; then
+    echo "MAP STAGE SKIP: optional maps only run after the NymphsCore / Z-Image flow."
+    exit 0
+  fi
+  map_subject="${subject_id:-${safe_subject_id:-}}"
+  if [[ -z "${map_subject}" ]]; then
+    map_subject="$("${python_bin}" - "${config}" <<'PY'
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+try:
+    payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+except Exception:
+    payload = {}
+print(str(payload.get("subject_id") or "sprite_subject"))
+PY
+)"
+  fi
+  echo "MAP STAGE START: backend=${map_backend} source=${map_source}"
+  "${python_bin}" -m foundry.cli derive-maps \
+    --subject "${map_subject}" \
+    --direction-count "${direction_count}" \
+    --source "${map_source}" \
+    --backend "${map_backend}" \
+    --device "${map_device}" \
+    --sprite-size "${sprite_size}"
+fi

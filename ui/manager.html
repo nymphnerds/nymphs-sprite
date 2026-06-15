@@ -743,6 +743,22 @@
     .pose-lab summary::before {
       color: var(--cyan);
     }
+    .check-row {
+      align-items: center;
+      color: var(--text);
+      display: flex;
+      font-size: 14px;
+      font-weight: 800;
+      gap: 10px;
+      letter-spacing: 0;
+      margin: 10px 0 12px;
+      text-transform: none;
+    }
+    .check-row input {
+      accent-color: var(--green);
+      height: 18px;
+      width: 18px;
+    }
     .pose-editor-wrap {
       border: 1px solid rgba(33, 71, 74, 0.72);
       border-radius: 6px;
@@ -938,6 +954,31 @@
 
       <section class="section">
         <div class="section-title"><span>Generate</span><span>4</span></div>
+        <details id="optional-outputs-panel">
+          <summary>Optional Outputs</summary>
+          <p class="flow-note">Extra assets created from this sprite run.</p>
+          <label class="check-row">
+            <input id="generate-maps" type="checkbox">
+            <span>Depth/normal maps</span>
+          </label>
+          <div class="grid">
+            <div class="field wide">
+              <label for="map-backend">Map Backend</label>
+              <select id="map-backend">
+                <option value="depth_anything">Depth Anything</option>
+                <option value="midas">MiDaS</option>
+              </select>
+            </div>
+            <div class="field wide">
+              <label for="map-source">Map Source</label>
+              <select id="map-source">
+                <option value="cutout">Pre-pixel cutout</option>
+                <option value="processed">Final sprite</option>
+                <option value="raw">Raw image</option>
+              </select>
+            </div>
+          </div>
+        </details>
         <div class="command-row">
           <button id="generate-foundry" class="primary" type="button">Generate Sprite Set</button>
         </div>
@@ -1387,6 +1428,8 @@
         if (kv) addOutput(kv[2].trim(), kv[1].replace(/^output_/, ""));
         const named = line.match(/^\s*(Raw inspection|Pixel contact):\s+(.+\.(?:png|jpg|jpeg|webp))\s*$/i);
         if (named) addOutput(named[2].trim(), named[1].toLowerCase());
+        const mapReview = line.match(/^\s*Review:\s+(.+\.(?:png|jpg|jpeg|webp))\s*$/i);
+        if (mapReview) addOutput(mapReview[1].trim(), "maps");
         const directionDone = line.match(/^\s*\[([a-z_]+)\]\s+generate\b.*\bOK\b/);
         if (directionDone && state.activeRunOutputDir) {
           const direction = directionDone[1];
@@ -1427,6 +1470,12 @@
         setProgress("Backend", "Backend ready.", 15);
       } else if (line.includes("No Z-Image LoRA weights matched")) {
         setProgress("Error", "Selected LoRA is incompatible with this Nunchaku runtime.", 0);
+      } else if (line.includes("MAP STAGE START") || line.includes("Deriving maps")) {
+        setProgress("Maps", "Generating optional depth/normal maps.", 92);
+      } else if (line.includes("Map stage complete")) {
+        setProgress("Maps", "Depth/normal maps ready.", 96);
+      } else if (/^\s*Review:\s+.+map_review\.(?:png|jpg|jpeg|webp)/i.test(line)) {
+        setProgress("Maps", "Map review ready.", 98);
       } else if (line.includes("MODEL FETCH STATUS") || line.includes("LORA FETCH STATUS")) {
         setProgress("Fetch", line.replace(/\s+/g, " "), 45);
       } else if (line.startsWith("generate=")) {
@@ -2120,6 +2169,11 @@
         "nunchaku-rank": String(zSelection.nunchaku_rank),
         "nunchaku-precision": zSelection.nunchaku_precision
       };
+      if ($("generate-maps")?.checked) {
+        args["generate-maps"] = "true";
+        args["map-backend"] = value("map-backend") || "depth_anything";
+        args["map-source"] = value("map-source") || "cutout";
+      }
       addEncodedArg(args, "subject-prompt", value("subject-prompt"));
       addEncodedArg(args, "negative-prompt", value("negative-prompt"));
       addEncodedArg(args, "lora-path", selectedLoraPath);
@@ -2913,7 +2967,8 @@
       renderGallery();
       $("result-image").style.display = "none";
       $("empty").hidden = false;
-      setProgress("Generate", "Starting backend, then generating sprite set.", 10);
+      const mapsEnabled = $("generate-maps")?.checked;
+      setProgress("Generate", mapsEnabled ? "Starting backend, then generating sprite set and maps." : "Starting backend, then generating sprite set.", 10);
       setBusy(true, "Foundry");
       startActiveTaskPolling();
       (async () => {
@@ -2930,7 +2985,7 @@
           renderGallery();
           if (state.visibleOutputs[0]) showOutput(0);
         }
-        setProgress("Done", state.outputs.length ? "Foundry run ready." : "Finished.", 100);
+        setProgress("Done", state.outputs.length ? (mapsEnabled ? "Foundry run and maps ready." : "Foundry run ready.") : "Finished.", 100);
       })().catch((error) => {
         append(`ERROR: ${error.message || error}`);
         setProgress("Error", error.message || "Generation failed.", 0);
