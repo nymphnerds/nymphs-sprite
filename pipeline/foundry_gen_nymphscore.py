@@ -849,7 +849,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--guidance-scale", type=float, default=0.0)
     parser.add_argument("--controlnet-guidance-scale", type=float, default=0.0)
     parser.add_argument("--controlnet-mode", default="auto", choices=["auto", "off"])
-    parser.add_argument("--controlnet-lora-mode", default="on", choices=["on", "staged", "off"], help="on uses same-pass ControlNet + LoRA; staged runs ControlNet first, then LoRA img2img")
+    parser.add_argument("--controlnet-lora-mode", default="staged", choices=["on", "staged", "off"], help="on uses same-pass ControlNet + LoRA; staged runs ControlNet first, then LoRA img2img")
     parser.add_argument("--lora-img2img-strength", type=float, default=0.45, help="Strength for optional staged LoRA img2img refinement after Pose Lab ControlNet")
     parser.add_argument("--debug-no-lora", action="store_true", help="Diagnostic: run without LoRA to isolate ControlNet from LoRA merging")
     parser.add_argument("--max-directions", type=int, default=0, help="Diagnostic: generate only the first N directions")

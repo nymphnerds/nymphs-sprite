@@ -57,7 +57,7 @@ clear reason to inspect files directly.
 Current published module version:
 
 ```text
-Nymphs Sprite 1.2.30
+Nymphs Sprite 1.2.31
 ```
 
 Current module identity:
@@ -251,13 +251,14 @@ The Z-Image payload is normally:
 mode: controlnet_edit
 input image: temporary Pose Lab OpenPose PNG/data URL
 prompt: character/style prompt with pose language stripped back
-LoRA: selected pixel-art LoRA
+LoRA: omitted in ControlNet stage by default
 output_dir: Nymphs Sprite backend staging folder
 ```
 
-The normal target path is same-pass ControlNet + LoRA. The packed Nunchaku LoRA
-garble bug was fixed in the Z-Image compatibility shim; staged generation should
-only remain as a fallback/diagnostic path.
+The normal product path is staged ControlNet + LoRA. Same-pass ControlNet +
+LoRA remains a backend diagnostic only because the installed Nunchaku Z-Image
+runtime can still produce checker/noise when both are active in one denoise
+call.
 
 Raw direction output is moved to:
 
@@ -1073,7 +1074,7 @@ Test in small slices.
 
 ## Immediate Next Implementation Order
 
-1. Test/update installed Nymphs Sprite `1.2.30` or newer in the `NymphsCore`
+1. Test/update installed Nymphs Sprite `1.2.31` or newer in the `NymphsCore`
    test WSL.
 2. Confirm status panel and LoRA dropdown are fixed after restart/update.
 3. Open Pose Lab, move points in one direction, switch slots, and confirm the
@@ -1110,7 +1111,7 @@ Expected current status signs:
 
 ```text
 id=nymphs-sprite
-version=1.2.30 or newer
+version=1.2.31 or newer
 controlnet_ready=true
 models_ready=true
 lora_choices=...
@@ -1128,7 +1129,7 @@ Current source-of-truth repos:
 
 Latest target module state:
 
-- Nymphs Sprite `1.2.30`
+- Nymphs Sprite `1.2.31`
 - Purpose: wire live Pose Lab JSON refs into Z-Image ControlNet generation.
 
 What changed in the latest working idea:
@@ -1167,7 +1168,7 @@ Known untested / risky areas:
 
 Next best pickup steps:
 
-1. Update/install Nymphs Sprite `1.2.30+` on the `NymphsCore` test WSL.
+1. Update/install Nymphs Sprite `1.2.31+` on the `NymphsCore` test WSL.
 2. Open Pose Lab and confirm the bottom strip immediately shows all 8 slots.
 3. Switch to 16 directions and confirm all 16 live JSON slots appear.
 4. Click several strip slots and confirm the main editor changes direction.
@@ -1562,9 +1563,8 @@ Dev WSL validation:
 - Final output was not checker/noise. It is still soft and needs tuning, but
   the catastrophic corruption is gone.
 
-Current generation stance at that checkpoint was staged-by-default. This was
-superseded by the same-pass backend fix below. Keep the staged path as a
-fallback/diagnostic, but do not treat it as the desired product flow.
+Current generation stance is staged-by-default. Keep same-pass as a diagnostic
+only until the backend is proven clean again on the test WSL.
 
 Docs/source anchors for the next resume:
 
@@ -1575,7 +1575,7 @@ Docs/source anchors for the next resume:
 - VideoX-Fun native Z-Image ControlNet example:
   `https://github.com/aigc-apps/VideoX-Fun/blob/main/examples/z_image_fun/predict_t2i_control_2.1.py`
 
-## Patch Checkpoint: 2026-06-12 Same-Pass Backend Garble Fix
+## Patch Checkpoint: 2026-06-12 Same-Pass Backend Garble Attempt
 
 The checker/noise bug was not caused by Pose Lab PNG generation. It was caused
 by our Z-Image Nunchaku compatibility shim.
@@ -1599,7 +1599,7 @@ interleaves rank fragments, so slicing after packing can corrupt the base
 low-rank branch. This explains why the output looked like structured
 checker/noise instead of a normal bad image.
 
-Backend fix:
+Backend attempt:
 
 - Patched both:
   - `/home/nymph/NymphsModules/zimage/nunchaku_compat.py`
@@ -1607,14 +1607,14 @@ Backend fix:
 - Smaller tensors are still padded into the existing slot.
 - Larger packed tensors are no longer truncated; they are passed through so the
   backend uses the real expanded packed LoRA tensor.
-- Same-pass ControlNet + LoRA is now the normal Sprite path again.
+- Same-pass ControlNet + LoRA was temporarily believed clean, but a later
+  test WSL run on 2026-06-15 reproduced checker/noise again.
 
-Sprite behavior after fix:
+Sprite behavior after the 2026-06-15 regression:
 
-- `--controlnet-lora-mode` now defaults to `on`.
-- `on` means same-pass `controlnet_edit` with the selected LoRA applied.
-- `staged` remains available only as a fallback/diagnostic:
-  ControlNet first, then LoRA img2img.
+- `--controlnet-lora-mode` defaults to `staged`.
+- `staged` means ControlNet first, then LoRA img2img.
+- `on` remains available only for same-pass backend testing.
 - `off` remains a no-LoRA diagnostic path.
 
 Live dev WSL validation:
@@ -1633,14 +1633,14 @@ result:
 /home/nymph/NymphsData/outputs/nymphs-sprite/goblin_scout/front_raw.png
 ```
 
-The result was a clean green-background goblin image, not checker/noise. The
-mechanical gate still failed composition and the pose was soft/upright, so pose
-following remains a separate tuning problem.
+That result was not stable enough to make same-pass the product path. The
+2026-06-15 installed-runtime test produced checker/noise again with
+`controlnet_lora_mode=on`, so normal generation must stay staged.
 
 Next backend/frontend work:
 
 1. Tune Pose Lab control strength and prompt language for stronger pose
-   following now that same-pass generation is not corrupting tensors.
+   following in staged mode.
 2. Compare `guide_strength` values and `controlnet_guidance_scale` with
    one-direction tests before running 8/16 directions.
 3. Keep the temporary ControlNet PNGs as diagnostics, but the real editable
@@ -1650,7 +1650,7 @@ Next backend/frontend work:
 
 ## Patch Checkpoint: 2026-06-12 Pose Following Defaults
 
-After the same-pass garble fix, Pose Lab was tested as a separate issue.
+After the staged fallback, Pose Lab was tested as a separate issue.
 
 Finding:
 
