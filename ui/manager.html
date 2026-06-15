@@ -887,7 +887,7 @@
         <textarea id="subject-prompt" spellcheck="false" maxlength="620">solo, 1character, single character only, one figure, a goblin scout assassin, in a deep predatory crouch with a dark tattered hood, glowing pale yellow eyes, lean compact body wrapped in a ragged cloak, holding twin curved rusty daggers, mottled dark green skin barely visible, fully visible full body</textarea>
         <details>
           <summary>Negative</summary>
-          <textarea id="negative-prompt" spellcheck="false" maxlength="520">multiple people, two characters, group, reflection, mirror, turnaround sheet, model sheet, blurry, smooth, photorealistic, 3D render, low quality, deformed, extra limbs, text, watermark, cropped, cut off, partial body</textarea>
+          <textarea id="negative-prompt" spellcheck="false" maxlength="520">multiple people, two characters, group, reflection, mirror, turnaround sheet, model sheet, deformed, extra limbs, text, watermark, cropped, cut off, partial body, scenery, floor, ground plane, cast shadow, drop shadow, busy background</textarea>
         </details>
       </section>
 
@@ -1024,12 +1024,12 @@
                 <option value="int4_r256">Z-Image Nunchaku r256</option>
               </select>
             </div>
-            <div class="field"><label for="width">Width</label><input id="width" type="number" min="256" max="2048" step="64" value="512"></div>
-            <div class="field"><label for="height">Height</label><input id="height" type="number" min="256" max="2048" step="64" value="512"></div>
-            <div class="field"><label for="steps">Steps</label><input id="steps" type="number" min="1" max="80" value="8"></div>
+            <div class="field"><label for="width">Width</label><input id="width" type="number" min="256" max="2048" step="64" value="1024"></div>
+            <div class="field"><label for="height">Height</label><input id="height" type="number" min="256" max="2048" step="64" value="1024"></div>
+            <div class="field"><label for="steps">Steps</label><input id="steps" type="number" min="1" max="80" value="9"></div>
             <div class="field"><label for="seed">Seed</label><input id="seed" type="number" value="0"></div>
             <div class="field"><label for="lora-trigger">Trigger</label><input id="lora-trigger" maxlength="80" value="pxlstl"></div>
-            <div class="field"><label for="lora-scale">Scale</label><input id="lora-scale" type="number" min="0" max="2" step="0.05" value="1"></div>
+            <div class="field"><label for="lora-scale">Scale</label><input id="lora-scale" type="number" min="0" max="2" step="0.05" value="0.85"></div>
             <div class="field wide"><label for="run-id">Run ID</label><input id="run-id" maxlength="120" autocomplete="off"></div>
             <div class="field"><label for="review-direction">Direction</label><select id="review-direction">
               <option value="front">front</option>

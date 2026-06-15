@@ -57,7 +57,7 @@ clear reason to inspect files directly.
 Current published module version:
 
 ```text
-Nymphs Sprite 1.2.36
+Nymphs Sprite 1.2.37
 ```
 
 Current module identity:
@@ -1358,21 +1358,26 @@ Research findings:
   the Pose Lab renderer should stay OpenPose-like for now. Monochrome refs are
   a future Scribble/Canny experiment, not the default Pose path.
 
-Patch direction after the noisy `1.2.24` test:
+Current prompt rule:
 
-- Restore documented-ish ControlNet strength defaults:
-  `soft=0.65`, `normal=0.75`, `strong=0.90`.
-- Make ControlNet generation default to `controlnet_guidance_scale=4.0` while
-  leaving plain txt2img guidance at `0.0`.
-- Render Pose Lab refs as slimmer colored OpenPose-style lines, not huge neon
-  sticks and not monochrome Canny-like lines.
-- Save the exact temporary ControlNet ref PNGs as
-  `<direction>_control.png` beside the run outputs for debugging. These are not
-  the long-term preset storage format; Pose Lab sets remain JSON-first.
-- Add diagnostic flags:
-  `--controlnet-mode off`,
-  `--debug-no-lora`,
-  `--max-directions N`.
+- LoRA owns style.
+- Pose Lab owns pose and direction when ControlNet refs exist.
+- The generation payload strips inherited style clauses before sending prompts
+  to Z-Image: no `pixel art`, `sprite`, `HD-2D`, `48px`, green-screen,
+  photorealistic, 3D-render, smooth/blurry, or similar style-fighting text.
+- The final positive prompt is intentionally small:
+  LoRA trigger + cleaned character identity + no-background/no-shadow output
+  constraints + Pose Lab control instruction.
+- The final negative prompt keeps mechanical exclusions and adds no background,
+  no floor/ground plane, no cast/drop/contact shadow.
+- ControlNet guidance stays at `0.0`; do not reintroduce the old CFG-4
+  experiment unless a fresh backend test proves it is needed.
+
+Useful diagnostic flags remain:
+
+- `--controlnet-mode off`
+- `--debug-no-lora`
+- `--max-directions N`
 
 Immediate test matrix:
 
@@ -1743,5 +1748,61 @@ Current stance:
 - If the output is clean but pose still feels soft, first try `Ref Strength:
   Strong`.
 - Keep ControlNet guidance/CFG at `0.0` by default for Pose Lab runs.
-- Prompt text should describe identity/style, not limb placement; Pose Lab owns
-  limb placement.
+- Prompt text should describe identity, not visual style or limb placement.
+  LoRA owns style. Pose Lab owns limb placement.
+
+## Patch Checkpoint: 2026-06-15 Prompt Ownership Cleanup
+
+Problem:
+
+- Raw ControlNet + LoRA output still looked far worse than expected.
+- Postprocess could be disabled, but the request still carried inherited
+  Foundry style language: `pixel art`, `sprite`, `HD-2D`, green-screen,
+  `48px`, photorealistic/3D-render negatives, and direction text that could
+  fight Pose Lab.
+
+Implemented:
+
+- `pipeline/foundry_gen_nymphscore.py` now cleans every generation payload at
+  runtime, including prompt presets and typed prompts.
+- Style clauses are stripped before sending to Z-Image.
+- Pose clauses are stripped when Pose Lab ControlNet refs are active.
+- ControlNet runs no longer append text direction prompts; the Pose Lab PNG is
+  the direction/pose authority.
+- Positive prompt shape is now:
+
+```text
+LoRA trigger
+cleaned character identity
+single full body / isolated figure / no background / no shadow constraints
+Pose Lab control instruction, only when ControlNet is active
+```
+
+- Negative prompt shape is now:
+
+```text
+cleaned mechanical negatives
+no multiple characters
+no text/watermark/frame
+no scenery/background/floor/ground plane
+no cast/drop/contact shadow
+Pose mismatch negatives, only when ControlNet is active
+```
+
+- UI defaults now match the backend defaults:
+
+```text
+width=1024
+height=1024
+steps=9
+lora_scale=0.85
+```
+
+Next test:
+
+1. Update/install Nymphs Sprite `1.2.37+` on the test WSL.
+2. Disable Sprite postprocess for the first check.
+3. Run one or two directions with mks0813 and Pose Lab refs.
+4. Inspect raw outputs first. Do not judge the Python pixel/cutout stage until
+   the raw Z-Image + LoRA + ControlNet result looks like the expected model
+   quality.

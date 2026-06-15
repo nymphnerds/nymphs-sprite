@@ -25,7 +25,7 @@ accepted results as structured game assets.
 The first working target is a dependable 8-direction flow, with 16 directions
 available for experiments when the extra coverage is worth the extra runtime:
 
-- Define a character prompt, subject id, sprite size, seed, LoRA, and style.
+- Define a character prompt, subject id, seed, LoRA, and optional outputs.
 - Generate one attempt per direction with the Nymphs Image backend.
 - Review results by direction.
 - Regenerate weak directions without throwing away the whole set.
@@ -115,9 +115,16 @@ exported for inspection, but stored pose libraries should stay JSON-first.
 
 ### Style
 
-Pick the LoRA/style inputs. Sprite postprocess, pixel resize, sprite size, and
-palette live under Generate -> Optional Outputs so raw model debugging stays
-separate from cleanup/export decisions.
+Pick the LoRA. The LoRA owns visual style. Nymphs Sprite cleans inherited
+prompt presets before generation so style words like pixel art, sprite, HD-2D,
+green-screen, photorealistic, and 3D render do not fight the selected LoRA.
+The final prompt sent to Z-Image is intentionally small: LoRA trigger, cleaned
+character identity, no-background/no-shadow constraints, and the Pose Lab
+control instruction when ControlNet is active.
+
+Sprite postprocess, pixel resize, sprite size, and palette live under Generate
+-> Optional Outputs so raw model debugging stays separate from cleanup/export
+decisions.
 
 ### Generate
 

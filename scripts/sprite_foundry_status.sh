@@ -40,7 +40,7 @@ downloaded_loras=none
 selected_lora_candidate=""
 selected_lora_path=""
 selected_lora_trigger="pxlstl"
-selected_lora_scale="1"
+selected_lora_scale="0.85"
 
 if sprite_foundry_controlnet_ready; then
   controlnet_ready=true
@@ -75,7 +75,7 @@ candidates = {
             "mks0813_pixel_art.safetensors",
         ],
         "trigger": "pxlstl",
-        "scale": "1",
+        "scale": "0.85",
     },
     "SkyAsl--Pixel-artist-Z": {
         "profile": "nymphs_sprite_lora_skyasl_pixel_artist",
@@ -86,7 +86,7 @@ candidates = {
             "skyasl_pixel_artist.safetensors",
         ],
         "trigger": "a pixel art character",
-        "scale": "1",
+        "scale": "0.85",
     },
     "tarn59--pixel_art_style_lora_z_image_turbo": {
         "profile": "nymphs_sprite_lora_tarn59_pixel_art",
@@ -97,7 +97,7 @@ candidates = {
             "tarn59_pixel_art.safetensors",
         ],
         "trigger": "Pixel art style.",
-        "scale": "1",
+        "scale": "0.85",
     },
 }
 

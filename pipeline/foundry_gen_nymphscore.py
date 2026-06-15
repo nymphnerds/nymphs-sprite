@@ -62,13 +62,15 @@ DIRECTIONS_16 = [
 ]
 DIRECTIONS = DIRECTIONS_8
 
-STYLE_SUFFIX = (
-    "pixel art sprite, game character sprite, 2D RPG, clean readable silhouette, "
-    "centered full body character, isolated figure, bright green background, "
-    "crisp sprite design, HD-2D inspired, single character only"
+OUTPUT_CONSTRAINT_PROMPT = (
+    "single full body character only, isolated figure, plain empty background, "
+    "no scenery, no floor, no ground plane, no cast shadow"
 )
-
-NEGATIVE_BG = "white background, gray background, grey background, beige background, gradient background"
+OUTPUT_CONSTRAINT_NEGATIVE = (
+    "multiple characters, group, crowd, duplicate character, cropped body, cut off body, "
+    "partial body, text, watermark, signature, frame, border, scenery, landscape, room, "
+    "floor, ground plane, cast shadow, drop shadow, contact shadow, busy background"
+)
 POSE_CONTROL_PROMPT = (
     "mandatory Pose Lab control reference, match the supplied control reference for body pose, "
     "limb placement, stance, silhouette, and direction, do not invent a different pose"
@@ -85,6 +87,23 @@ POSE_CONFLICT_PATTERN = re.compile(
     r"arms?|hands?|legs?|feet|foot|knees?|ankles?|wrist|elbow|shoulder|"
     r"holding|held|gripping|raised|overhead|at sides?|profile view|side view|front view|rear view|"
     r"looking at camera|looking left|looking right|facing"
+    r")\b",
+    re.IGNORECASE,
+)
+STYLE_CONFLICT_PATTERN = re.compile(
+    r"\b("
+    r"pixel\s*art|sprite|2d\s*rpg|hd-?2d|48\s*px|48px|top[- ]down|"
+    r"game\s+character|fantasy\s+horror\s+boss\s+creature|chibi|cartoon|"
+    r"photorealistic|photo[- ]?realistic|3d\s+render|rendered|smooth|blurry|"
+    r"bright\s+green\s+background|green\s+background|chroma\s*key|transparent\s+background"
+    r")\b",
+    re.IGNORECASE,
+)
+IDENTITY_PROP_PATTERN = re.compile(
+    r"\b("
+    r"dagger|daggers|knife|knives|sword|blade|bow|staff|shield|club|axe|"
+    r"weapon|quiver|arrow|arrows|robe|cloak|hood|helmet|armor|armour|"
+    r"hat|mask|visor|bag|belt|boots|gloves|wings|tail|antennae|horns"
     r")\b",
     re.IGNORECASE,
 )
@@ -300,10 +319,26 @@ def image_file_data_url(path: Path) -> str:
     return "data:image/png;base64," + base64.b64encode(path.read_bytes()).decode("ascii")
 
 
-def pose_safe_text(text: str) -> str:
+def clean_prompt_text(text: str, *, strip_pose: bool = False, strip_style: bool = True) -> str:
     clauses = [clause.strip() for clause in str(text or "").split(",")]
-    kept = [clause for clause in clauses if clause and not POSE_CONFLICT_PATTERN.search(clause)]
+    kept: list[str] = []
+    for clause in clauses:
+        if not clause:
+            continue
+        if strip_pose and POSE_CONFLICT_PATTERN.search(clause) and not IDENTITY_PROP_PATTERN.search(clause):
+            continue
+        if strip_style and STYLE_CONFLICT_PATTERN.search(clause):
+            continue
+        kept.append(clause)
     return ", ".join(kept)
+
+
+def pose_safe_text(text: str) -> str:
+    return clean_prompt_text(text, strip_pose=True, strip_style=True)
+
+
+def joined_prompt(parts: list[str]) -> str:
+    return ", ".join(part.strip() for part in parts if str(part or "").strip())
 
 
 def checkerboard(size: int, tile: int = 8) -> Image.Image:
@@ -412,14 +447,11 @@ def build_payload(
     controlnet_guidance_scale: float | None = None,
 ) -> dict[str, Any]:
     pose_control_active = bool(control_image)
-    subject_prompt = str(config["subject_prompt"])
-    negative = str(config.get("negative_prompt") or "")
+    subject_prompt = clean_prompt_text(str(config["subject_prompt"]), strip_pose=pose_control_active, strip_style=True)
+    negative = clean_prompt_text(str(config.get("negative_prompt") or ""), strip_pose=pose_control_active, strip_style=True)
+    full_negative = joined_prompt([negative, OUTPUT_CONSTRAINT_NEGATIVE])
     if pose_control_active:
-        subject_prompt = pose_safe_text(subject_prompt)
-        negative = pose_safe_text(negative)
-    full_negative = f"{negative}, {NEGATIVE_BG}" if negative else NEGATIVE_BG
-    if pose_control_active:
-        full_negative = f"{full_negative}, {POSE_CONTROL_NEGATIVE}"
+        full_negative = joined_prompt([full_negative, POSE_CONTROL_NEGATIVE])
     effective_lora_path = lora_path
     effective_lora_scale = args.lora_scale
     if control_image and getattr(args, "controlnet_lora_mode", "on") != "on":
@@ -428,10 +460,11 @@ def build_payload(
     prompt_parts = [
         args.lora_trigger if effective_lora_path else "",
         subject_prompt,
+        OUTPUT_CONSTRAINT_PROMPT,
         POSE_CONTROL_PROMPT if pose_control_active else "",
-        direction_prompt,
-        STYLE_SUFFIX,
     ]
+    if not pose_control_active:
+        prompt_parts.append(direction_prompt)
     payload = {
         "provider": "zimage",
         "mode": "txt2img",
@@ -443,7 +476,7 @@ def build_payload(
         "steps": args.steps,
         "guidance_scale": args.guidance_scale,
         "seed": seed,
-        "prompt": ", ".join(part for part in prompt_parts if part),
+        "prompt": joined_prompt(prompt_parts),
         "negative_prompt": full_negative,
         "lora_path": effective_lora_path,
         "lora_scale": effective_lora_scale,
@@ -478,15 +511,14 @@ def build_lora_img2img_payload(
     seed: int,
     image_path: Path,
 ) -> dict[str, Any]:
-    subject_prompt = pose_safe_text(str(config["subject_prompt"]))
-    negative = pose_safe_text(str(config.get("negative_prompt") or ""))
-    full_negative = f"{negative}, {NEGATIVE_BG}" if negative else NEGATIVE_BG
+    subject_prompt = clean_prompt_text(str(config["subject_prompt"]), strip_pose=True, strip_style=True)
+    negative = clean_prompt_text(str(config.get("negative_prompt") or ""), strip_pose=True, strip_style=True)
+    full_negative = joined_prompt([negative, OUTPUT_CONSTRAINT_NEGATIVE, POSE_CONTROL_NEGATIVE])
     prompt_parts = [
         args.lora_trigger if lora_path else "",
         subject_prompt,
+        OUTPUT_CONSTRAINT_PROMPT,
         "preserve the input image pose, silhouette, direction, and centered full body framing",
-        direction_prompt,
-        STYLE_SUFFIX,
     ]
     return {
         "provider": "zimage",
@@ -501,7 +533,7 @@ def build_lora_img2img_payload(
         "strength": args.lora_img2img_strength,
         "seed": seed,
         "image": image_file_data_url(image_path),
-        "prompt": ", ".join(part for part in prompt_parts if part),
+        "prompt": joined_prompt(prompt_parts),
         "negative_prompt": full_negative,
         "lora_path": lora_path,
         "lora_scale": args.lora_scale,
