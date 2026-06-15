@@ -959,8 +959,12 @@
           <summary>Optional Outputs</summary>
           <p class="flow-note">Extra assets created from this sprite run.</p>
           <label class="check-row">
+            <input id="postprocess-output" type="checkbox" checked>
+            <span>Postprocess sprites</span>
+          </label>
+          <label class="check-row">
             <input id="pixelate-output" type="checkbox" checked>
-            <span>Pixelated final sprites</span>
+            <span>Pixel resize final sprites</span>
           </label>
           <div class="grid">
             <div class="field"><label for="sprite-size">Sprite Size</label><input id="sprite-size" type="number" min="24" max="512" step="8" value="96"></div>
@@ -2179,10 +2183,14 @@
         "nunchaku-rank": String(zSelection.nunchaku_rank),
         "nunchaku-precision": zSelection.nunchaku_precision
       };
-      if ($("generate-maps")?.checked) {
+      const postprocessEnabled = Boolean($("postprocess-output")?.checked);
+      if (postprocessEnabled && $("generate-maps")?.checked) {
         args["generate-maps"] = "true";
         args["map-backend"] = value("map-backend") || "depth_anything";
         args["map-source"] = value("map-source") || "cutout";
+      }
+      if (!postprocessEnabled) {
+        args["no-postprocess"] = "true";
       }
       if (!$("pixelate-output")?.checked) {
         args["no-pixelate"] = "true";
@@ -2195,11 +2203,21 @@
     }
 
     function syncPixelateControls() {
+      const postprocessEnabled = Boolean($("postprocess-output")?.checked);
       const enabled = Boolean($("pixelate-output")?.checked);
+      $("pixelate-output").disabled = !postprocessEnabled;
+      $("pixelate-output").closest(".check-row")?.classList.toggle("muted", !postprocessEnabled);
+      $("generate-maps").disabled = !postprocessEnabled;
+      $("generate-maps").closest(".check-row")?.classList.toggle("muted", !postprocessEnabled);
       for (const id of ["sprite-size", "palette-colors"]) {
         const node = $(id);
-        node.disabled = !enabled;
-        node.closest(".field")?.classList.toggle("muted", !enabled);
+        node.disabled = !postprocessEnabled || !enabled;
+        node.closest(".field")?.classList.toggle("muted", !postprocessEnabled || !enabled);
+      }
+      for (const id of ["map-backend", "map-source"]) {
+        const node = $(id);
+        node.disabled = !postprocessEnabled || !$("generate-maps")?.checked;
+        node.closest(".field")?.classList.toggle("muted", !postprocessEnabled || !$("generate-maps")?.checked);
       }
     }
 
@@ -3076,7 +3094,9 @@
     });
     $("commit-pose-guide").addEventListener("click", commitPoseRefs);
     $("view-guide-candidates").addEventListener("click", viewGuideCandidates);
+    $("postprocess-output").addEventListener("change", syncPixelateControls);
     $("pixelate-output").addEventListener("change", syncPixelateControls);
+    $("generate-maps").addEventListener("change", syncPixelateControls);
     $("review-select-all").addEventListener("click", selectAllVisibleOutputs);
     $("review-clear").addEventListener("click", clearOutputSelection);
     $("export-contact-sheet").addEventListener("click", exportSelectedContactSheet);

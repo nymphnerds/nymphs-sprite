@@ -115,8 +115,9 @@ exported for inspection, but stored pose libraries should stay JSON-first.
 
 ### Style
 
-Pick the LoRA/style inputs. Sprite size and palette are Python postprocess
-controls and live under Generate -> Optional Outputs with the pixelation toggle.
+Pick the LoRA/style inputs. Sprite postprocess, pixel resize, sprite size, and
+palette live under Generate -> Optional Outputs so raw model debugging stays
+separate from cleanup/export decisions.
 
 ### Generate
 

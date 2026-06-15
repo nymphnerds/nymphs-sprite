@@ -57,7 +57,7 @@ clear reason to inspect files directly.
 Current published module version:
 
 ```text
-Nymphs Sprite 1.2.34
+Nymphs Sprite 1.2.35
 ```
 
 Current module identity:
@@ -256,12 +256,13 @@ For every selected direction:
 4. Send payload to Z-Image                       [Sprite Python -> Z-Image backend]
 5. Generate raw image                            [Z-Image Turbo / Nunchaku]
 6. Move raw image into Sprite output folder      [Sprite Python]
-7. Remove background with simple keyer           [Sprite Python + Pillow]
-8. Crop visible alpha to square                  [Sprite Python + Pillow]
-9. Save pre-pixel cutout to `_intermediate/`     [Sprite Python + Pillow]
-10. Optional: pixelate to sprite size            [Sprite Python + Pillow]
-11. Save final direction PNG                     [Sprite Python]
-12. Move to next direction                       [Sprite Python]
+7. Optional: run Sprite postprocess              [Sprite Python + Pillow]
+8. If postprocess is on: key background          [Sprite Python + Pillow]
+9. If postprocess is on: crop/normalize square   [Sprite Python + Pillow]
+10. If postprocess is on: save pre-pixel cutout  [Sprite Python + Pillow]
+11. Optional: pixel resize to sprite size        [Sprite Python + Pillow]
+12. Save final direction PNG                     [Sprite Python]
+13. Move to next direction                       [Sprite Python]
 ```
 
 The Z-Image payload is normally:
@@ -302,14 +303,17 @@ _intermediate/<direction>_cutout.png
   Use this to judge cutout/crop quality before sprite crunching.
 
 <direction>.png
-  Final visible output in the UI strip. If "Pixelated final sprites" is on,
-  this is resized to Sprite Size with nearest-neighbor. If it is off, this is
-  the normalized cutout saved as the final output.
+  Final visible output in the UI strip. If "Postprocess sprites" is off, this
+  is the raw Z-Image result copied into the normal final slot. If postprocess
+  is on and "Pixel resize final sprites" is off, this is the normalized cutout.
+  If both are on, this is resized to Sprite Size with nearest-neighbor.
 ```
 
-Pixelation is optional because it can make a weak raw image look much worse in
-the preview. Untick it while debugging generation, pose following, or
-background removal. Turn it back on when judging actual game-sprite scale.
+Postprocess is optional because the simple key/crop/normalize path can hide
+whether Z-Image + ControlNet + LoRA worked. Turn it off to inspect raw model
+results through the normal UI strip. Pixel resize is separately optional
+because it can make a weak raw image look much worse in the preview. Turn it
+back on when judging actual game-sprite scale.
 
 Pre-pixel cutout output is saved to:
 
@@ -928,7 +932,7 @@ Build and test from the top down.
 - Generate all selected directions through Z-Image.
 - Use Pose Lab body/direction guides as ControlNet refs.
 - Optional Outputs contains postprocess/export extras:
-  pixelated final sprites, sprite size, palette, and depth/normal maps.
+  Sprite postprocess, pixel resize, sprite size, palette, and depth/normal maps.
 - Save into Nymphs Sprite output folders.
 - One main button should cover the normal path.
 

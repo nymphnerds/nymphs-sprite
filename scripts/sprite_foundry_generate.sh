@@ -9,6 +9,7 @@ generation_path="nymphscore"
 config="pipeline/chars/goblin_scout.json"
 sprite_size="96"
 palette_colors="0"
+postprocess_output="true"
 pixelate_output="true"
 steps="9"
 seed=""
@@ -58,6 +59,22 @@ while [[ $# -gt 0 ]]; do
     --palette-colors)
       palette_colors="$2"
       shift 2
+      ;;
+    --postprocess-output)
+      postprocess_output="$2"
+      shift 2
+      ;;
+    --postprocess)
+      postprocess_output="true"
+      shift
+      ;;
+    --no-postprocess)
+      postprocess_output="false"
+      if [[ $# -gt 1 && "$2" != --* ]]; then
+        shift 2
+      else
+        shift
+      fi
       ;;
     --pixelate-output)
       pixelate_output="$2"
@@ -336,6 +353,9 @@ case "${generation_path}" in
     if [[ -n "${palette_colors}" ]]; then
       cmd+=(--palette-colors "${palette_colors}")
     fi
+    if [[ "${postprocess_output}" != "true" ]]; then
+      cmd+=(--no-postprocess)
+    fi
     if [[ "${pixelate_output}" != "true" ]]; then
       cmd+=(--no-pixelate)
     fi
@@ -412,6 +432,7 @@ cmd+=("${extra_args[@]}")
   printf 'controlnet_guidance_scale=%s\n' "${controlnet_guidance_scale:-default}"
   printf 'controlnet_mode=%s\n' "${controlnet_mode:-auto}"
   printf 'controlnet_lora_mode=%s\n' "${controlnet_lora_mode:-on}"
+  printf 'postprocess_output=%s\n' "${postprocess_output}"
   printf 'pixelate_output=%s\n' "${pixelate_output}"
   printf 'lora_img2img_strength=%s\n' "${lora_img2img_strength:-0.45}"
   printf 'debug_no_lora=%s\n' "${debug_no_lora}"
