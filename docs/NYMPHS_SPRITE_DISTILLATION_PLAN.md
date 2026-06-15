@@ -1,6 +1,6 @@
 # Nymphs Sprite Distillation Plan
 
-Current as of 2026-06-12.
+Current as of 2026-06-15.
 
 This is the single current handoff for Nymphs Sprite. The old Sprite Foundry
 docs remain useful reference material, but this doc is the clean resume point
@@ -57,7 +57,7 @@ clear reason to inspect files directly.
 Current published module version:
 
 ```text
-Nymphs Sprite 1.2.31
+Nymphs Sprite 1.2.32
 ```
 
 Current module identity:
@@ -160,6 +160,22 @@ Nymphs Sprite UI
 The `Start` button starts the Nymphs Image / Z-Image backend when needed. It is
 not a separate sprite-specific model runtime.
 
+Current ControlNet + LoRA stance:
+
+```text
+Nymphs Sprite default: controlnet_lora_mode=on
+Required backend: Nymphs Image / Z-Image 0.1.114 or newer
+Runtime shape: one controlnet_edit request per direction
+Payload: Pose Lab control image + selected LoRA in the same Z-Image request
+Fallback: staged is diagnostic only, not the normal product path
+```
+
+This matters for performance and correctness. With the same model/rank/precision
+selected, Z-Image should load the Nunchaku ControlNet pipeline once, then reuse
+that already-loaded backend for every direction in the sprite run. Repeated
+pipeline switching usually means an old Sprite install is still forcing staged
+mode, or the test WSL has not updated Nymphs Image to `0.1.114+`.
+
 The custom UI status panel should now read the local `/api/status` endpoint
 first, then fall back to the Manager bridge only if local status fails. This was
 changed in `1.2.12` because the previous bridge-first path made the UI look
@@ -251,14 +267,13 @@ The Z-Image payload is normally:
 mode: controlnet_edit
 input image: temporary Pose Lab OpenPose PNG/data URL
 prompt: character/style prompt with pose language stripped back
-LoRA: omitted in ControlNet stage by default
+LoRA: selected LoRA in the same ControlNet request
 output_dir: Nymphs Sprite backend staging folder
 ```
 
-The normal product path is staged ControlNet + LoRA. Same-pass ControlNet +
-LoRA remains a backend diagnostic only because the installed Nunchaku Z-Image
-runtime can still produce checker/noise when both are active in one denoise
-call.
+The normal product path is same-pass ControlNet + LoRA. The old staged path was
+a temporary diagnostic workaround from the broken-backend period; keep it only
+for isolating regressions.
 
 Raw direction output is moved to:
 
@@ -1074,7 +1089,7 @@ Test in small slices.
 
 ## Immediate Next Implementation Order
 
-1. Test/update installed Nymphs Sprite `1.2.31` or newer in the `NymphsCore`
+1. Test/update installed Nymphs Sprite `1.2.32` or newer in the `NymphsCore`
    test WSL.
 2. Confirm status panel and LoRA dropdown are fixed after restart/update.
 3. Open Pose Lab, move points in one direction, switch slots, and confirm the
@@ -1111,7 +1126,7 @@ Expected current status signs:
 
 ```text
 id=nymphs-sprite
-version=1.2.31 or newer
+version=1.2.32 or newer
 controlnet_ready=true
 models_ready=true
 lora_choices=...
@@ -1129,7 +1144,7 @@ Current source-of-truth repos:
 
 Latest target module state:
 
-- Nymphs Sprite `1.2.31`
+- Nymphs Sprite `1.2.32`
 - Purpose: wire live Pose Lab JSON refs into Z-Image ControlNet generation.
 
 What changed in the latest working idea:
@@ -1168,7 +1183,7 @@ Known untested / risky areas:
 
 Next best pickup steps:
 
-1. Update/install Nymphs Sprite `1.2.31+` on the `NymphsCore` test WSL.
+1. Update/install Nymphs Sprite `1.2.32+` on the `NymphsCore` test WSL.
 2. Open Pose Lab and confirm the bottom strip immediately shows all 8 slots.
 3. Switch to 16 directions and confirm all 16 live JSON slots appear.
 4. Click several strip slots and confirm the main editor changes direction.
@@ -1410,19 +1425,14 @@ Split the bugs:
 
 ControlNet + LoRA target behavior:
 
-- `controlnet_lora_mode` defaults to `staged`.
-- The first stage sends Pose Lab refs through `controlnet_edit` with LoRA
-  omitted. This avoids the proven Nunchaku checker-noise path.
-- The second stage sends the posed result through `img2img` with the selected
-  LoRA. This keeps the product goal: Pose Lab controls pose, LoRA controls
-  sprite style, but not in the same broken denoise call.
-- `--controlnet-lora-mode on` remains as a diagnostic for same-pass backend
-  development; currently it is known to produce checker/noise with the
-  quantized Nunchaku LoRA path.
-- `--controlnet-lora-mode off` is a no-LoRA diagnostic fallback.
-- `recipe.json` records `controlnet_lora_mode` and
-  `controlnet_lora_bypassed`, plus `lora_stage2_directions` when staged mode
-  runs the LoRA refinement pass.
+- `controlnet_lora_mode` now defaults to `on`.
+- The normal path sends Pose Lab refs through `controlnet_edit` with the
+  selected LoRA in the same backend request.
+- `--controlnet-lora-mode staged` remains only as a diagnostic fallback from
+  the broken-backend period.
+- `--controlnet-lora-mode off` remains a no-LoRA diagnostic fallback.
+- `recipe.json` records `controlnet_lora_mode` so a bad run can be traced
+  without guessing which path was active.
 
 Next technical probes:
 
@@ -1431,11 +1441,9 @@ Next technical probes:
 2. Compare OpenPose-color refs against a simple Scribble/edge silhouette ref,
    because this diffusers pipeline has no explicit `pose` mode flag; it
    VAE-encodes the control PNG as visual context.
-3. Tune staged mode quality: `lora_img2img_strength`, prompt, green background,
-   and pose preservation.
-4. If same-pass backend work resumes, retest only with
-   `--controlnet-lora-mode on --max-directions 1` before touching the normal
-   product path.
+3. If same-pass regresses, isolate with `--controlnet-lora-mode off` and
+   `--controlnet-lora-mode staged --max-directions 1` before changing the
+   normal product path again.
 
 ## Patch Checkpoint: 2026-06-12 Pose Lab Prompt Authority
 
@@ -1533,7 +1541,7 @@ application during a ControlNet denoise pass:
   same ControlNet denoise call. It also means that switch is not a product fix,
   because it disables the LoRA effect.
 
-Working product path:
+Temporary staged diagnostic path from this checkpoint:
 
 ```text
 Pose Lab JSON
@@ -1545,9 +1553,9 @@ Pose Lab JSON
   -> pixelate/export
 ```
 
-Implemented behavior:
+Historical behavior from this checkpoint:
 
-- `--controlnet-lora-mode staged` is now the default.
+- `--controlnet-lora-mode staged` was made the default during this checkpoint.
 - `staged` saves `<direction>_pose_raw.png` for the first ControlNet stage.
 - Final `<direction>_raw.png` comes from the second LoRA img2img stage.
 - `--lora-img2img-strength` defaults to `0.45`.
@@ -1563,8 +1571,9 @@ Dev WSL validation:
 - Final output was not checker/noise. It is still soft and needs tuning, but
   the catastrophic corruption is gone.
 
-Current generation stance is staged-by-default. Keep same-pass as a diagnostic
-only until the backend is proven clean again on the test WSL.
+Current generation stance has since changed back to same-pass by default after
+the Z-Image `0.1.114` packed-LoRA compatibility fix. Keep this section as
+forensic history only.
 
 Docs/source anchors for the next resume:
 
@@ -1607,14 +1616,17 @@ Backend attempt:
 - Smaller tensors are still padded into the existing slot.
 - Larger packed tensors are no longer truncated; they are passed through so the
   backend uses the real expanded packed LoRA tensor.
-- Same-pass ControlNet + LoRA was temporarily believed clean, but a later
-  test WSL run on 2026-06-15 reproduced checker/noise again.
+- Same-pass ControlNet + LoRA was restored as the intended product path after
+  the Z-Image `0.1.114` packed-LoRA compatibility fix. If checker/noise appears
+  again, first confirm the test WSL has both Nymphs Image `0.1.114+` and Nymphs
+  Sprite `1.2.32+` installed.
 
-Sprite behavior after the 2026-06-15 regression:
+Current Sprite behavior after the 2026-06-15 cleanup:
 
-- `--controlnet-lora-mode` defaults to `staged`.
-- `staged` means ControlNet first, then LoRA img2img.
-- `on` remains available only for same-pass backend testing.
+- `--controlnet-lora-mode` defaults to `on`.
+- `on` means Pose Lab ControlNet and selected LoRA run in the same
+  `controlnet_edit` request.
+- `staged` remains available only for backend regression isolation.
 - `off` remains a no-LoRA diagnostic path.
 
 Live dev WSL validation:
@@ -1633,14 +1645,15 @@ result:
 /home/nymph/NymphsData/outputs/nymphs-sprite/goblin_scout/front_raw.png
 ```
 
-That result was not stable enough to make same-pass the product path. The
-2026-06-15 installed-runtime test produced checker/noise again with
-`controlnet_lora_mode=on`, so normal generation must stay staged.
+That installed-runtime result is now treated as stale/mismatched-runtime
+evidence, not the current product stance. Normal generation should stay
+same-pass unless a fresh test on Nymphs Image `0.1.114+` and Nymphs Sprite
+`1.2.32+` proves otherwise.
 
 Next backend/frontend work:
 
 1. Tune Pose Lab control strength and prompt language for stronger pose
-   following in staged mode.
+   following in same-pass mode.
 2. Compare `guide_strength` values and `controlnet_guidance_scale` with
    one-direction tests before running 8/16 directions.
 3. Keep the temporary ControlNet PNGs as diagnostics, but the real editable
