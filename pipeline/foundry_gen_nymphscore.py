@@ -819,21 +819,23 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     )
 
     for direction_name in generated_dirs:
-        foundry_cmd(
-            "register-attempt",
-            run_id,
-            direction_name,
-            "--seed",
-            str(direction_seeds[direction_name]),
+        artifact_args = [
             "--artifacts",
             "raw",
             str(raw_paths[direction_name]),
             "--artifacts",
             "pixel",
             str(pixel_paths[direction_name]),
-            "--artifacts",
-            "cutout",
-            str(cutout_paths[direction_name]),
+        ]
+        if direction_name in cutout_paths:
+            artifact_args.extend(["--artifacts", "cutout", str(cutout_paths[direction_name])])
+        foundry_cmd(
+            "register-attempt",
+            run_id,
+            direction_name,
+            "--seed",
+            str(direction_seeds[direction_name]),
+            *artifact_args,
         )
 
     if not args.no_check:

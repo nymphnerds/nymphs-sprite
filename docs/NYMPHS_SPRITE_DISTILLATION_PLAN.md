@@ -57,7 +57,7 @@ clear reason to inspect files directly.
 Current published module version:
 
 ```text
-Nymphs Sprite 1.2.35
+Nymphs Sprite 1.2.36
 ```
 
 Current module identity:
@@ -314,6 +314,10 @@ whether Z-Image + ControlNet + LoRA worked. Turn it off to inspect raw model
 results through the normal UI strip. Pixel resize is separately optional
 because it can make a weak raw image look much worse in the preview. Turn it
 back on when judging actual game-sprite scale.
+
+When postprocess is off, no `_intermediate/<direction>_cutout.png` files are
+created and Foundry registration records only raw/final artifacts for each
+direction.
 
 Pre-pixel cutout output is saved to:
 
