@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -68,6 +69,25 @@ STYLE_SUFFIX = (
 )
 
 NEGATIVE_BG = "white background, gray background, grey background, beige background, gradient background"
+POSE_CONTROL_PROMPT = (
+    "mandatory Pose Lab control reference, match the supplied control reference for body pose, "
+    "limb placement, stance, silhouette, and direction, do not invent a different pose"
+)
+POSE_CONTROL_NEGATIVE = (
+    "pose that does not match the control reference, limbs that do not match the control reference, "
+    "different stance than the control reference"
+)
+POSE_CONFLICT_PATTERN = re.compile(
+    r"\b("
+    r"pose|posture|stance|standing|stand|stands|crouch|crouched|crouching|hunch|hunched|"
+    r"leaning|forward lean|backward lean|weight on|ready to spring|ready-to-spring|"
+    r"lowest|horizontal profile|sneaking|ambush|predator|lumbering|hovering|floating|"
+    r"arms?|hands?|legs?|feet|foot|knees?|ankles?|wrist|elbow|shoulder|"
+    r"holding|held|gripping|raised|overhead|at sides?|profile view|side view|front view|rear view|"
+    r"looking at camera|looking left|looking right|facing"
+    r")\b",
+    re.IGNORECASE,
+)
 
 POSE_JOINTS = [
     "head", "neck", "spine", "pelvis",
@@ -192,10 +212,10 @@ def pixelate(image: Image.Image, sprite_size: int, palette_colors: int = 0) -> I
 
 def guide_strength_scale(value: str) -> float:
     return {
-        "soft": 0.55,
-        "normal": 0.75,
-        "strong": 0.95,
-    }.get(str(value or "normal").strip().lower(), 0.75)
+        "soft": 0.75,
+        "normal": 0.90,
+        "strong": 1.00,
+    }.get(str(value or "normal").strip().lower(), 0.90)
 
 
 def latest_pose_lab_set(subject_id: str, direction_count: int) -> tuple[Path, dict[str, Any]] | None:
@@ -247,8 +267,8 @@ def render_pose_control_data_url(slot: dict[str, Any], width: int, height: int, 
         y = max(0.0, min(canvas_size, point[1])) / canvas_size * height
         return x, y
 
-    line_width = max(4, int(round(min(width, height) * 0.018)))
-    dot_radius = max(5, int(round(min(width, height) * 0.022)))
+    line_width = max(4, int(round(min(width, height) * 0.008)))
+    dot_radius = max(4, int(round(min(width, height) * 0.008)))
     for a, b, color in POSE_SEGMENTS:
         if a not in points or b not in points:
             continue
@@ -263,6 +283,27 @@ def render_pose_control_data_url(slot: dict[str, Any], width: int, height: int, 
     buffer = BytesIO()
     image.save(buffer, format="PNG")
     return "data:image/png;base64," + base64.b64encode(buffer.getvalue()).decode("ascii")
+
+
+def save_data_url_png(data_url: str, path: Path) -> None:
+    marker = "base64,"
+    if marker not in data_url:
+        return
+    try:
+        raw = base64.b64decode(data_url.split(marker, 1)[1])
+    except Exception:
+        return
+    path.write_bytes(raw)
+
+
+def image_file_data_url(path: Path) -> str:
+    return "data:image/png;base64," + base64.b64encode(path.read_bytes()).decode("ascii")
+
+
+def pose_safe_text(text: str) -> str:
+    clauses = [clause.strip() for clause in str(text or "").split(",")]
+    kept = [clause for clause in clauses if clause and not POSE_CONFLICT_PATTERN.search(clause)]
+    return ", ".join(kept)
 
 
 def checkerboard(size: int, tile: int = 8) -> Image.Image:
@@ -369,11 +410,24 @@ def build_payload(
     controlnet_scale: float = 0.75,
     controlnet_guidance_scale: float | None = None,
 ) -> dict[str, Any]:
+    pose_control_active = bool(control_image)
+    subject_prompt = str(config["subject_prompt"])
     negative = str(config.get("negative_prompt") or "")
+    if pose_control_active:
+        subject_prompt = pose_safe_text(subject_prompt)
+        negative = pose_safe_text(negative)
     full_negative = f"{negative}, {NEGATIVE_BG}" if negative else NEGATIVE_BG
+    if pose_control_active:
+        full_negative = f"{full_negative}, {POSE_CONTROL_NEGATIVE}"
+    effective_lora_path = lora_path
+    effective_lora_scale = args.lora_scale
+    if control_image and getattr(args, "controlnet_lora_mode", "on") != "on":
+        effective_lora_path = ""
+        effective_lora_scale = None
     prompt_parts = [
-        args.lora_trigger,
-        config["subject_prompt"],
+        args.lora_trigger if effective_lora_path else "",
+        subject_prompt,
+        POSE_CONTROL_PROMPT if pose_control_active else "",
         direction_prompt,
         STYLE_SUFFIX,
     ]
@@ -390,8 +444,8 @@ def build_payload(
         "seed": seed,
         "prompt": ", ".join(part for part in prompt_parts if part),
         "negative_prompt": full_negative,
-        "lora_path": lora_path,
-        "lora_scale": args.lora_scale,
+        "lora_path": effective_lora_path,
+        "lora_scale": effective_lora_scale,
         "batch_id": batch_id,
         "batch_label": f"Nymphs Sprite: {config.get('display_name') or config['subject_id']}",
         "batch_type": "sprite_foundry_direction",
@@ -409,10 +463,63 @@ def build_payload(
     return payload
 
 
+def build_lora_img2img_payload(
+    *,
+    args: argparse.Namespace,
+    batch_id: str,
+    backend_dir: Path,
+    direction_name: str,
+    direction_prompt: str,
+    index: int,
+    direction_count: int,
+    config: dict[str, Any],
+    lora_path: str,
+    seed: int,
+    image_path: Path,
+) -> dict[str, Any]:
+    subject_prompt = pose_safe_text(str(config["subject_prompt"]))
+    negative = pose_safe_text(str(config.get("negative_prompt") or ""))
+    full_negative = f"{negative}, {NEGATIVE_BG}" if negative else NEGATIVE_BG
+    prompt_parts = [
+        args.lora_trigger if lora_path else "",
+        subject_prompt,
+        "preserve the input image pose, silhouette, direction, and centered full body framing",
+        direction_prompt,
+        STYLE_SUFFIX,
+    ]
+    return {
+        "provider": "zimage",
+        "mode": "img2img",
+        "model_id": args.model_id,
+        "nunchaku_rank": args.nunchaku_rank,
+        "nunchaku_precision": args.nunchaku_precision,
+        "width": args.width,
+        "height": args.height,
+        "steps": args.steps,
+        "guidance_scale": args.guidance_scale,
+        "strength": args.lora_img2img_strength,
+        "seed": seed,
+        "image": image_file_data_url(image_path),
+        "prompt": ", ".join(part for part in prompt_parts if part),
+        "negative_prompt": full_negative,
+        "lora_path": lora_path,
+        "lora_scale": args.lora_scale,
+        "batch_id": batch_id,
+        "batch_label": f"Nymphs Sprite: {config.get('display_name') or config['subject_id']}",
+        "batch_type": "sprite_foundry_direction_lora_refine",
+        "item_label": f"{direction_name}_lora_refine",
+        "item_index": index,
+        "item_total": direction_count,
+        "output_dir": str(backend_dir),
+    }
+
+
 def selected_directions(args: argparse.Namespace) -> list[tuple[str, str]]:
-    if int(args.direction_count) == 16:
-        return DIRECTIONS_16
-    return DIRECTIONS_8
+    directions = DIRECTIONS_16 if int(args.direction_count) == 16 else DIRECTIONS_8
+    max_directions = int(getattr(args, "max_directions", 0) or 0)
+    if max_directions > 0:
+        return directions[:max_directions]
+    return directions
 
 
 def clean_backend_staging(root: Path) -> None:
@@ -441,8 +548,8 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     subject_id = config["subject_id"]
     display_name = config.get("display_name") or subject_id
     seed = args.seed if args.seed is not None else int(config["seed"])
-    lora_path = args.lora_path
-    if not lora_path:
+    lora_path = "" if getattr(args, "debug_no_lora", False) else args.lora_path
+    if not lora_path and not getattr(args, "debug_no_lora", False):
         raise SystemExit("No LoRA path supplied. Choose a Nymphs Sprite LoRA in the UI before generating.")
     pose_set = latest_pose_lab_set(subject_id, len(directions))
     pose_set_path: Path | None = None
@@ -463,12 +570,15 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     backend_root = Path.home() / "NymphsData" / "outputs" / "nymphs-sprite" / "_backend"
     clean_backend_staging(backend_root)
     backend_dir = backend_root / run_id
+    intermediate_dir = out_dir / "_intermediate"
     out_dir.mkdir(parents=True, exist_ok=True)
     backend_dir.mkdir(parents=True, exist_ok=True)
+    intermediate_dir.mkdir(parents=True, exist_ok=True)
     all_direction_names = {name for name, _ in DIRECTIONS_8 + DIRECTIONS_16}
     for direction_name in all_direction_names:
         for suffix in (".png", "_raw.png", "_raw.json"):
             (out_dir / f"{direction_name}{suffix}").unlink(missing_ok=True)
+        (intermediate_dir / f"{direction_name}_cutout.png").unlink(missing_ok=True)
     for filename in ("raw_inspection.png", "contact_sheet.png", "recipe.json", "manifest.json"):
         (out_dir / filename).unlink(missing_ok=True)
 
@@ -485,20 +595,30 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     print(f"{'=' * 60}\n")
 
     raw_paths: dict[str, Path] = {}
+    cutout_paths: dict[str, Path] = {}
     pixel_paths: dict[str, Path] = {}
     generated_dirs: list[str] = []
     responses: dict[str, Any] = {}
     direction_seeds: dict[str, int] = {}
     controlnet_used: list[str] = []
+    controlnet_lora_bypassed: list[str] = []
+    lora_stage2_used: list[str] = []
     controlnet_scale = guide_strength_scale(args.guide_strength)
-    controlnet_guidance_scale = getattr(args, "controlnet_guidance_scale", 1.0)
+    controlnet_guidance_scale = getattr(args, "controlnet_guidance_scale", 0.0)
+    controlnet_lora_mode = getattr(args, "controlnet_lora_mode", "on")
 
     for index, (direction_name, direction_prompt) in enumerate(directions, start=1):
         item_seed = seed + (index - 1) * args.seed_step
         pose_slot = pose_directions.get(direction_name) if isinstance(pose_directions, dict) else None
-        control_image = render_pose_control_data_url(pose_slot, args.width, args.height, pose_canvas_size) if isinstance(pose_slot, dict) else None
+        control_image = None
+        if getattr(args, "controlnet_mode", "auto") != "off" and isinstance(pose_slot, dict):
+            control_image = render_pose_control_data_url(pose_slot, args.width, args.height, pose_canvas_size)
         mode_label = "controlnet" if control_image else "txt2img"
         print(f"  [{direction_name}] generate seed={item_seed} mode={mode_label}...", end=" ", flush=True)
+        if control_image:
+            save_data_url_png(control_image, out_dir / f"{direction_name}_control.png")
+            if lora_path and controlnet_lora_mode != "on":
+                controlnet_lora_bypassed.append(direction_name)
         payload = build_payload(
             args=args,
             batch_id=run_id,
@@ -519,6 +639,30 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
             source = output_path(response)
             if source is None or not source.exists():
                 raise RuntimeError(f"missing output_path in response: {response}")
+            if control_image and lora_path and controlnet_lora_mode == "staged":
+                pose_raw_path = out_dir / f"{direction_name}_pose_raw.png"
+                pose_metadata = source.with_suffix(".json")
+                shutil.move(str(source), str(pose_raw_path))
+                if pose_metadata.is_file():
+                    shutil.move(str(pose_metadata), str(pose_raw_path.with_suffix(".json")))
+                lora_payload = build_lora_img2img_payload(
+                    args=args,
+                    batch_id=run_id,
+                    backend_dir=backend_dir,
+                    direction_name=direction_name,
+                    direction_prompt=direction_prompt,
+                    index=index,
+                    direction_count=len(directions),
+                    config=config,
+                    lora_path=lora_path,
+                    seed=item_seed,
+                    image_path=pose_raw_path,
+                )
+                response = generate_zimage(args.nymphscore_url, lora_payload)
+                source = output_path(response)
+                if source is None or not source.exists():
+                    raise RuntimeError(f"missing lora refine output_path in response: {response}")
+                lora_stage2_used.append(direction_name)
         except Exception as exc:
             message = str(exc)
             print(f"FAIL: {message}")
@@ -544,8 +688,14 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
             pass
         with Image.open(raw_path) as handle:
             raw_img = handle.convert("RGBA")
+        cutout_img = normalize_to_square(
+            remove_bg(raw_img, args.bg_tolerance, green_screen=not args.no_green_screen),
+            args.crop_padding,
+        )
+        cutout_path = intermediate_dir / f"{direction_name}_cutout.png"
+        cutout_img.save(cutout_path, "PNG")
         pixel_img = pixelate(
-            normalize_to_square(remove_bg(raw_img, args.bg_tolerance, green_screen=not args.no_green_screen), args.crop_padding),
+            cutout_img,
             args.sprite_size,
             args.palette_colors,
         )
@@ -553,6 +703,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
         pixel_img.save(pixel_path, "PNG")
 
         raw_paths[direction_name] = raw_path
+        cutout_paths[direction_name] = cutout_path
         pixel_paths[direction_name] = pixel_path
         direction_seeds[direction_name] = item_seed
         responses[direction_name] = response
@@ -582,6 +733,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
         "stack": "NymphScore_ZImage",
         "model": args.model_id,
         "lora": lora_path,
+        "debug_no_lora": bool(getattr(args, "debug_no_lora", False)),
         "lora_trigger": args.lora_trigger,
         "lora_scale": args.lora_scale,
         "steps": args.steps,
@@ -599,6 +751,11 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
         "controlnet_directions": controlnet_used,
         "controlnet_conditioning_scale": controlnet_scale if controlnet_used else None,
         "controlnet_guidance_scale": controlnet_guidance_scale if controlnet_used else None,
+        "controlnet_mode": getattr(args, "controlnet_mode", "auto"),
+        "controlnet_lora_mode": controlnet_lora_mode,
+        "controlnet_lora_bypassed": controlnet_lora_bypassed,
+        "lora_img2img_strength": args.lora_img2img_strength,
+        "lora_stage2_directions": lora_stage2_used,
     }
     (out_dir / "recipe.json").write_text(json.dumps(recipe, indent=2), encoding="utf-8")
     (out_dir / "manifest.json").write_text(
@@ -613,6 +770,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
                 "timestamp": ts,
                 "directions": generated_dirs,
                 "direction_seeds": direction_seeds,
+                "intermediate_cutouts": {name: str(cutout_paths[name]) for name in generated_dirs if name in cutout_paths},
                 "pose_lab_ref_set": str(pose_set_path) if pose_set_path else "",
                 "controlnet_directions": controlnet_used,
                 "nymphs_image_responses": responses,
@@ -656,6 +814,9 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
             "--artifacts",
             "pixel",
             str(pixel_paths[direction_name]),
+            "--artifacts",
+            "cutout",
+            str(cutout_paths[direction_name]),
         )
 
     if not args.no_check:
@@ -686,7 +847,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--height", type=int, default=1024)
     parser.add_argument("--steps", type=int, default=9)
     parser.add_argument("--guidance-scale", type=float, default=0.0)
-    parser.add_argument("--controlnet-guidance-scale", type=float, default=1.0)
+    parser.add_argument("--controlnet-guidance-scale", type=float, default=0.0)
+    parser.add_argument("--controlnet-mode", default="auto", choices=["auto", "off"])
+    parser.add_argument("--controlnet-lora-mode", default="on", choices=["on", "staged", "off"], help="on uses same-pass ControlNet + LoRA; staged runs ControlNet first, then LoRA img2img")
+    parser.add_argument("--lora-img2img-strength", type=float, default=0.45, help="Strength for optional staged LoRA img2img refinement after Pose Lab ControlNet")
+    parser.add_argument("--debug-no-lora", action="store_true", help="Diagnostic: run without LoRA to isolate ControlNet from LoRA merging")
+    parser.add_argument("--max-directions", type=int, default=0, help="Diagnostic: generate only the first N directions")
     parser.add_argument("--nunchaku-rank", type=int, default=32)
     parser.add_argument("--nunchaku-precision", default="auto", choices=["auto", "int4", "fp4"])
     parser.add_argument("--sprite-size", type=int, default=96)

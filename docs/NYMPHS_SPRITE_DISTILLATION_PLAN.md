@@ -1,6 +1,6 @@
 # Nymphs Sprite Distillation Plan
 
-Current as of 2026-06-09.
+Current as of 2026-06-12.
 
 This is the single current handoff for Nymphs Sprite. The old Sprite Foundry
 docs remain useful reference material, but this doc is the clean resume point
@@ -57,7 +57,7 @@ clear reason to inspect files directly.
 Current published module version:
 
 ```text
-Nymphs Sprite 1.2.21
+Nymphs Sprite 1.2.29
 ```
 
 Current module identity:
@@ -131,6 +131,453 @@ The custom UI status panel should now read the local `/api/status` endpoint
 first, then fall back to the Manager bridge only if local status fails. This was
 changed in `1.2.12` because the previous bridge-first path made the UI look
 broken when a stale DOM reference threw during render.
+
+## Easy Current Flow
+
+This is the current Nymphs Sprite flow in actual execution order.
+
+The simplest mental model:
+
+```text
+1. Nymphs Sprite UI
+   Browser / HTML / JS
+   You choose character, edit Pose Lab, click Generate.
+
+2. Nymphs Sprite module server
+   Python
+   Receives the UI request and runs the sprite pipeline.
+
+3. Nymphs Sprite Pose Lab prep
+   Python + Pillow
+   Converts Pose Lab JSON into temporary OpenPose-style control images.
+
+4. Nymphs Image / Z-Image backend
+   Separate backend service
+   This is where the AI generation happens:
+   Z-Image Turbo + Nunchaku + ControlNet + LoRA.
+
+5. Nymphs Sprite postprocess
+   Python + Pillow
+   Takes Z-Image's raw output and does:
+   background keying, crop, square normalize, pixelate.
+
+6. Nymphs Sprite UI
+   Browser / HTML / JS
+   Shows raw images, processed sprites, contact sheets, review/export controls.
+```
+
+In this section, "Sprite Python" means the Python code inside:
+
+```text
+/home/nymph/NymphsModules/nymphs-sprite
+```
+
+The main generation/postprocess script is:
+
+```text
+pipeline/foundry_gen_nymphscore.py
+```
+
+### A. Before Generate
+
+```text
+1. User chooses character/prompt/settings       [Nymphs Sprite UI / browser]
+2. User edits Pose Lab direction slots          [Nymphs Sprite UI / browser]
+3. Pose Lab live rig data exists as JSON        [Nymphs Sprite UI + Sprite Python]
+4. User clicks Generate Sprite Set              [Nymphs Sprite UI]
+5. Sprite command starts/uses Z-Image backend   [Sprite Python -> Z-Image backend]
+```
+
+Pose Lab JSON is the editable source of truth. The preview strip renders this
+JSON live. Persistent PNG piles are not the design goal.
+
+### B. Generate Loop
+
+Nymphs Sprite then processes directions one at a time.
+
+For every selected direction:
+
+```text
+1. Read that direction's Pose Lab JSON slot      [Sprite Python]
+2. Render temp OpenPose PNG/data URL             [Sprite Python + Pillow]
+3. Build Z-Image payload                         [Sprite Python]
+4. Send payload to Z-Image                       [Sprite Python -> Z-Image backend]
+5. Generate raw image                            [Z-Image Turbo / Nunchaku]
+6. Move raw image into Sprite output folder      [Sprite Python]
+7. Remove background with simple keyer           [Sprite Python + Pillow]
+8. Crop visible alpha to square                  [Sprite Python + Pillow]
+9. Save pre-pixel cutout to `_intermediate/`     [Sprite Python + Pillow]
+10. Pixelate to sprite size                      [Sprite Python + Pillow]
+11. Save processed direction PNG                 [Sprite Python]
+12. Move to next direction                       [Sprite Python]
+```
+
+The Z-Image payload is normally:
+
+```text
+mode: controlnet_edit
+input image: temporary Pose Lab OpenPose PNG/data URL
+prompt: character/style prompt with pose language stripped back
+LoRA: selected pixel-art LoRA
+output_dir: Nymphs Sprite backend staging folder
+```
+
+The normal target path is same-pass ControlNet + LoRA. The packed Nunchaku LoRA
+garble bug was fixed in the Z-Image compatibility shim; staged generation should
+only remain as a fallback/diagnostic path.
+
+Raw direction output is moved to:
+
+```text
+$HOME/NymphsData/outputs/nymphs-sprite/<subject>/<direction>_raw.png
+```
+
+Processed direction output is saved to:
+
+```text
+$HOME/NymphsData/outputs/nymphs-sprite/<subject>/<direction>.png
+```
+
+Pre-pixel cutout output is saved to:
+
+```text
+$HOME/NymphsData/outputs/nymphs-sprite/<subject>/_intermediate/<direction>_cutout.png
+```
+
+Raw images are the best place to judge whether ControlNet, prompt, and LoRA
+worked. The processed direction PNG is where background removal, cropping, and
+pixelation can introduce separate problems.
+
+### C. After All Directions
+
+After the direction loop finishes:
+
+```text
+1. Build raw inspection sheet                    [Sprite Python + Pillow]
+2. Build processed contact sheet                 [Sprite Python + Pillow]
+3. Write recipe metadata                         [Sprite Python]
+4. Write manifest metadata                       [Sprite Python]
+5. Register attempts/review records              [Sprite Python + local DB]
+6. UI gallery shows the newest output folder      [Nymphs Sprite UI]
+```
+
+### Current Background Removal
+
+Backend: Nymphs Sprite Python + Pillow.
+
+Current background removal is not BRIA/RMBG and not a learned matting model.
+
+It is a simple local keyer in:
+
+```text
+pipeline/foundry_gen_nymphscore.py
+```
+
+The current function:
+
+- samples the four image corners to estimate background color
+- removes pixels close to that background color
+- also removes obvious green-screen pixels
+
+This happens immediately after each raw direction image is generated and moved
+into the Sprite output folder, before crop/normalize/pixelate.
+
+This is deliberately crude and is the weak stage right now. It can leave halos,
+eat edges, fail on green spill, or behave badly when the model paints uneven
+backgrounds.
+
+### BRIA/RMBG Next Step
+
+Future backend: likely Pixal3D BRIA/RMBG code path or a shared local RMBG helper.
+
+BRIA/RMBG should replace or supplement the current simple keyer after the current
+ControlNet/LoRA flow is validated.
+
+The intended future per-direction postprocess would become:
+
+```text
+raw generated direction image
+  -> BRIA/RMBG alpha matte
+  -> optional alpha cleanup
+  -> crop/normalize
+  -> pixelate
+  -> final direction sprite
+```
+
+Pixal3D already has BRIA/RMBG wiring, so the next investigation is whether
+Nymphs Sprite should reuse that module path, share a small common RMBG helper,
+or call a Pixal3D-owned background-removal action. Keep this as an optional
+background-removal upgrade, not part of the first ControlNet validation.
+
+### Depth And Normal Map Postprocess
+
+The old Sprite Foundry did have a map postprocess, but it was not part of the
+main image-generation pass.
+
+Old Foundry map flow:
+
+```text
+accepted albedo/raw sprite
+  -> upload to ComfyUI
+  -> MiDaS-NormalMapPreprocessor
+  -> save normal_raw + pixel normal map
+  -> DepthAnythingPreprocessor
+  -> save depth_raw + pixel depth map
+  -> register normal/depth artifacts
+  -> export albedo/normal/depth pack
+```
+
+Old source files:
+
+```text
+/home/nymph/NymphsModules/sprite-foundry/pipeline/foundry_maps.py
+/home/nymph/NymphsModules/sprite-foundry/pipeline/gen_kael_maps.py
+```
+
+The same legacy files currently exist in Nymphs Sprite too:
+
+```text
+/home/nymph/NymphsModules/nymphs-sprite/pipeline/foundry_maps.py
+/home/nymph/NymphsModules/nymphs-sprite/pipeline/gen_kael_maps.py
+```
+
+Current old implementation details:
+
+- backend: ComfyUI on `http://127.0.0.1:8188`
+- normal model/node: `MiDaS-NormalMapPreprocessor`
+- depth model/node: `DepthAnythingPreprocessor`
+- depth checkpoint: `depth_anything_vitl14.pth`
+- input: accepted raw/albedo sprite artifacts from the Foundry DB
+- output: `*_normal_raw.png`, `*_normal.png`, `*_depth_raw.png`,
+  `*_depth.png`
+- export structure: `albedo/`, `normal/`, `depth/`, `preview/`,
+  `manifest.json`
+
+This is a good idea to keep, but not as-is. It is still wired to old Foundry
+state, ComfyUI, and `bakeoff/` folders.
+
+Recommended Nymphs Sprite adaptation:
+
+```text
+Generate/review sprite set
+  -> accept/select final direction sprites
+  -> optional Maps stage
+  -> create normal/depth maps from the accepted clean sprite images
+  -> show a 3-row review sheet: albedo / normal / depth
+  -> export game pack with albedo, normal, depth, manifest
+```
+
+Best near-term product shape:
+
+```text
+Review
+  -> Export
+     - Albedo only
+     - Albedo + Depth
+     - Albedo + Normal + Depth
+     - Godot pack
+```
+
+Do not block the core sprite generator on maps. Treat depth/normal generation as
+an optional export enhancement after the sprite image, cutout, crop, and
+pixelation stages are already accepted.
+
+Implemented model-backed slice:
+
+```text
+python -m foundry.cli derive-maps --subject <subject> --direction-count 8 --source cutout --backend depth_anything --sprite-size 96
+```
+
+Implementation file:
+
+```text
+/home/nymph/NymphsModules/nymphs-sprite/pipeline/nymphs_sprite_maps.py
+```
+
+Current backend:
+
+```text
+depth_anything
+```
+
+`depth_anything` is a ComfyUI-free real model path using Transformers depth
+estimation directly in Python.
+
+Supported backends:
+
+```text
+depth_anything -> LiheYoung/depth-anything-small-hf
+midas          -> Intel/dpt-hybrid-midas
+alpha_volume   -> explicit emergency/debug fallback only
+```
+
+The model-backed path:
+
+- reads pre-pixel cutout direction PNGs from the Nymphs Sprite output folder
+- composites transparent cutouts for the RGB-only depth model
+- generates depth with the selected model backend
+- normalizes depth over the foreground alpha only
+- derives a normal candidate from the depth gradient
+- writes `albedo/`, `depth/`, `normal/`, `map_review.png`, and `manifest.json`
+
+Model cache:
+
+```text
+$HOME/NymphsData/cache/huggingface
+```
+
+Model fetching:
+
+```text
+Details page -> Model Fetch -> Nymphs Sprite Map Models
+```
+
+Equivalent direct command:
+
+```text
+scripts/sprite_foundry_fetch_controlnet.sh --model nymphs_sprite_map_all
+```
+
+Fetch profiles:
+
+```text
+nymphs_sprite_map_all
+nymphs_sprite_map_depth_anything
+nymphs_sprite_map_midas
+```
+
+Validation on dev WSL:
+
+```text
+Depth Anything:
+/home/nymph/NymphsData/outputs/nymphs-sprite/goblin_scout/maps/20260612-162653/map_review.png
+
+MiDaS:
+/home/nymph/NymphsData/outputs/nymphs-sprite/goblin_scout/maps/20260612-162853/map_review.png
+```
+
+Current map-source decision:
+
+```text
+Maps should be derived after cutout/normalization and before pixelation.
+```
+
+Reason:
+
+- original Foundry uploaded high-resolution raw accepted images to ComfyUI
+  preprocessors first, then pixelated the resulting depth/normal maps down to
+  the sprite target
+- final 96px sprite PNGs have already thrown away detail, so they are a worse
+  source for depth/normal
+- raw generated images still include background and can be fully opaque, so
+  they are also a worse source until BRIA/RMBG is available
+- use pre-pixel cutouts now, and later replace the current simple keyer with
+  BRIA/RMBG for better cutout inputs
+- then crop/normalize/pixelate the generated maps to match the final albedo
+  sprite size
+- keep final map alignment strict: every `albedo/<direction>.png` must have
+  matching `normal/<direction>.png` and `depth/<direction>.png`
+
+### Future Texture/PBR Module Boundary
+
+There is a related but separate idea: a dedicated Nymphs texture/material module
+based on the kind of flow shown by:
+
+```text
+https://github.com/lovisdotio/fal-texture-pbr-generator
+```
+
+That repo is a PATINA/fal.ai-style PBR texture generator. Its README describes
+text-to-material and image-to-PBR workflows, real-time Three.js preview, and
+downloads for standard maps such as `BaseColor`, `Normal`, `Roughness`,
+`Metallic`, and `Height`.
+
+This should probably become a separate module, not extra weight inside Nymphs
+Sprite.
+
+Possible future module:
+
+```text
+Nymphs Texture
+  -> text or image input
+  -> PBR material maps
+  -> 3D preview
+  -> Substance/Blender/Unreal/Unity/Godot export
+```
+
+Relationship to Nymphs Sprite:
+
+- Nymphs Sprite owns character sprite sheets, Pose Lab, direction control,
+  sprite cutout, pixelation, and game-sprite export.
+- Nymphs Texture owns tileable materials, PBR maps, texture previews, and
+  material pack export.
+- A future bridge could let Sprite export albedo/normal/depth packs while
+  Texture handles richer PBR material generation for environments, props, and
+  surfaces.
+
+Keep the boundary clean. Sprite can have optional depth/normal export for game
+lighting, but full PBR material generation belongs in a separate texture module.
+
+Better shared-module framing:
+
+```text
+Nymphs Texture / Map Lab
+  -> shared map generation service for all modules
+  -> text-to-PBR materials
+  -> image-to-PBR extraction
+  -> normal/height/roughness/metallic/basecolor packs
+  -> map preview and export
+  -> callable from Sprite, Pixal3D, TripoSplat, TRELLIS, and future mesh modules
+```
+
+Useful parts from `fal-texture-pbr-generator`:
+
+- simple `/api/generate` pattern with `text` and `image` modes
+- map request list: `basecolor`, `normal`, `roughness`, `metalness`, `height`
+- result normalization into a stable map dictionary
+- live Three.js material preview
+- material sliders for displacement, normal intensity, metalness, roughness, and
+  environment/reflection strength
+- ZIP/export naming conventions for external tools
+
+Important distinction:
+
+```text
+PBR height map != always the same as character/object depth map
+```
+
+PBR height is usually surface relief or displacement for a material. Character
+depth is object-space or view-relative volume information for sprite/game
+lighting. They can both be useful, but Nymphs Sprite should not blindly treat a
+PATINA `height` map as a perfect Sprite `depth` map without testing.
+
+Good interception points:
+
+```text
+Sprite accepted albedo
+  -> Map Lab image-to-PBR
+  -> use normal/height candidates for lighting experiments
+  -> compare against old DepthAnything/MiDaS map stage
+
+Pixal3D/TRELLIS/TripoSplat mesh texture
+  -> Map Lab image-to-PBR or text-to-PBR
+  -> apply basecolor/normal/roughness/metallic/height to mesh materials
+
+World/prop/environment modules
+  -> Map Lab text-to-PBR
+  -> tileable material packs
+```
+
+Preferred architecture:
+
+```text
+Nymphs Texture / Map Lab owns PBR generation.
+Other modules call it as a service.
+Each caller decides how to use the maps.
+```
+
+This keeps Nymphs Sprite lean while still allowing Sprite to request better
+normal/depth/height candidates during export.
 
 ## Current Model And LoRA Handling
 
@@ -593,7 +1040,7 @@ Test in small slices.
 
 ## Immediate Next Implementation Order
 
-1. Test/update installed Nymphs Sprite `1.2.21` or newer in the `NymphsCore`
+1. Test/update installed Nymphs Sprite `1.2.29` or newer in the `NymphsCore`
    test WSL.
 2. Confirm status panel and LoRA dropdown are fixed after restart/update.
 3. Open Pose Lab, move points in one direction, switch slots, and confirm the
@@ -630,7 +1077,7 @@ Expected current status signs:
 
 ```text
 id=nymphs-sprite
-version=1.2.21 or newer
+version=1.2.29 or newer
 controlnet_ready=true
 models_ready=true
 lora_choices=...
@@ -648,7 +1095,7 @@ Current source-of-truth repos:
 
 Latest target module state:
 
-- Nymphs Sprite `1.2.21`
+- Nymphs Sprite `1.2.29`
 - Purpose: wire live Pose Lab JSON refs into Z-Image ControlNet generation.
 
 What changed in the latest working idea:
@@ -687,7 +1134,7 @@ Known untested / risky areas:
 
 Next best pickup steps:
 
-1. Update/install Nymphs Sprite `1.2.21+` on the `NymphsCore` test WSL.
+1. Update/install Nymphs Sprite `1.2.29+` on the `NymphsCore` test WSL.
 2. Open Pose Lab and confirm the bottom strip immediately shows all 8 slots.
 3. Switch to 16 directions and confirm all 16 live JSON slots appear.
 4. Click several strip slots and confirm the main editor changes direction.
@@ -759,7 +1206,7 @@ Patch direction for `1.2.22`:
 - Build the generate args from the actual selected LoRA dropdown option so the
   payload matches what the UI shows.
 - Keep normal txt2img guidance at `0.0`, but send ControlNet generations with
-  `controlnet_guidance_scale: 1.0`.
+  a stronger dedicated `controlnet_guidance_scale`.
 - Record `controlnet_guidance_scale` in `recipe.json`.
 
 Follow-up patch for `1.2.23`:
@@ -781,7 +1228,8 @@ Follow-up patch for `1.2.24`:
 - `1.2.22` added `--controlnet-guidance-scale` only to the pipeline parser, so
   the CLI-created `Namespace` lacked `controlnet_guidance_scale` and crashed
   before the garbled-output fix could be tested.
-- Added the missing CLI arg and a defensive runner default of `1.0`.
+- Added the missing CLI arg and a defensive runner default. This was later
+  raised to `4.0` during ControlNet noise testing.
 
 Next validation:
 
@@ -791,10 +1239,429 @@ Next validation:
 4. Confirm the new `recipe.json` uses the selected mks0813 LoRA path and
    `lora_trigger: pxlstl`.
 5. Confirm `controlnet_directions` contains all generated directions.
-6. Confirm `controlnet_guidance_scale` is `1.0`.
+6. Confirm `controlnet_guidance_scale` is `4.0`.
 7. If outputs are still unresolved noise, isolate with a no-LoRA direct
    `controlnet_edit` probe before blaming Pose Lab. If no-LoRA also produces
    noise, investigate the Z-Image ControlNet runtime/adaptation. If no-LoRA
    works, investigate LoRA + ControlNet interaction and scale.
 - A working 8-direction generator matters more than preserving every old
   Foundry feature.
+
+## Resume Checkpoint: 2026-06-12 ControlNet Noise Deep Dive
+
+The `1.2.24` crash fix got generation running again, but the next user test
+still produced full-frame blue/white/black checker-noise during
+`controlnet_edit`.
+
+Working assumption:
+
+- This is a ControlNet runtime/payload problem, not the pixelation stage.
+- The raw images are already corrupted before green-screen removal, crop, and
+  nearest-neighbor sprite resizing.
+- The old non-ControlNet Z-Image path worked, so do not chase general prompt or
+  LoRA availability first.
+
+Research findings:
+
+- The Z-Image Turbo ControlNet Union 2.1 2602 weight explicitly supports Pose,
+  Canny, Depth, MLSD, HED, Scribble, and Gray.
+- The model card says the 2.1 8-step family should use 8 inference steps and
+  a ControlNet/control-context strength in the `0.65-1.00` range.
+- Diffusers Z-Image guidance only enables classifier-free guidance when
+  `guidance_scale > 1`.
+- The official Z-Image-Fun ControlNet example uses a stronger guided setting
+  than our `1.0` default.
+- Classic ControlNet OpenPose maps are colored sticks/keypoints on black, so
+  the Pose Lab renderer should stay OpenPose-like for now. Monochrome refs are
+  a future Scribble/Canny experiment, not the default Pose path.
+
+Patch direction after the noisy `1.2.24` test:
+
+- Restore documented-ish ControlNet strength defaults:
+  `soft=0.65`, `normal=0.75`, `strong=0.90`.
+- Make ControlNet generation default to `controlnet_guidance_scale=4.0` while
+  leaving plain txt2img guidance at `0.0`.
+- Render Pose Lab refs as slimmer colored OpenPose-style lines, not huge neon
+  sticks and not monochrome Canny-like lines.
+- Save the exact temporary ControlNet ref PNGs as
+  `<direction>_control.png` beside the run outputs for debugging. These are not
+  the long-term preset storage format; Pose Lab sets remain JSON-first.
+- Add diagnostic flags:
+  `--controlnet-mode off`,
+  `--debug-no-lora`,
+  `--max-directions N`.
+
+Immediate test matrix:
+
+1. `txt2img + LoRA`, one direction:
+   `--controlnet-mode off --max-directions 1`
+2. `ControlNet without LoRA`, one direction:
+   `--debug-no-lora --max-directions 1`
+3. `ControlNet + selected LoRA`, one direction:
+   default mode, `--max-directions 1`
+
+Interpretation:
+
+- If test 1 works and test 2 is noise, the Z-Image/Nunchaku ControlNet runtime
+  or ControlNet weight integration is broken.
+- If tests 1 and 2 work but test 3 is noise, the problem is LoRA + ControlNet
+  interaction, probably LoRA merge/rank/scale in the Nunchaku ControlNet
+  pipeline.
+- If all three work at one direction but the full 8-way run fails, look at
+  backend state reuse, batch staging, or per-direction payload differences.
+
+## Probe Results: 2026-06-12
+
+Local dev probes were run against Z-Image foreground API with the Nunchaku
+environment sourced from `scripts/_zimage_common.sh`. Important: launching
+`api_server.py` directly without that environment starts the standard runtime
+and reports `supports_controlnet_edit: false`.
+
+Probe setup:
+
+- subject: `goblin_scout`
+- size: `512x512`
+- steps: `8`
+- direction: `front` only via `--max-directions 1`
+- diagnostic pose set:
+  `$HOME/NymphsData/outputs/nymphs-sprite/pose_lab/refs/goblin_scout/diagnostic-current/pose_set.json`
+
+Results:
+
+1. `txt2img + mks0813 LoRA`, no ControlNet:
+   `--controlnet-mode off`
+   produced a normal goblin scout image. This proves base Z-Image/Nunchaku +
+   LoRA generation is healthy.
+
+2. `ControlNet`, no LoRA:
+   `--debug-no-lora`
+   produced a non-noisy but blurry dark humanoid silhouette. This proves the
+   ControlNet path can return a real image without LoRA, but it also proves the
+   current Pose Lab ref is not being followed strongly enough for production.
+
+3. `ControlNet + mks0813 LoRA`:
+   `lora_scale=1.0`
+   produced full-frame checker/noise. This reproduces the user failure with the
+   selected mks0813 pixel-art LoRA.
+
+4. `ControlNet + SkyAsl LoRA`:
+   `lora_scale=1.0`
+   also produced full-frame checker/noise. This means the corruption is not
+   mks0813-specific. It is a general LoRA + Z-Image ControlNet/Nunchaku
+   interaction.
+
+5. `ControlNet + mks0813 LoRA`:
+   `lora_scale=0.25`
+   still produced full-frame checker/noise. This means the corruption is not
+   just a too-strong LoRA scale. Any active LoRA in this ControlNet/Nunchaku
+   path should be treated as unsafe until the backend merge path is fixed.
+
+6. `ControlNet with selected LoRA bypassed for the ControlNet payload`:
+   the user can still choose a LoRA in Nymphs Sprite, but the runner strips
+   `lora_path`/`lora_scale` only when it sends `mode=controlnet_edit`.
+   This produced a real non-noisy goblin image and the backend log confirmed
+   `lora=False` plus `wrapper.reset` before denoising.
+
+Split the bugs:
+
+- Bug A: LoRA + ControlNet corrupts image quality. This is likely in the
+  Nunchaku Z-Image ControlNet LoRA merge/deferred wrapper path, not in Pose Lab.
+  The temporary safety fix was to bypass LoRA only for `controlnet_edit` calls.
+  A later live dev test proved same-pass ControlNet + quantized Nunchaku LoRA
+  still corrupts output even after the backend LoRA sync patch.
+- Bug B: Pose obedience is weak even when ControlNet does not corrupt. This is
+  a separate control-image-format/strength problem. The current Pose Lab PNG is
+  transported correctly, but it is not proven to be the best format for this
+  Z-Image Union ControlNet.
+
+ControlNet + LoRA target behavior:
+
+- `controlnet_lora_mode` defaults to `staged`.
+- The first stage sends Pose Lab refs through `controlnet_edit` with LoRA
+  omitted. This avoids the proven Nunchaku checker-noise path.
+- The second stage sends the posed result through `img2img` with the selected
+  LoRA. This keeps the product goal: Pose Lab controls pose, LoRA controls
+  sprite style, but not in the same broken denoise call.
+- `--controlnet-lora-mode on` remains as a diagnostic for same-pass backend
+  development; currently it is known to produce checker/noise with the
+  quantized Nunchaku LoRA path.
+- `--controlnet-lora-mode off` is a no-LoRA diagnostic fallback.
+- `recipe.json` records `controlnet_lora_mode` and
+  `controlnet_lora_bypassed`, plus `lora_stage2_directions` when staged mode
+  runs the LoRA refinement pass.
+
+Next technical probes:
+
+1. Test `controlnet_conditioning_scale=1.0` no-LoRA to see if pose obedience
+   improves without introducing noise.
+2. Compare OpenPose-color refs against a simple Scribble/edge silhouette ref,
+   because this diffusers pipeline has no explicit `pose` mode flag; it
+   VAE-encodes the control PNG as visual context.
+3. Tune staged mode quality: `lora_img2img_strength`, prompt, green background,
+   and pose preservation.
+4. If same-pass backend work resumes, retest only with
+   `--controlnet-lora-mode on --max-directions 1` before touching the normal
+   product path.
+
+## Patch Checkpoint: 2026-06-12 Pose Lab Prompt Authority
+
+The next failure after the ControlNet noise split was simpler and important:
+the character prompts were fighting Pose Lab. For example, Goblin Scout asked
+for a "deep predatory crouch" while the active Pose Lab ref was upright. The
+negative prompt also blocked "standing upright", which directly punished the
+ref we were trying to follow.
+
+Current rule:
+
+```text
+When a Pose Lab ref is active, Pose Lab owns pose, stance, limb placement,
+silhouette, and direction. The character prompt owns identity, clothing,
+materials, palette, and readable sprite style.
+```
+
+Implemented fix:
+
+- `pipeline/foundry_gen_nymphscore.py` now sanitizes prompt clauses only when a
+  ControlNet/Pose Lab image is active.
+- The sanitizer removes pose/action/view clauses such as crouch, stance,
+  standing, leaning, hands, arms, feet, profile view, facing, and similar
+  control-conflict language.
+- The sanitizer keeps identity/style clauses such as goblin, hood, glowing
+  eyes, armor, cloak, material, color, and creature description.
+- The generated positive prompt now includes an explicit mandatory Pose Lab
+  control-reference instruction.
+- The generated negative prompt now blocks only "does not match the control
+  reference" style failures, instead of globally banning concrete poses that
+  the user may intentionally draw later.
+- `verify.sh` now has a Pose Lab prompt hygiene regression check.
+
+Example sanitized Goblin Scout identity prompt:
+
+```text
+solo, 1character, single character only, one figure, a goblin scout assassin,
+dark tattered hood pulled low over face hiding features except two glowing pale
+yellow eyes peering out, lean compact body wrapped in a dark grey-brown ragged
+cloak that breaks the body outline, mottled dark green skin barely visible
+under wrappings, dark cloth wraps around forearms and shins, fully visible full
+body
+```
+
+Local validation:
+
+- `bash -n scripts/sprite_foundry_generate.sh`: passed.
+- `python -m py_compile pipeline/foundry_gen_nymphscore.py foundry/cli.py`:
+  passed.
+- Z-Image backend touched files `model_manager.py` and `nunchaku_compat.py`:
+  passed `py_compile`.
+- `PYTHON_BIN=/home/nymph/Z-Image/.venv-nunchaku/bin/python bash verify.sh`:
+  passed, including the new prompt hygiene check.
+
+Backend note:
+
+- `/home/nymph/Z-Image/nunchaku_compat.py` was also patched to avoid replacing
+  Nunchaku's own modern `forward` method when that method already supports
+  `controlnet_block_samples` and `**kwargs`.
+- A diagnostic `ControlNet + LoRA` retest after that first patch still hung
+  after the backend request went quiet, with no fresh output written. That was
+  before the later backend LoRA synchronization fix below.
+
+Follow-up backend integration fix:
+
+- `/home/nymph/Z-Image/model_manager.py` had another likely ControlNet/LoRA
+  ordering bug.
+- The Nunchaku transformer is wrapped in `DeferredNunchakuLoraWrapper`, which
+  normally waits until `transformer.forward()` to apply/reset LoRA weights.
+- In `ZImageControlNetPipeline`, the ControlNet forward runs before the
+  transformer forward. That means ControlNet could produce
+  `controlnet_block_samples` from the old/no-LoRA transformer state, then the
+  transformer would suddenly apply LoRA on its own forward pass.
+- This mismatch was a real bug, but live testing later proved it was not the
+  whole checker-noise cause.
+- `model_manager.py` now forces the deferred wrapper to synchronize immediately
+  when configuring or resetting LoRA on a pipeline that has `controlnet`, so
+  ControlNet and the transformer see the same LoRA state before denoising.
+- Live dev WSL validation showed same-pass `controlnet_edit + LoRA` still
+  produces checker/noise.
+
+## Patch Checkpoint: 2026-06-12 Staged ControlNet + LoRA
+
+Dev WSL live testing narrowed the garble to Nunchaku's quantized Z-Image LoRA
+application during a ControlNet denoise pass:
+
+- Pose Lab `front_control.png` was clean OpenPose-style skeleton data.
+- `controlnet_edit` without LoRA produced a real goblin silhouette.
+- Same-pass `controlnet_edit` with mks0813 LoRA produced checker/noise even at
+  `controlnet_guidance_scale=1.0`.
+- Restarting the backend with
+  `NYMPHS_ZIMAGE_LORA_DISABLE_QUANTIZED=1` stopped the checker/noise. The log
+  changed from `updated_lora_modules: 136` to `updated_lora_modules: 0`.
+- That proves the corruptor is the quantized Nunchaku LoRA path inside the
+  same ControlNet denoise call. It also means that switch is not a product fix,
+  because it disables the LoRA effect.
+
+Working product path:
+
+```text
+Pose Lab JSON
+  -> temporary OpenPose PNG
+  -> Z-Image controlnet_edit with no LoRA
+  -> posed raw image
+  -> Z-Image img2img with selected LoRA
+  -> final raw sprite source
+  -> pixelate/export
+```
+
+Implemented behavior:
+
+- `--controlnet-lora-mode staged` is now the default.
+- `staged` saves `<direction>_pose_raw.png` for the first ControlNet stage.
+- Final `<direction>_raw.png` comes from the second LoRA img2img stage.
+- `--lora-img2img-strength` defaults to `0.45`.
+- `--controlnet-lora-mode on` still exists only for same-pass backend testing.
+- `--controlnet-lora-mode off` skips the LoRA refinement.
+
+Dev WSL validation:
+
+- One-direction staged Goblin Scout run completed.
+- Backend logs showed first call `mode=controlnet_edit lora=False`.
+- Backend logs showed second call `mode=img2img lora=True`, with the selected
+  mks0813 LoRA applied to 136 quantized modules.
+- Final output was not checker/noise. It is still soft and needs tuning, but
+  the catastrophic corruption is gone.
+
+Current generation stance at that checkpoint was staged-by-default. This was
+superseded by the same-pass backend fix below. Keep the staged path as a
+fallback/diagnostic, but do not treat it as the desired product flow.
+
+Docs/source anchors for the next resume:
+
+- Z-Image Turbo ControlNet Union 2.1 model card:
+  `https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union-2.1`
+- Diffusers Z-Image ControlNet pipeline docs:
+  `https://huggingface.co/docs/diffusers/main/en/api/pipelines/z_image`
+- VideoX-Fun native Z-Image ControlNet example:
+  `https://github.com/aigc-apps/VideoX-Fun/blob/main/examples/z_image_fun/predict_t2i_control_2.1.py`
+
+## Patch Checkpoint: 2026-06-12 Same-Pass Backend Garble Fix
+
+The checker/noise bug was not caused by Pose Lab PNG generation. It was caused
+by our Z-Image Nunchaku compatibility shim.
+
+Root cause:
+
+- Pose Lab refs rendered clean OpenPose-style PNGs.
+- ControlNet without LoRA produced a real image.
+- Same-pass ControlNet + quantized LoRA produced full-frame checker/noise.
+- Disabling quantized LoRA stopped the checker/noise, but also removed the
+  LoRA effect.
+- The compatibility shim in `nunchaku_compat.py` tried to keep packed low-rank
+  tensors inside the existing rank slot by truncating wider tensors:
+
+```python
+return tensor[:, :target_rank].contiguous()
+```
+
+That is invalid for packed Nunchaku low-rank tensors. The packed layout
+interleaves rank fragments, so slicing after packing can corrupt the base
+low-rank branch. This explains why the output looked like structured
+checker/noise instead of a normal bad image.
+
+Backend fix:
+
+- Patched both:
+  - `/home/nymph/NymphsModules/zimage/nunchaku_compat.py`
+  - `/home/nymph/Z-Image/nunchaku_compat.py`
+- Smaller tensors are still padded into the existing slot.
+- Larger packed tensors are no longer truncated; they are passed through so the
+  backend uses the real expanded packed LoRA tensor.
+- Same-pass ControlNet + LoRA is now the normal Sprite path again.
+
+Sprite behavior after fix:
+
+- `--controlnet-lora-mode` now defaults to `on`.
+- `on` means same-pass `controlnet_edit` with the selected LoRA applied.
+- `staged` remains available only as a fallback/diagnostic:
+  ControlNet first, then LoRA img2img.
+- `off` remains a no-LoRA diagnostic path.
+
+Live dev WSL validation:
+
+```text
+command:
+generate-nymphscore ... --max-directions 1 --controlnet-lora-mode on
+
+backend:
+runtime=nunchaku
+mode=controlnet_edit
+lora=True
+quantized_apply.updated_lora_modules=136
+
+result:
+/home/nymph/NymphsData/outputs/nymphs-sprite/goblin_scout/front_raw.png
+```
+
+The result was a clean green-background goblin image, not checker/noise. The
+mechanical gate still failed composition and the pose was soft/upright, so pose
+following remains a separate tuning problem.
+
+Next backend/frontend work:
+
+1. Tune Pose Lab control strength and prompt language for stronger pose
+   following now that same-pass generation is not corrupting tensors.
+2. Compare `guide_strength` values and `controlnet_guidance_scale` with
+   one-direction tests before running 8/16 directions.
+3. Keep the temporary ControlNet PNGs as diagnostics, but the real editable
+   source of truth remains Pose Lab JSON.
+4. Package the Z-Image backend fix so test WSL installs get the updated
+   `nunchaku_compat.py`.
+
+## Patch Checkpoint: 2026-06-12 Pose Following Defaults
+
+After the same-pass garble fix, Pose Lab was tested as a separate issue.
+
+Finding:
+
+- Pose Lab PNG rendering is valid.
+- Z-Image ControlNet follows a clean OpenPose-style ref when the ref is
+  visually strong.
+- Same-pass ControlNet + mks0813 LoRA also follows the ref after the packed
+  LoRA truncation bug was fixed.
+- The weak/ignored-pose behavior was mainly a defaults problem, especially
+  using high text CFG guidance during ControlNet generation.
+
+Reference note:
+
+- The local Diffusers `ZImageControlNetPipeline` example for Z-Image Turbo
+  ControlNet uses `guidance_scale=0.0`.
+- The Z-Image Turbo ControlNet Union 2.1 model card recommends control strength
+  in the `0.65-1.00` range.
+
+Implemented defaults:
+
+- `--controlnet-guidance-scale` now defaults to `0.0`.
+- `guide_strength_scale()` now maps:
+
+```text
+soft   -> 0.75
+normal -> 0.90
+strong -> 1.00
+```
+
+Validation run:
+
+1. Created a temporary diagnostic Pose Lab set with raised left arm and wide
+   legs.
+2. Ran one direction with `--debug-no-lora`, strong ref, CFG `0.0`.
+3. Output followed the pose.
+4. Ran one direction with mks0813 LoRA enabled using normal defaults.
+5. Output still followed the raised-arm/wide-stance pose and passed mechanical
+   gates.
+6. Removed the temporary diagnostic pose set afterward.
+
+Current stance:
+
+- If the output is clean but pose still feels soft, first try `Ref Strength:
+  Strong`.
+- Keep ControlNet guidance/CFG at `0.0` by default for Pose Lab runs.
+- Prompt text should describe identity/style, not limb placement; Pose Lab owns
+  limb placement.

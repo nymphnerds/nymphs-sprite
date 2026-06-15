@@ -38,11 +38,42 @@ echo "Checking CLI parser..."
 from foundry.cli import build_parser
 args = build_parser().parse_args(['generate-nymphscore', '--config', 'pipeline/chars/goblin_scout.json'])
 assert hasattr(args, 'controlnet_guidance_scale'), 'missing controlnet_guidance_scale'
-assert args.controlnet_guidance_scale == 1.0, args.controlnet_guidance_scale
-print('OK: generate-nymphscore args include controlnet guidance')
+assert args.controlnet_guidance_scale == 0.0, args.controlnet_guidance_scale
+assert hasattr(args, 'controlnet_lora_mode'), 'missing controlnet_lora_mode'
+assert args.controlnet_lora_mode == 'on', args.controlnet_lora_mode
+assert hasattr(args, 'lora_img2img_strength'), 'missing lora_img2img_strength'
+assert args.lora_img2img_strength == 0.45, args.lora_img2img_strength
+print('OK: generate-nymphscore args include same-pass ControlNet + LoRA defaults')
 " || { echo "FAIL: generate-nymphscore args"; FAIL=1; }
+"$PYTHON_BIN" -c "
+from foundry.cli import build_parser
+args = build_parser().parse_args(['derive-maps', '--subject', 'goblin_scout'])
+assert args.subject == 'goblin_scout'
+assert args.direction_count == 8
+assert args.source == 'cutout'
+assert args.backend == 'depth_anything'
+assert args.device == 'auto'
+assert args.sprite_size == 96
+assert args.detail_strength == 0.45
+print('OK: derive-maps CLI defaults use model-backed depth')
+" || { echo "FAIL: derive-maps args"; FAIL=1; }
 
-# 4. Export packs structure
+# 4. Pose Lab prompt hygiene
+echo "Checking Pose Lab prompt hygiene..."
+"$PYTHON_BIN" -c "
+from pipeline.foundry_gen_nymphscore import pose_safe_text
+
+sample = 'solo goblin, deep predatory crouch, dark hood, standing upright with hands at sides, glowing eyes'
+clean = pose_safe_text(sample)
+assert 'goblin' in clean
+assert 'dark hood' in clean
+assert 'glowing eyes' in clean
+for blocked in ('crouch', 'standing', 'hands at sides'):
+    assert blocked not in clean.lower(), clean
+print('OK: Pose Lab prompt sanitizer keeps identity and removes pose conflicts')
+" || { echo "FAIL: Pose Lab prompt sanitizer"; FAIL=1; }
+
+# 5. Export packs structure
 echo "Checking export packs..."
 PACK_COUNT=0
 PACK_ERRORS=0
@@ -81,7 +112,7 @@ else
     echo "  OK: all packs valid"
 fi
 
-# 5. Roster index
+# 6. Roster index
 echo "Checking roster index..."
 if [ -f "exports/roster_index.json" ]; then
     "$PYTHON_BIN" -c "
@@ -94,7 +125,7 @@ else
     echo "WARN: exports/roster_index.json not found (non-blocking)"
 fi
 
-# 6. Required files
+# 7. Required files
 echo "Checking required files..."
 for f in README.md LICENSE SECURITY.md; do
     if [ -f "$f" ]; then

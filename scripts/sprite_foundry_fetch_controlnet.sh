@@ -64,7 +64,16 @@ cache_size_bytes() {
 
 hf_repo_cache_dir() {
   local repo_id="$1"
-  printf '%s/models--%s\n' "${SPRITE_FOUNDRY_HF_CACHE_DIR}" "${repo_id//\//--}"
+  local repo_path="${repo_id//\//--}"
+  local direct="${SPRITE_FOUNDRY_HF_CACHE_DIR}/models--${repo_path}"
+  local hub="${SPRITE_FOUNDRY_HF_CACHE_DIR}/hub/models--${repo_path}"
+  if [[ -d "${direct}" ]]; then
+    printf '%s\n' "${direct}"
+  elif [[ -d "${hub}" ]]; then
+    printf '%s\n' "${hub}"
+  else
+    printf '%s\n' "${direct}"
+  fi
 }
 
 hf_repo_blob_bytes() {
@@ -188,6 +197,50 @@ PY
   run_with_hf_download_progress "Nymphs Sprite LoRA" "${repo_id}" download_lora
 }
 
+fetch_hf_model_snapshot() {
+  local profile="$1"
+  local repo_id="$2"
+
+  sprite_foundry_ensure_dirs
+  echo "model_fetch_plan=Nymphs Sprite map model ${profile}"
+  download_model_snapshot() {
+    "${python_bin}" - "${repo_id}" "${SPRITE_FOUNDRY_HF_CACHE_DIR}" "${SPRITE_FOUNDRY_HF_CACHE_DIR}/hub" <<'PY'
+from __future__ import annotations
+
+import os
+import sys
+from pathlib import Path
+
+try:
+    from huggingface_hub import snapshot_download
+except Exception as exc:
+    raise SystemExit(f"ERROR: huggingface_hub is required to fetch Nymphs Sprite map models: {exc}")
+
+repo_id, hf_home, hub_cache_dir = sys.argv[1:4]
+token = os.getenv("NYMPHS3D_HF_TOKEN") or os.getenv("HF_TOKEN") or None
+Path(hf_home).mkdir(parents=True, exist_ok=True)
+Path(hub_cache_dir).mkdir(parents=True, exist_ok=True)
+os.environ.setdefault("HF_HOME", hf_home)
+os.environ.setdefault("HUGGINGFACE_HUB_CACHE", hub_cache_dir)
+snapshot_path = Path(snapshot_download(repo_id=repo_id, cache_dir=hub_cache_dir, token=token))
+print(f"MODEL FETCH COMPLETE: model_path={snapshot_path}", flush=True)
+PY
+  }
+  run_with_hf_download_progress "Nymphs Sprite map model" "${repo_id}" download_model_snapshot
+}
+
+fetch_depth_anything() {
+  fetch_hf_model_snapshot \
+    "${SPRITE_FOUNDRY_MAP_DEPTH_ANYTHING_PROFILE}" \
+    "${SPRITE_FOUNDRY_DEPTH_ANYTHING_REPO}"
+}
+
+fetch_midas() {
+  fetch_hf_model_snapshot \
+    "${SPRITE_FOUNDRY_MAP_MIDAS_PROFILE}" \
+    "${SPRITE_FOUNDRY_MIDAS_REPO}"
+}
+
 fetch_mks0813() {
   fetch_lora \
     "${SPRITE_FOUNDRY_LORA_MKS0813_PROFILE}" \
@@ -220,6 +273,16 @@ case "${selected_model}" in
     fetch_mks0813
     fetch_skyasl
     fetch_tarn59
+    ;;
+  "${SPRITE_FOUNDRY_MAP_ALL_PROFILE}")
+    fetch_depth_anything
+    fetch_midas
+    ;;
+  "${SPRITE_FOUNDRY_MAP_DEPTH_ANYTHING_PROFILE}")
+    fetch_depth_anything
+    ;;
+  "${SPRITE_FOUNDRY_MAP_MIDAS_PROFILE}")
+    fetch_midas
     ;;
   "${SPRITE_FOUNDRY_CONTROLNET_PROFILE}")
     echo "Nymphs Sprite ControlNet fetch"

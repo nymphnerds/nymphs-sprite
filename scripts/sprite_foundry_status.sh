@@ -14,7 +14,10 @@ state="available"
 health="unavailable"
 detail="${SPRITE_FOUNDRY_MODULE_NAME} is not installed."
 controlnet_ready=false
-weight_profiles_available="${SPRITE_FOUNDRY_CONTROLNET_PROFILE},${SPRITE_FOUNDRY_LORA_MKS0813_PROFILE},${SPRITE_FOUNDRY_LORA_SKYASL_PROFILE},${SPRITE_FOUNDRY_LORA_TARN59_PROFILE}"
+map_depth_anything_ready=false
+map_midas_ready=false
+map_models_ready=false
+weight_profiles_available="${SPRITE_FOUNDRY_CONTROLNET_PROFILE},${SPRITE_FOUNDRY_LORA_MKS0813_PROFILE},${SPRITE_FOUNDRY_LORA_SKYASL_PROFILE},${SPRITE_FOUNDRY_LORA_TARN59_PROFILE},${SPRITE_FOUNDRY_MAP_DEPTH_ANYTHING_PROFILE},${SPRITE_FOUNDRY_MAP_MIDAS_PROFILE},${SPRITE_FOUNDRY_MAP_ALL_PROFILE}"
 weight_profiles_downloaded="none"
 weight_profiles_missing="${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"
 models_ready=false
@@ -41,6 +44,15 @@ selected_lora_scale="1"
 
 if sprite_foundry_controlnet_ready; then
   controlnet_ready=true
+fi
+if sprite_foundry_depth_anything_ready; then
+  map_depth_anything_ready=true
+fi
+if sprite_foundry_midas_ready; then
+  map_midas_ready=true
+fi
+if [[ "${map_depth_anything_ready}" == "true" && "${map_midas_ready}" == "true" ]]; then
+  map_models_ready=true
 fi
 
 lora_status="$(
@@ -186,6 +198,21 @@ case ",${downloaded_lora_profiles:-none}," in
   *,"${SPRITE_FOUNDRY_LORA_TARN59_PROFILE}",*) downloaded_fetch_profiles+=("${SPRITE_FOUNDRY_LORA_TARN59_PROFILE}") ;;
   *) missing_fetch_profiles+=("${SPRITE_FOUNDRY_LORA_TARN59_PROFILE}") ;;
 esac
+if [[ "${map_depth_anything_ready}" == "true" ]]; then
+  downloaded_fetch_profiles+=("${SPRITE_FOUNDRY_MAP_DEPTH_ANYTHING_PROFILE}")
+else
+  missing_fetch_profiles+=("${SPRITE_FOUNDRY_MAP_DEPTH_ANYTHING_PROFILE}")
+fi
+if [[ "${map_midas_ready}" == "true" ]]; then
+  downloaded_fetch_profiles+=("${SPRITE_FOUNDRY_MAP_MIDAS_PROFILE}")
+else
+  missing_fetch_profiles+=("${SPRITE_FOUNDRY_MAP_MIDAS_PROFILE}")
+fi
+if [[ "${map_models_ready}" == "true" ]]; then
+  downloaded_fetch_profiles+=("${SPRITE_FOUNDRY_MAP_ALL_PROFILE}")
+else
+  missing_fetch_profiles+=("${SPRITE_FOUNDRY_MAP_ALL_PROFILE}")
+fi
 if [[ ${#downloaded_fetch_profiles[@]} -gt 0 ]]; then
   weight_profiles_downloaded="$(IFS=,; printf '%s' "${downloaded_fetch_profiles[*]}")"
 else
@@ -301,6 +328,14 @@ printf 'zimage_url=%s\n' "${SPRITE_FOUNDRY_ZIMAGE_URL}"
 printf 'controlnet_ready=%s\n' "${controlnet_ready}"
 printf 'controlnet_profile=%s\n' "${SPRITE_FOUNDRY_CONTROLNET_PROFILE}"
 printf 'controlnet_weight=%s/%s\n' "${SPRITE_FOUNDRY_CONTROLNET_REPO}" "${SPRITE_FOUNDRY_CONTROLNET_FILE}"
+printf 'map_depth_anything_ready=%s\n' "${map_depth_anything_ready}"
+printf 'map_depth_anything_profile=%s\n' "${SPRITE_FOUNDRY_MAP_DEPTH_ANYTHING_PROFILE}"
+printf 'map_depth_anything_repo=%s\n' "${SPRITE_FOUNDRY_DEPTH_ANYTHING_REPO}"
+printf 'map_midas_ready=%s\n' "${map_midas_ready}"
+printf 'map_midas_profile=%s\n' "${SPRITE_FOUNDRY_MAP_MIDAS_PROFILE}"
+printf 'map_midas_repo=%s\n' "${SPRITE_FOUNDRY_MIDAS_REPO}"
+printf 'map_models_ready=%s\n' "${map_models_ready}"
+printf 'map_models_profile=%s\n' "${SPRITE_FOUNDRY_MAP_ALL_PROFILE}"
 printf 'models_ready=%s\n' "${models_ready}"
 printf 'weight_profile_selected=%s\n' "${SPRITE_FOUNDRY_STARTER_PROFILE}"
 printf 'weight_profiles_available=%s\n' "${weight_profiles_available}"

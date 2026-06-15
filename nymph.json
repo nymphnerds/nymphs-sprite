@@ -3,7 +3,7 @@
   "id": "nymphs-sprite",
   "name": "Nymphs Sprite",
   "short_name": "NS",
-  "version": "1.2.24",
+  "version": "1.2.29",
   "description": "Nymphs-native guided 8/16-direction game sprite generation, Pose Lab refs, review, lifecycle, and export.",
   "category": "image",
   "kind": "sprite",
@@ -102,6 +102,14 @@
           {
             "label": "Nymphs Image backend",
             "url": "https://github.com/nymphnerds/zimage"
+          },
+          {
+            "label": "Depth Anything map model",
+            "url": "https://huggingface.co/LiheYoung/depth-anything-small-hf"
+          },
+          {
+            "label": "MiDaS map model",
+            "url": "https://huggingface.co/Intel/dpt-hybrid-midas"
           }
         ],
         "fields": [
@@ -126,6 +134,21 @@
                 "label": "All Nymphs Sprite LoRAs",
                 "value": "nymphs_sprite_all_loras",
                 "description": "Fetch all bundled Z-Image pixel-art LoRA choices into the shared LoRA folder"
+              },
+              {
+                "label": "Nymphs Sprite Map Models",
+                "value": "nymphs_sprite_map_all",
+                "description": "Fetch Depth Anything and MiDaS for real depth/normal map export"
+              },
+              {
+                "label": "Depth Anything map model",
+                "value": "nymphs_sprite_map_depth_anything",
+                "description": "Recommended depth backend for Nymphs Sprite map export"
+              },
+              {
+                "label": "MiDaS map model",
+                "value": "nymphs_sprite_map_midas",
+                "description": "Alternative DPT/MiDaS depth backend for map comparison"
               },
               {
                 "label": "mks0813/z-image-turbo-pixel-art-lora",

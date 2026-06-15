@@ -20,6 +20,12 @@ nunchaku_rank=""
 nunchaku_precision=""
 direction_count="8"
 guide_strength="normal"
+controlnet_guidance_scale=""
+controlnet_mode=""
+controlnet_lora_mode=""
+lora_img2img_strength=""
+debug_no_lora="false"
+max_directions=""
 body_class=""
 depth_refs=""
 edge_refs=""
@@ -98,6 +104,30 @@ while [[ $# -gt 0 ]]; do
       ;;
     --guide-strength)
       guide_strength="$2"
+      shift 2
+      ;;
+    --controlnet-guidance-scale)
+      controlnet_guidance_scale="$2"
+      shift 2
+      ;;
+    --controlnet-mode)
+      controlnet_mode="$2"
+      shift 2
+      ;;
+    --controlnet-lora-mode)
+      controlnet_lora_mode="$2"
+      shift 2
+      ;;
+    --lora-img2img-strength)
+      lora_img2img_strength="$2"
+      shift 2
+      ;;
+    --debug-no-lora)
+      debug_no_lora="true"
+      shift
+      ;;
+    --max-directions)
+      max_directions="$2"
       shift 2
       ;;
     --subject-id)
@@ -277,6 +307,24 @@ case "${generation_path}" in
     if [[ -n "${nunchaku_precision}" ]]; then
       cmd+=(--nunchaku-precision "${nunchaku_precision}")
     fi
+    if [[ -n "${controlnet_guidance_scale}" ]]; then
+      cmd+=(--controlnet-guidance-scale "${controlnet_guidance_scale}")
+    fi
+    if [[ -n "${controlnet_mode}" ]]; then
+      cmd+=(--controlnet-mode "${controlnet_mode}")
+    fi
+    if [[ -n "${controlnet_lora_mode}" ]]; then
+      cmd+=(--controlnet-lora-mode "${controlnet_lora_mode}")
+    fi
+    if [[ -n "${lora_img2img_strength}" ]]; then
+      cmd+=(--lora-img2img-strength "${lora_img2img_strength}")
+    fi
+    if [[ "${debug_no_lora}" == "true" ]]; then
+      cmd+=(--debug-no-lora)
+    fi
+    if [[ -n "${max_directions}" ]]; then
+      cmd+=(--max-directions "${max_directions}")
+    fi
     ;;
   stack_a_v2)
     cmd=("${python_bin}" -m foundry.cli generate-stack-a-v2 --config "${config}")
@@ -308,6 +356,12 @@ cmd+=("${extra_args[@]}")
   printf 'run_at=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   printf 'generation_path=%s\n' "${generation_path}"
   printf 'config=%s\n' "${config}"
+  printf 'controlnet_guidance_scale=%s\n' "${controlnet_guidance_scale:-default}"
+  printf 'controlnet_mode=%s\n' "${controlnet_mode:-auto}"
+  printf 'controlnet_lora_mode=%s\n' "${controlnet_lora_mode:-on}"
+  printf 'lora_img2img_strength=%s\n' "${lora_img2img_strength:-0.45}"
+  printf 'debug_no_lora=%s\n' "${debug_no_lora}"
+  printf 'max_directions=%s\n' "${max_directions:-all}"
 } >> "${SPRITE_FOUNDRY_LOG_FILE}"
 
 exec "${cmd[@]}"

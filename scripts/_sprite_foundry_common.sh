@@ -25,8 +25,13 @@ SPRITE_FOUNDRY_LORA_MKS0813_PROFILE="nymphs_sprite_lora_mks0813_pixel_art"
 SPRITE_FOUNDRY_LORA_SKYASL_PROFILE="nymphs_sprite_lora_skyasl_pixel_artist"
 SPRITE_FOUNDRY_LORA_TARN59_PROFILE="nymphs_sprite_lora_tarn59_pixel_art"
 SPRITE_FOUNDRY_ALL_LORAS_PROFILE="nymphs_sprite_all_loras"
+SPRITE_FOUNDRY_MAP_DEPTH_ANYTHING_PROFILE="nymphs_sprite_map_depth_anything"
+SPRITE_FOUNDRY_MAP_MIDAS_PROFILE="nymphs_sprite_map_midas"
+SPRITE_FOUNDRY_MAP_ALL_PROFILE="nymphs_sprite_map_all"
 SPRITE_FOUNDRY_CONTROLNET_REPO="${SPRITE_FOUNDRY_CONTROLNET_REPO:-alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union-2.1}"
 SPRITE_FOUNDRY_CONTROLNET_FILE="${SPRITE_FOUNDRY_CONTROLNET_FILE:-Z-Image-Turbo-Fun-Controlnet-Union-2.1-2602-8steps.safetensors}"
+SPRITE_FOUNDRY_DEPTH_ANYTHING_REPO="${SPRITE_FOUNDRY_DEPTH_ANYTHING_REPO:-LiheYoung/depth-anything-small-hf}"
+SPRITE_FOUNDRY_MIDAS_REPO="${SPRITE_FOUNDRY_MIDAS_REPO:-Intel/dpt-hybrid-midas}"
 
 export NYMPHS_DATA_ROOT
 
@@ -153,20 +158,57 @@ sprite_foundry_start_zimage_backend() {
 sprite_foundry_repo_cache_dir() {
   local repo_id="$1"
   local repo_path="${repo_id//\//--}"
-  printf '%s/models--%s\n' "${SPRITE_FOUNDRY_HF_CACHE_DIR}" "${repo_path}"
+  local direct="${SPRITE_FOUNDRY_HF_CACHE_DIR}/models--${repo_path}"
+  local hub="${SPRITE_FOUNDRY_HF_CACHE_DIR}/hub/models--${repo_path}"
+  if [[ -d "${direct}" ]]; then
+    printf '%s\n' "${direct}"
+  elif [[ -d "${hub}" ]]; then
+    printf '%s\n' "${hub}"
+  else
+    printf '%s\n' "${direct}"
+  fi
 }
 
 sprite_foundry_cached_file_path() {
   local repo_id="$1"
   local filename="$2"
+  local repo_path="${repo_id//\//--}"
   local cache_dir
-  cache_dir="$(sprite_foundry_repo_cache_dir "${repo_id}")"
-  if [[ ! -d "${cache_dir}/snapshots" ]]; then
-    return 1
-  fi
-  find -L "${cache_dir}/snapshots" -mindepth 2 -maxdepth 2 -type f -name "${filename}" -print -quit 2>/dev/null
+  for cache_dir in \
+    "${SPRITE_FOUNDRY_HF_CACHE_DIR}/models--${repo_path}" \
+    "${SPRITE_FOUNDRY_HF_CACHE_DIR}/hub/models--${repo_path}"; do
+    [[ -d "${cache_dir}/snapshots" ]] || continue
+    find -L "${cache_dir}/snapshots" -mindepth 2 -maxdepth 2 -type f -name "${filename}" -print -quit 2>/dev/null
+  done | head -n 1
 }
 
 sprite_foundry_controlnet_ready() {
   [[ -n "$(sprite_foundry_cached_file_path "${SPRITE_FOUNDRY_CONTROLNET_REPO}" "${SPRITE_FOUNDRY_CONTROLNET_FILE}" || true)" ]]
+}
+
+sprite_foundry_hf_repo_ready() {
+  local repo_id="$1"
+  local repo_path="${repo_id//\//--}"
+  local cache_dir
+  local snapshot
+  for cache_dir in \
+    "${SPRITE_FOUNDRY_HF_CACHE_DIR}/models--${repo_path}" \
+    "${SPRITE_FOUNDRY_HF_CACHE_DIR}/hub/models--${repo_path}"; do
+    [[ -d "${cache_dir}/snapshots" ]] || continue
+    while IFS= read -r snapshot; do
+      [[ -f "${snapshot}/config.json" ]] || continue
+      if find -L "${snapshot}" -maxdepth 2 -type f \( -name '*.safetensors' -o -name 'pytorch_model.bin' \) -print -quit 2>/dev/null | grep -q .; then
+        return 0
+      fi
+    done < <(find -L "${cache_dir}/snapshots" -mindepth 1 -maxdepth 1 -type d -print 2>/dev/null)
+  done
+  return 1
+}
+
+sprite_foundry_depth_anything_ready() {
+  sprite_foundry_hf_repo_ready "${SPRITE_FOUNDRY_DEPTH_ANYTHING_REPO}"
+}
+
+sprite_foundry_midas_ready() {
+  sprite_foundry_hf_repo_ready "${SPRITE_FOUNDRY_MIDAS_REPO}"
 }

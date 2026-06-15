@@ -148,6 +148,58 @@ generation. `Recent` is useful as a fallback, but it gets noisy fast.
 Package the accepted set for downstream game engines. Godot-friendly packaging,
 depth maps, and normal maps are planned as part of the production export path.
 
+### Maps
+
+Nymphs Sprite has a ComfyUI-free, model-backed map stage:
+
+```bash
+python -m foundry.cli derive-maps --subject goblin_scout --direction-count 8 --source cutout --backend depth_anything --sprite-size 96
+```
+
+The default backend is `depth_anything`, using Transformers depth estimation
+directly in Python. `--backend midas` is also available. Both paths generate
+depth from the pre-pixel cutout, then derive a normal map from that depth.
+`--backend alpha_volume` exists only as an emergency/debug fallback.
+
+The preferred source is `cutout`: the generated image after background removal
+and square normalization, but before final sprite pixelation. That mirrors the
+old Foundry idea: derive maps from the highest-detail accepted image, then
+resize/pixelate albedo/depth/normal together so they stay aligned.
+
+The model weights use the shared Nymphs Hugging Face cache:
+
+```text
+$HOME/NymphsData/cache/huggingface
+```
+
+Fetch the map weights from the module Details page with `Nymphs Sprite Map
+Models`, or fetch them directly:
+
+```bash
+scripts/sprite_foundry_fetch_controlnet.sh --model nymphs_sprite_map_all
+```
+
+Individual fetch profiles are also available:
+
+```text
+nymphs_sprite_map_depth_anything
+nymphs_sprite_map_midas
+```
+
+Outputs are written under the subject folder:
+
+```text
+$HOME/NymphsData/outputs/nymphs-sprite/<subject>/maps/<timestamp>/
+├── albedo/
+├── depth/
+├── normal/
+├── map_review.png
+└── manifest.json
+```
+
+Later this same map lane can add PATINA, BRIA-cutout inputs, or a shared Nymphs
+Texture / Map Lab backend.
+
 ## What We Kept From Sprite Foundry
 
 Sprite Foundry had a lot of useful machinery mixed with a lot of experimental

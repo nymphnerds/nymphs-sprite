@@ -36,7 +36,7 @@ REVIEW_TYPES = ["mechanical", "raw_source", "pixel", "finish"]
 REVIEW_DECISIONS = ["pass", "fail", "accept", "reject", "needs_regen"]
 
 ARTIFACT_KINDS = [
-    "raw", "pixel",
+    "raw", "cutout", "pixel",
     "normal_raw", "normal",
     "depth_raw", "depth",
     "contact_sheet", "raw_inspection",

@@ -2013,6 +2013,31 @@ def cmd_generate_nymphscore(args):
     foundry_gen_nymphscore.generate_and_register(config, args)
 
 
+# -- foundry derive-maps --------------------------------------
+
+def cmd_derive_maps(args):
+    """Derive local depth/normal map candidates from Nymphs Sprite outputs."""
+    from pipeline import nymphs_sprite_maps
+
+    result = nymphs_sprite_maps.derive_maps(
+        subject=args.subject,
+        input_dir=args.input_dir,
+        output_dir=args.output_dir,
+        direction_count=args.direction_count,
+        source=args.source,
+        backend=args.backend,
+        model_id=args.model_id,
+        device=args.device,
+        sprite_size=args.sprite_size,
+        normal_strength=args.normal_strength,
+        detail_strength=args.detail_strength,
+    )
+    print(f"Map stage complete: {result['count']} directions")
+    print(f"Output: {result['root']}")
+    print(f"Review: {result['review']}")
+    print(f"Manifest: {result['manifest']}")
+
+
 # -- foundry generate-stack-a-v2 ------------------------------
 
 def cmd_generate_stack_a_v2(args):
@@ -2147,7 +2172,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--height", type=int, default=1024)
     p.add_argument("--steps", type=int, default=9)
     p.add_argument("--guidance-scale", type=float, default=0.0)
-    p.add_argument("--controlnet-guidance-scale", type=float, default=1.0)
+    p.add_argument("--controlnet-guidance-scale", type=float, default=0.0)
+    p.add_argument("--controlnet-mode", default="auto", choices=["auto", "off"])
+    p.add_argument("--controlnet-lora-mode", default="on", choices=["on", "staged", "off"], help="on uses same-pass ControlNet + LoRA; staged runs ControlNet first, then LoRA img2img")
+    p.add_argument("--lora-img2img-strength", type=float, default=0.45, help="Strength for optional staged LoRA img2img refinement after Pose Lab ControlNet")
+    p.add_argument("--debug-no-lora", action="store_true", help="Diagnostic: run without LoRA to isolate ControlNet from LoRA merging")
+    p.add_argument("--max-directions", type=int, default=0, help="Diagnostic: generate only the first N directions")
     p.add_argument("--nunchaku-rank", type=int, default=32)
     p.add_argument("--nunchaku-precision", default="auto", choices=["auto", "int4", "fp4"])
     p.add_argument("--sprite-size", type=int, default=96)
@@ -2159,6 +2189,20 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--green-screen", dest="no_green_screen", action="store_false", default=False)
     p.add_argument("--no-green-screen", dest="no_green_screen", action="store_true")
     p.add_argument("--no-check", action="store_true", help="Skip immediate Foundry mechanical gates")
+
+    # derive-maps
+    p = sub.add_parser("derive-maps", help="Derive local depth/normal map candidates from Sprite outputs")
+    p.add_argument("--subject", required=True, help="Subject/output folder name")
+    p.add_argument("--input-dir", type=Path, help="Override subject output folder")
+    p.add_argument("--output-dir", type=Path, help="Override map output folder")
+    p.add_argument("--direction-count", type=int, default=8, choices=[8, 16])
+    p.add_argument("--source", choices=["cutout", "processed", "raw"], default="cutout")
+    p.add_argument("--backend", choices=["depth_anything", "midas", "alpha_volume"], default="depth_anything")
+    p.add_argument("--model-id", help="Override the default depth model for the selected backend")
+    p.add_argument("--device", choices=["auto", "cuda", "cpu"], default="auto")
+    p.add_argument("--sprite-size", type=int, default=96)
+    p.add_argument("--normal-strength", type=float, default=3.0)
+    p.add_argument("--detail-strength", type=float, default=0.45, help="Only used by --backend alpha_volume")
 
     # generate-stack-a-v2
     p = sub.add_parser("generate-stack-a-v2", help="Generate the original Stack A v2 8-direction Foundry run")
@@ -2291,6 +2335,7 @@ def main():
         "register-run": cmd_register_run,
         "register-attempt": cmd_register_attempt,
         "generate-nymphscore": cmd_generate_nymphscore,
+        "derive-maps": cmd_derive_maps,
         "generate-stack-a-v2": cmd_generate_stack_a_v2,
         "generate-morph": cmd_generate_morph,
         "generate-turnaround": cmd_generate_turnaround,
