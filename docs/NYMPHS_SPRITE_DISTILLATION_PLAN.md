@@ -57,7 +57,7 @@ clear reason to inspect files directly.
 Current published module version:
 
 ```text
-Nymphs Sprite 1.2.32
+Nymphs Sprite 1.2.33
 ```
 
 Current module identity:
@@ -124,6 +124,7 @@ Sidebar order:
 3. Style
 4. Generate
    [collapsed] Optional Outputs
+     [x] Pixelated final sprites
      [ ] Depth/normal maps
      Map Backend: Depth Anything / MiDaS
      Map Source: Pre-pixel cutout / Final sprite / Raw image
@@ -256,8 +257,8 @@ For every selected direction:
 7. Remove background with simple keyer           [Sprite Python + Pillow]
 8. Crop visible alpha to square                  [Sprite Python + Pillow]
 9. Save pre-pixel cutout to `_intermediate/`     [Sprite Python + Pillow]
-10. Pixelate to sprite size                      [Sprite Python + Pillow]
-11. Save processed direction PNG                 [Sprite Python]
+10. Optional: pixelate to sprite size            [Sprite Python + Pillow]
+11. Save final direction PNG                     [Sprite Python]
 12. Move to next direction                       [Sprite Python]
 ```
 
@@ -286,6 +287,27 @@ Processed direction output is saved to:
 ```text
 $HOME/NymphsData/outputs/nymphs-sprite/<subject>/<direction>.png
 ```
+
+Important output distinction:
+
+```text
+<direction>_raw.png
+  Direct Z-Image result. Use this to judge generation, ControlNet, LoRA,
+  prompt, and pose following.
+
+_intermediate/<direction>_cutout.png
+  Raw image after Nymphs Sprite background keying, crop, and square normalize.
+  Use this to judge cutout/crop quality before sprite crunching.
+
+<direction>.png
+  Final visible output in the UI strip. If "Pixelated final sprites" is on,
+  this is resized to Sprite Size with nearest-neighbor. If it is off, this is
+  the normalized cutout saved as the final output.
+```
+
+Pixelation is optional because it can make a weak raw image look much worse in
+the preview. Untick it while debugging generation, pose following, or
+background removal. Turn it back on when judging actual game-sprite scale.
 
 Pre-pixel cutout output is saved to:
 
@@ -1089,7 +1111,7 @@ Test in small slices.
 
 ## Immediate Next Implementation Order
 
-1. Test/update installed Nymphs Sprite `1.2.32` or newer in the `NymphsCore`
+1. Test/update installed Nymphs Sprite `1.2.33` or newer in the `NymphsCore`
    test WSL.
 2. Confirm status panel and LoRA dropdown are fixed after restart/update.
 3. Open Pose Lab, move points in one direction, switch slots, and confirm the
@@ -1126,7 +1148,7 @@ Expected current status signs:
 
 ```text
 id=nymphs-sprite
-version=1.2.32 or newer
+version=1.2.33 or newer
 controlnet_ready=true
 models_ready=true
 lora_choices=...
@@ -1144,7 +1166,7 @@ Current source-of-truth repos:
 
 Latest target module state:
 
-- Nymphs Sprite `1.2.32`
+- Nymphs Sprite `1.2.33`
 - Purpose: wire live Pose Lab JSON refs into Z-Image ControlNet generation.
 
 What changed in the latest working idea:
@@ -1183,7 +1205,7 @@ Known untested / risky areas:
 
 Next best pickup steps:
 
-1. Update/install Nymphs Sprite `1.2.32+` on the `NymphsCore` test WSL.
+1. Update/install Nymphs Sprite `1.2.33+` on the `NymphsCore` test WSL.
 2. Open Pose Lab and confirm the bottom strip immediately shows all 8 slots.
 3. Switch to 16 directions and confirm all 16 live JSON slots appear.
 4. Click several strip slots and confirm the main editor changes direction.
@@ -1619,7 +1641,7 @@ Backend attempt:
 - Same-pass ControlNet + LoRA was restored as the intended product path after
   the Z-Image `0.1.114` packed-LoRA compatibility fix. If checker/noise appears
   again, first confirm the test WSL has both Nymphs Image `0.1.114+` and Nymphs
-  Sprite `1.2.32+` installed.
+  Sprite `1.2.33+` installed.
 
 Current Sprite behavior after the 2026-06-15 cleanup:
 
@@ -1648,7 +1670,7 @@ result:
 That installed-runtime result is now treated as stale/mismatched-runtime
 evidence, not the current product stance. Normal generation should stay
 same-pass unless a fresh test on Nymphs Image `0.1.114+` and Nymphs Sprite
-`1.2.32+` proves otherwise.
+`1.2.33+` proves otherwise.
 
 Next backend/frontend work:
 

@@ -958,6 +958,10 @@
           <summary>Optional Outputs</summary>
           <p class="flow-note">Extra assets created from this sprite run.</p>
           <label class="check-row">
+            <input id="pixelate-output" type="checkbox" checked>
+            <span>Pixelated final sprites</span>
+          </label>
+          <label class="check-row">
             <input id="generate-maps" type="checkbox">
             <span>Depth/normal maps</span>
           </label>
@@ -1482,7 +1486,7 @@
         setProgress("Generate", line, 65);
       } else if (line.startsWith("sprite_contact_sheet=")) {
         setProgress("Done", "Contact sheet ready.", 100);
-      } else if (line.includes("Raw inspection:") || line.includes("Pixel contact:")) {
+      } else if (line.includes("Raw inspection:") || line.includes("Pixel contact:") || line.includes("Final contact:")) {
         setProgress("Done", "Contact sheet ready.", 98);
       } else if (line.includes("GENERATION COMPLETE")) {
         setProgress("Done", "Foundry run ready.", 100);
@@ -2174,6 +2178,9 @@
         args["generate-maps"] = "true";
         args["map-backend"] = value("map-backend") || "depth_anything";
         args["map-source"] = value("map-source") || "cutout";
+      }
+      if (!$("pixelate-output")?.checked) {
+        args["no-pixelate"] = "true";
       }
       addEncodedArg(args, "subject-prompt", value("subject-prompt"));
       addEncodedArg(args, "negative-prompt", value("negative-prompt"));

@@ -606,6 +606,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
     controlnet_scale = guide_strength_scale(args.guide_strength)
     controlnet_guidance_scale = getattr(args, "controlnet_guidance_scale", 0.0)
     controlnet_lora_mode = getattr(args, "controlnet_lora_mode", "on")
+    pixelate_output = not bool(getattr(args, "no_pixelate", False))
 
     for index, (direction_name, direction_prompt) in enumerate(directions, start=1):
         item_seed = seed + (index - 1) * args.seed_step
@@ -694,13 +695,13 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
         )
         cutout_path = intermediate_dir / f"{direction_name}_cutout.png"
         cutout_img.save(cutout_path, "PNG")
-        pixel_img = pixelate(
-            cutout_img,
-            args.sprite_size,
-            args.palette_colors,
+        final_img = (
+            pixelate(cutout_img, args.sprite_size, args.palette_colors)
+            if pixelate_output
+            else cutout_img
         )
         pixel_path = out_dir / f"{direction_name}.png"
-        pixel_img.save(pixel_path, "PNG")
+        final_img.save(pixel_path, "PNG")
 
         raw_paths[direction_name] = raw_path
         cutout_paths[direction_name] = cutout_path
@@ -727,7 +728,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
         preview_cell_size=args.preview_cell_size,
     )
     print(f"\n  Raw inspection: {raw_sheet}")
-    print(f"  Pixel contact:  {pixel_sheet}")
+    print(f"  Final contact:  {pixel_sheet}")
 
     recipe = {
         "stack": "NymphScore_ZImage",
@@ -739,7 +740,8 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
         "steps": args.steps,
         "guidance_scale": args.guidance_scale,
         "gen_size": f"{args.width}x{args.height}",
-        "pixelate": args.sprite_size,
+        "pixelate": args.sprite_size if pixelate_output else False,
+        "pixelate_enabled": pixelate_output,
         "seed": seed,
         "seed_step": args.seed_step,
         "direction_count": len(directions),
@@ -767,6 +769,7 @@ def generate_and_register(config: dict[str, Any], args: argparse.Namespace) -> s
                 "seed": seed,
                 "gen_size": f"{args.width}x{args.height}",
                 "sprite_size": args.sprite_size,
+                "pixelate_enabled": pixelate_output,
                 "timestamp": ts,
                 "directions": generated_dirs,
                 "direction_seeds": direction_seeds,
@@ -857,6 +860,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--nunchaku-precision", default="auto", choices=["auto", "int4", "fp4"])
     parser.add_argument("--sprite-size", type=int, default=96)
     parser.add_argument("--palette-colors", type=int, default=0)
+    parser.add_argument("--no-pixelate", action="store_true", help="Save normalized cutouts as final direction PNGs instead of pixelating to sprite size")
     parser.add_argument("--bg-tolerance", type=int, default=35)
     parser.add_argument("--crop-padding", type=float, default=0.08)
     parser.add_argument("--raw-cell-size", type=int, default=192)

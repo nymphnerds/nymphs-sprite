@@ -2182,6 +2182,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--nunchaku-precision", default="auto", choices=["auto", "int4", "fp4"])
     p.add_argument("--sprite-size", type=int, default=96)
     p.add_argument("--palette-colors", type=int, default=0)
+    p.add_argument("--no-pixelate", action="store_true", help="Save normalized cutouts as final direction PNGs instead of pixelating to sprite size")
     p.add_argument("--bg-tolerance", type=int, default=35)
     p.add_argument("--crop-padding", type=float, default=0.08)
     p.add_argument("--raw-cell-size", type=int, default=192)
